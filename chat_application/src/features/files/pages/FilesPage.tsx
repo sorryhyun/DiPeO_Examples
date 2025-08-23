@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { filesService } from '../../../services/endpoints/files';
-import { FileUploader } from '../../../shared/components/molecules/FileUploader';
-import { Button } from '../../../shared/components/atoms/Button';
-import { Input } from '../../../shared/components/atoms/Input';
-import { Spinner } from '../../../shared/components/atoms/Spinner';
-import { Icon } from '../../../shared/components/atoms/Icon';
+import { listFiles } from '../../../services/endpoints/files';
+import FileUploader from '../../../shared/components/molecules/FileUploader';
+import Button from '../../../shared/components/atoms/Button';
+import Input from '../../../shared/components/atoms/Input';
+import Spinner from '../../../shared/components/atoms/Spinner';
+import Icon from '../../../shared/components/atoms/Icon';
 import { formatDate } from '../../../utils/formatDate';
 import type { FileMeta } from '../../../types';
 
@@ -21,7 +21,7 @@ const FilesPage: React.FC = () => {
     error
   } = useQuery({
     queryKey: ['files'],
-    queryFn: filesService.listFiles
+    queryFn: () => listFiles()
   });
 
   const handleUploadSuccess = () => {
@@ -156,7 +156,7 @@ const FilesPage: React.FC = () => {
                         </div>
                         <div className="flex gap-2 mt-3">
                           <Button
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             onClick={() => window.open(file.url, '_blank')}
                           >
@@ -164,7 +164,7 @@ const FilesPage: React.FC = () => {
                             View
                           </Button>
                           <Button
-                            variant="outline"
+                            variant="secondary"
                             size="sm"
                             onClick={() => {
                               const link = document.createElement('a');

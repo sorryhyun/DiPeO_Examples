@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface EmojiPickerProps {
-  onSelect: (emoji: string) => void;
+  onSelect?: (emoji: string) => void;
+  onEmojiSelect?: (emoji: string) => void;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -20,7 +22,7 @@ const EMOJI_LIST = [
   { emoji: '🚀', label: 'rocket' }
 ];
 
-export default function EmojiPicker({ onSelect, className = '' }: EmojiPickerProps) {
+export default function EmojiPicker({ onSelect, onEmojiSelect, onClose, className = '' }: EmojiPickerProps) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -54,7 +56,8 @@ export default function EmojiPicker({ onSelect, className = '' }: EmojiPickerPro
       case 'Enter':
       case ' ':
         event.preventDefault();
-        onSelect(EMOJI_LIST[index].emoji);
+        onSelect?.(EMOJI_LIST[index].emoji);
+        onEmojiSelect?.(EMOJI_LIST[index].emoji);
         return;
       default:
         return;
@@ -65,7 +68,8 @@ export default function EmojiPicker({ onSelect, className = '' }: EmojiPickerPro
   };
 
   const handleClick = (emoji: string) => {
-    onSelect(emoji);
+    onSelect?.(emoji);
+    onEmojiSelect?.(emoji);
   };
 
   const handleFocus = (index: number) => {

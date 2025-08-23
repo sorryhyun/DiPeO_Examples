@@ -16,6 +16,9 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 interface RequestOptions {
   getAuthToken?: () => string | null;
+  headers?: Record<string, string>;
+  params?: Record<string, any>;
+  onUploadProgress?: (progressEvent: any) => void;
 }
 
 class ApiClient {

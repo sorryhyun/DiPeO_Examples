@@ -17,6 +17,4 @@ export const devConfig: DevConfig = {
   use_localstorage_persistence: true,
 };
 
-export const isDev = process.env.NODE_ENV === 'development';
-
-export type { DevConfig };
+export const isDev = (globalThis as any).process?.env?.NODE_ENV === 'development' || false;

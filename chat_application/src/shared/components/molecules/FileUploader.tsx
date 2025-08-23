@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { uploadFile } from '../../services/endpoints/files';
-import { Button } from '../atoms/Button';
-import { Icon } from '../atoms/Icon';
-import { Spinner } from '../atoms/Spinner';
+import { uploadFile } from '../../../services/endpoints/files';
+import Button from '../atoms/Button';
+import Icon from '../atoms/Icon';
+import Spinner from '../atoms/Spinner';
 
 interface FileUploadState {
   file: File;
@@ -20,7 +20,12 @@ interface FileMeta {
 }
 
 interface FileUploaderProps {
-  onUpload: (fileMeta: FileMeta) => void;
+  onUpload?: (fileMeta: FileMeta) => void;
+  onUploadSuccess?: () => void;
+  onError?: (error: any) => void;
+  onFilesSelected?: (files: File[]) => void;
+  disabled?: boolean;
+  channelId?: string;
   accept?: string;
   multiple?: boolean;
   maxSize?: number;
@@ -29,6 +34,11 @@ interface FileUploaderProps {
 
 export default function FileUploader({
   onUpload,
+  onUploadSuccess,
+  onError,
+  onFilesSelected,
+  disabled = false,
+  channelId,
   accept = '*/*',
   multiple = true,
   maxSize = 10 * 1024 * 1024, // 10MB
@@ -78,7 +88,8 @@ export default function FileUploader({
         );
       }, 200);
 
-      const fileMeta = await uploadFile(file);
+      const result = await uploadFile(file, { channelId });
+      const fileMeta = result.file;
 
       clearInterval(progressInterval);
 
@@ -91,8 +102,9 @@ export default function FileUploader({
         )
       );
 
-      // Call onUpload callback
-      onUpload(fileMeta);
+      // Call callbacks
+      onUpload?.(fileMeta);
+      onUploadSuccess?.();
 
       // Remove from upload states after a delay
       setTimeout(() => {
@@ -106,21 +118,29 @@ export default function FileUploader({
         )
       );
       console.error('Upload failed:', error);
+      onError?.(error);
     }
-  }, [onUpload]);
+  }, [onUpload, onUploadSuccess, onError, channelId]);
 
   const handleFiles = useCallback((files: FileList | null) => {
     if (!files) return;
 
+    const validFiles: File[] = [];
     Array.from(files).forEach(file => {
       const error = validateFile(file);
       if (error) {
         console.error(`File validation failed for ${file.name}: ${error}`);
         return;
       }
+      validFiles.push(file);
       handleFileUpload(file);
     });
-  }, [handleFileUpload]);
+
+    // Call onFilesSelected with valid files
+    if (validFiles.length > 0 && onFilesSelected) {
+      onFilesSelected(validFiles);
+    }
+  }, [handleFileUpload, onFilesSelected]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFiles(e.target.files);
@@ -189,29 +209,32 @@ export default function FileUploader({
       {/* Drop Zone */}
       <div
         className={`
-          relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer
-          transition-colors duration-200 focus-within:outline-none focus-within:ring-2 
-          focus-within:ring-blue-500 focus-within:border-transparent
-          ${isDragOver
+          relative border-2 border-dashed rounded-lg p-6 text-center transition-colors duration-200 
+          ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
+          ${!disabled && 'focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent'}
+          ${!disabled && isDragOver
             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+            : 'border-gray-300 dark:border-gray-600'
           }
+          ${!disabled && !isDragOver && 'hover:border-gray-400 dark:hover:border-gray-500'}
         `}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
+        onDragEnter={disabled ? undefined : handleDragEnter}
+        onDragLeave={disabled ? undefined : handleDragLeave}
+        onDragOver={disabled ? undefined : handleDragOver}
+        onDrop={disabled ? undefined : handleDrop}
+        onClick={disabled ? undefined : handleClick}
+        onKeyDown={disabled ? undefined : handleKeyDown}
+        tabIndex={disabled ? -1 : 0}
         role="button"
-        aria-label="Upload files"
+        aria-label={disabled ? "Upload files (disabled)" : "Upload files"}
+        aria-disabled={disabled}
       >
         <input
           ref={fileInputRef}
           type="file"
           accept={accept}
           multiple={multiple}
+          disabled={disabled}
           onChange={handleInputChange}
           className="sr-only"
           aria-hidden="true"
@@ -246,7 +269,7 @@ export default function FileUploader({
             >
               <div className="flex items-center space-x-3 flex-1 min-w-0">
                 <div className="flex-shrink-0">
-                  {uploadState.status === 'uploading' && <Spinner size="sm" />}
+                  {uploadState.status === 'uploading' && <Spinner size="small" />}
                   {uploadState.status === 'completed' && (
                     <Icon name="check-circle" className="text-green-500" />
                   )}

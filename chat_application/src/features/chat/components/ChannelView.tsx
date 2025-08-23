@@ -1,19 +1,20 @@
 import React, { useRef, useEffect } from 'react';
-import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { MessageList } from '../../../shared/components/organisms/MessageList';
-import { Composer } from '../../../shared/components/organisms/Composer';
-import { messagesApi } from '../../../services/endpoints/messages';
+import { useInfiniteQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import MessageList from '../../../shared/components/organisms/MessageList';
+import Composer, { type ComposerPayload } from '../../../shared/components/organisms/Composer';
+import { fetchMessages, sendMessage } from '../../../services/endpoints/messages';
 import { generateId } from '../../../utils/generateId';
 import { useToast } from '../../../shared/hooks/useToast';
 import type { Message } from '../../../types';
 
 interface ChannelViewProps {
   channelId: string;
+  onThreadSelect?: (threadId: string) => void;
 }
 
-const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
+const ChannelView: React.FC<ChannelViewProps> = ({ channelId, onThreadSelect }) => {
   const queryClient = useQueryClient();
-  const { showToast } = useToast();
+  const { addToast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isUserScrolledUp = useRef(false);
@@ -26,25 +27,30 @@ const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useQuery({
+  } = useInfiniteQuery({
     queryKey: ['messages', channelId],
-    queryFn: ({ pageParam = 0 }) => messagesApi.fetchMessages(channelId, { 
-      page: pageParam,
-      limit: 50 
+    queryFn: ({ pageParam }) => fetchMessages(channelId, { 
+      cursor: pageParam,
+      pageSize: 50 
     }),
-    getNextPageParam: (lastPage, allPages) => {
+    getNextPageParam: (lastPage: any, allPages: any) => {
       return lastPage.hasMore ? allPages.length : undefined;
     },
+    initialPageParam: 0,
     enabled: !!channelId,
   });
 
   // Flatten paginated messages
-  const messages = messagesData?.pages.flatMap(page => page.messages) || [];
+  const messages = messagesData?.pages.flatMap((page: any) => page.messages) || [];
 
   // Send message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: (messageData: { content: string; type?: 'text' | 'file' }) => 
-      messagesApi.sendMessage(channelId, messageData),
+    mutationFn: (messageData: { content: string }) => 
+      sendMessage({
+        channelId,
+        content: messageData.content,
+        senderId: 'current-user', // This would come from auth context in real app
+      }),
     onMutate: async (messageData) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['messages', channelId] });
@@ -56,11 +62,9 @@ const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
       const optimisticMessage: Message = {
         id: generateId(),
         content: messageData.content,
-        type: messageData.type || 'text',
-        userId: 'current-user', // This would come from auth context in real app
+        senderId: 'current-user', // This would come from auth context in real app
         channelId,
-        timestamp: new Date().toISOString(),
-        isOptimistic: true,
+        createdAt: new Date().toISOString(),
       };
 
       // Optimistically update cache
@@ -80,14 +84,14 @@ const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
 
       return { previousMessages, optimisticMessage };
     },
-    onError: (error, variables, context) => {
+    onError: (_error, _variables, context) => {
       // Revert optimistic update
       if (context?.previousMessages) {
         queryClient.setQueryData(['messages', channelId], context.previousMessages);
       }
-      showToast('Failed to send message. Please try again.', 'error');
+      addToast({ title: 'Failed to send message. Please try again.', type: 'error' });
     },
-    onSuccess: (realMessage, variables, context) => {
+    onSuccess: (realMessage, _variables, context) => {
       // Replace optimistic message with real message
       queryClient.setQueryData(['messages', channelId], (old: any) => {
         if (!old) return old;
@@ -140,10 +144,11 @@ const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const handleSendMessage = async (content: string, type?: 'text' | 'file') => {
-    if (!content.trim()) return;
+  const handleSendMessage = async (payload: ComposerPayload) => {
+    if (!payload.content.trim()) return;
     
-    sendMessageMutation.mutate({ content, type });
+    sendMessageMutation.mutate({ content: payload.content });
+    // TODO: Handle attachments if needed
   };
 
   if (isLoading) {
@@ -201,8 +206,8 @@ const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
       {/* Composer */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-4">
         <Composer
-          onSendMessage={handleSendMessage}
-          isLoading={sendMessageMutation.isPending}
+          onSend={handleSendMessage}
+          disabled={sendMessageMutation.isPending}
           placeholder="Type a message..."
         />
       </div>

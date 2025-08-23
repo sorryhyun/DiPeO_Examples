@@ -1,5 +1,5 @@
 import { ApiResponse } from '../../types';
-import { mockData } from './mockData';
+import { mockData, getMockData } from './mockData';
 import { mockSocket } from './mockSocket';
 import { generateId } from '../../utils/generateId';
 import { devConfig } from '../../config/devConfig';
@@ -454,22 +454,26 @@ const handleRequest = (
 
 // Reset store to initial state
 const resetStore = (): void => {
+  const fresh = getMockData();
   store = {
-    users: [...mockData.users],
-    channels: [...mockData.channels],
-    messages: [...mockData.messages],
-    files: [...mockData.files],
-    presence: [...mockData.presence],
-    reactions: [...mockData.reactions],
-    threads: [...mockData.threads]
+    users: [...fresh.users],
+    channels: [...fresh.channels],
+    messages: [...fresh.messages],
+    files: [...fresh.files],
+    presence: [...fresh.presence],
+    reactions: [...fresh.reactions],
+    threads: [...fresh.threads]
   };
 };
 
 // Setup function for initializing mocks
 export const setupMocks = () => {
-  if (!devConfig.enableMockData) {
+  const disabledHandler = () => ({ data: null, success: false, error: { message: 'Mocks disabled', code: 'MOCKS_DISABLED' } });
+  
+  if (!devConfig.enable_mock_data) {
     return {
-      handleRequest: () => ({ data: null, success: false, error: { message: 'Mocks disabled', code: 'MOCKS_DISABLED' } }),
+      handle: disabledHandler,
+      handleRequest: disabledHandler,
       start: () => {},
       stop: () => {},
       resetStore
@@ -480,7 +484,7 @@ export const setupMocks = () => {
   mockSocket.connect();
   
   return {
-    handleRequest,
+    handle: handleRequest,
     start: () => {
       console.log('[MockServer] Mock server started');
     },
@@ -491,6 +495,8 @@ export const setupMocks = () => {
     resetStore
   };
 };
+
+export const mockServer = setupMocks();
 
 // Export the main handler for use by apiClient
 export { handleRequest };

@@ -23,26 +23,22 @@ export interface UpdateProfileData {
  * Sign in user with email and password
  */
 export const signIn = async (credentials: SignInCredentials): Promise<SignInResponse> => {
-  if (devConfig.useMockData) {
+  if (devConfig.enable_mock_data) {
     // Mock authentication for development
-    const mockUsers = [
+    const mockUsers: User[] = [
       {
         id: '1',
-        name: 'John Doe',
         email: 'john@example.com',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-        status: 'online',
-        isOnline: true,
-        lastSeen: new Date().toISOString()
+        displayName: 'John Doe',
+        role: 'member',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John'
       },
       {
         id: '2',
-        name: 'Jane Smith',
         email: 'jane@example.com',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
-        status: 'away',
-        isOnline: false,
-        lastSeen: new Date(Date.now() - 300000).toISOString()
+        displayName: 'Jane Smith', 
+        role: 'member',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane'
       }
     ];
 

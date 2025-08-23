@@ -1,4 +1,3 @@
-import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
@@ -9,7 +8,7 @@ import { AuthProvider } from './shared/context/AuthProvider'
 import { WebSocketProvider } from './shared/context/WebSocketProvider'
 import { ThemeProvider } from './shared/context/ThemeProvider'
 import { I18nProvider } from './shared/context/I18nProvider'
-import { ErrorBoundary } from './shared/ErrorBoundary'
+import ErrorBoundary from './shared/ErrorBoundary'
 
 // Dev configuration and mocks
 import { devConfig } from './config/devConfig'

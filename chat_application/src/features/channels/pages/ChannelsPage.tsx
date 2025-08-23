@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getChannels, createChannel } from '../../services/endpoints/channels';
-import { useToast } from '../../shared/hooks/useToast';
-import { Button } from '../../shared/components/atoms/Button';
-import { Input } from '../../shared/components/atoms/Input';
+import { fetchChannels, createChannel } from '../../../services/endpoints/channels';
+import { useToast } from '../../../shared/hooks/useToast';
+import Button from '../../../shared/components/atoms/Button';
+import Input from '../../../shared/components/atoms/Input';
 
 interface CreateChannelForm {
   name: string;
@@ -18,11 +18,11 @@ const ChannelsPage: React.FC = () => {
   const [errors, setErrors] = useState<{ name?: string }>({});
 
   const queryClient = useQueryClient();
-  const { showToast } = useToast();
+  const { addToast } = useToast();
 
   const { data: channels = [], isLoading, error } = useQuery({
     queryKey: ['channels'],
-    queryFn: getChannels
+    queryFn: () => fetchChannels()
   });
 
   const createChannelMutation = useMutation({
@@ -31,10 +31,10 @@ const ChannelsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['channels'] });
       setFormData({ name: '', isPrivate: false });
       setErrors({});
-      showToast('Channel created successfully', 'success');
+      addToast({ title: 'Channel created successfully', type: 'success' });
     },
     onError: (error: Error) => {
-      showToast(`Failed to create channel: ${error.message}`, 'error');
+      addToast({ title: `Failed to create channel: ${error.message}`, type: 'error' });
     }
   });
 
@@ -58,7 +58,7 @@ const ChannelsPage: React.FC = () => {
 
     createChannelMutation.mutate({
       name: formData.name.trim(),
-      isPrivate: formData.isPrivate
+      private: formData.isPrivate
     });
   };
 
@@ -112,7 +112,7 @@ const ChannelsPage: React.FC = () => {
             <Input
               label="Channel Name"
               value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('name', e.target.value)}
               placeholder="Enter channel name"
               error={errors.name}
               required
@@ -144,7 +144,7 @@ const ChannelsPage: React.FC = () => {
           <div className="flex justify-end">
             <Button
               type="submit"
-              loading={createChannelMutation.isPending}
+              isLoading={createChannelMutation.isPending}
               disabled={createChannelMutation.isPending}
             >
               Create Channel
@@ -157,11 +157,11 @@ const ChannelsPage: React.FC = () => {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Your Channels ({channels.length})
+            Your Channels ({(channels as any[]).length})
           </h2>
         </div>
 
-        {channels.length === 0 ? (
+        {(channels as any[]).length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-gray-500 dark:text-gray-400">
               No channels found. Create your first channel above.
@@ -169,7 +169,7 @@ const ChannelsPage: React.FC = () => {
           </div>
         ) : (
           <div className="divide-y divide-gray-200 dark:divide-gray-700">
-            {channels.map((channel) => (
+            {(channels as any[]).map((channel: any) => (
               <div key={channel.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">

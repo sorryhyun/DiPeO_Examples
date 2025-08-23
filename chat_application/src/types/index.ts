@@ -19,15 +19,30 @@ export interface Channel {
   description?: string;
 }
 
+export interface CreateChannelPayload {
+  name: string;
+  private: boolean;
+  description?: string;
+  members?: string[]; // User IDs
+}
+
+export interface UpdateChannelPayload {
+  name?: string;
+  private?: boolean;
+  description?: string;
+}
+
 // File types
 export interface FileMeta {
   id: string;
   name: string;
+  type: string;
   size: number;
   url: string;
   mimeType: string;
   uploadedAt: string;
   uploadedBy: string; // User ID
+  channelId?: string; // Optional channel association
 }
 
 // Reaction types
@@ -46,6 +61,25 @@ export interface Thread {
 }
 
 // Message types
+export interface SendMessageRequest {
+  channelId: string;
+  content: string;
+  threadId?: string;
+}
+
+export interface MessagePayload {
+  content: string;
+  channelId: string;
+  threadId?: string;
+  attachments?: FileMeta[];
+}
+
+export interface ReactionPayload {
+  messageId: string;
+  emoji: string;
+  action: 'add' | 'remove';
+}
+
 export interface Message {
   id: string;
   channelId: string;
@@ -94,6 +128,13 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface PaginationOptions {
+  page?: number;
+  limit?: number;
+  before?: string;
+  after?: string;
+}
+
 // WebSocket event types
 export interface WebSocketEvent {
   type: WebSocketEventType;
@@ -127,6 +168,11 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface SignInResponse {
+  user: AuthUser;
+  token: string;
+}
+
 // Theme types
 export type Theme = 'light' | 'dark' | 'system';
 
@@ -147,6 +193,16 @@ export interface SearchResult {
   channelId?: string;
   userId?: string;
   highlight?: string;
+}
+
+export interface SearchOptions {
+  query: string;
+  type?: 'message' | 'channel' | 'user' | 'all';
+  channelId?: string;
+  userId?: string;
+  limit?: number;
+  before?: string;
+  after?: string;
 }
 
 // Call types

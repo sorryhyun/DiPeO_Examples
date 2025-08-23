@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchChannels } from '../../../services/endpoints/channels';
-import { useDebounce } from '../../../shared/hooks/useDebounce';
-import { Input } from '../../../shared/components/atoms/Input';
-import { Spinner } from '../../../shared/components/atoms/Spinner';
-import { ChannelItem } from '../../../shared/components/organisms/ChannelItem';
+import useDebounce from '../../../shared/hooks/useDebounce';
+import Input from '../../../shared/components/atoms/Input';
+import Spinner from '../../../shared/components/atoms/Spinner';
+import { ChannelItem } from './ChannelItem';
 import type { Channel } from '../../../types';
 
 interface ChannelListProps {
@@ -18,7 +18,7 @@ export default function ChannelList({ selectedChannelId, onSelect }: ChannelList
 
   const { data: channels = [], isLoading, error } = useQuery({
     queryKey: ['channels'],
-    queryFn: fetchChannels,
+    queryFn: () => fetchChannels(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -29,7 +29,7 @@ export default function ChannelList({ selectedChannelId, onSelect }: ChannelList
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <Spinner size="md" />
+        <Spinner size="medium" />
       </div>
     );
   }
@@ -66,9 +66,12 @@ export default function ChannelList({ selectedChannelId, onSelect }: ChannelList
             {filteredChannels.map((channel: Channel) => (
               <ChannelItem
                 key={channel.id}
-                channel={channel}
-                isSelected={selectedChannelId === channel.id}
-                onClick={() => onSelect(channel.id)}
+                channel={{
+                  ...channel,
+                  members: undefined // Convert string[] to UI format when needed
+                }}
+                active={selectedChannelId === channel.id}
+                onSelect={onSelect}
               />
             ))}
           </div>

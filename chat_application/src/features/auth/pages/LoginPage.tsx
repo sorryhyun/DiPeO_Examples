@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../shared/components/atoms/Button';
-import { Input } from '../../../shared/components/atoms/Input';
-import { useAuth } from '../../../shared/hooks/useAuth';
+import Button from '../../../shared/components/atoms/Button';
+import Input from '../../../shared/components/atoms/Input';
+import { useAuth } from '../../../shared/context/AuthProvider';
 import { devConfig } from '../../../config/devConfig';
 
 export default function LoginPage() {
@@ -31,7 +31,7 @@ export default function LoginPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!validateForm()) return;
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 required
                 placeholder="Email address"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 error={errors.email}
                 aria-describedby={errors.email ? 'email-error' : undefined}
               />
@@ -105,7 +105,7 @@ export default function LoginPage() {
                 required
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
                 error={errors.password}
                 aria-describedby={errors.password ? 'password-error' : undefined}
               />
@@ -144,7 +144,11 @@ export default function LoginPage() {
               Quick Login (Development)
             </h3>
             <div className="space-y-2">
-              {devConfig.mock_auth_users.map((user, index) => (
+              {[
+                { email: 'john@example.com', password: 'password', name: 'John Doe' },
+                { email: 'jane@example.com', password: 'password', name: 'Jane Smith' },
+                { email: 'admin@example.com', password: 'password', name: 'Admin User' }
+              ].map((user, index) => (
                 <button
                   key={index}
                   onClick={() => handleMockLogin(user)}

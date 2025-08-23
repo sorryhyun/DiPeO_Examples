@@ -3,10 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import ChannelList from '../components/ChannelList';
 import ChannelView from '../components/ChannelView';
 import ThreadView from '../components/ThreadView';
-import { Button } from '../../../shared/components/atoms/Button';
-import { Icon } from '../../../shared/components/atoms/Icon';
+import Button from '../../../shared/components/atoms/Button';
+import Icon from '../../../shared/components/atoms/Icon';
 import { useQuery } from '@tanstack/react-query';
-import { channelsEndpoints } from '../../../services/endpoints/channels';
+import { fetchChannels } from '../../../services/endpoints/channels';
 
 const ChatPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,7 +20,7 @@ const ChatPage: React.FC = () => {
   // Fetch channels to get default channel if none selected
   const { data: channels } = useQuery({
     queryKey: ['channels'],
-    queryFn: channelsEndpoints.fetchChannels,
+    queryFn: () => fetchChannels(),
   });
 
   // Set default channel if none selected and channels are loaded
@@ -80,7 +80,7 @@ const ChatPage: React.FC = () => {
       >
         <ChannelList
           selectedChannelId={selectedChannelId}
-          onChannelSelect={handleChannelSelect}
+          onSelect={handleChannelSelect}
         />
       </div>
 

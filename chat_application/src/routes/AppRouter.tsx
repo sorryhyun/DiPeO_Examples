@@ -12,7 +12,7 @@ const FilesPage = lazy(() => import('../features/files/pages/FilesPage'));
 // Loading fallback component
 const PageLoader: React.FC = () => (
   <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
-    <Spinner size="lg" />
+    <Spinner size="large" />
   </div>
 );
 

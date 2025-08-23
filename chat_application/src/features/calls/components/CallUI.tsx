@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Icon } from '../../../shared/components/atoms/Icon';
+import { useState, useCallback, useEffect } from 'react';
+import Icon from '../../../shared/components/atoms/Icon';
 
 interface CallUIProps {
   onStartCall?: () => void;

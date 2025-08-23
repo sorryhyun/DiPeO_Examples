@@ -44,12 +44,12 @@ const MessageItem: React.FC<MessageItemProps> = ({
     <div className={`flex gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 ${isOwn ? 'flex-row-reverse' : ''}`}>
       <div className="flex-shrink-0 relative">
         <Avatar
-          src={message.sender.avatar}
-          alt={message.sender.name}
+          src={undefined} // TODO: Get user avatar from senderId
+          alt={`User ${message.senderId}`}
           size="md"
         />
         <PresenceIndicator 
-          status={message.sender.status}
+          presence={{ online: true }} // TODO: Get user presence from senderId
           className="absolute -bottom-1 -right-1"
         />
       </div>
@@ -58,10 +58,10 @@ const MessageItem: React.FC<MessageItemProps> = ({
         {/* Header */}
         <div className={`flex items-center gap-2 mb-1 ${isOwn ? 'justify-end' : ''}`}>
           <span className="font-semibold text-gray-900 dark:text-gray-100">
-            {message.sender.name}
+            User {message.senderId} {/* TODO: Get user name from senderId */}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {formatDate(message.timestamp)}
+            {formatDate(message.createdAt)}
           </span>
         </div>
 
@@ -102,18 +102,18 @@ const MessageItem: React.FC<MessageItemProps> = ({
         )}
 
         {/* Reactions */}
-        {message.reactions && message.reactions.length > 0 && (
+        {message.reactions && Object.keys(message.reactions).length > 0 && (
           <div className={`flex flex-wrap gap-1 mb-2 ${isOwn ? 'justify-end' : ''}`}>
-            {message.reactions.map((reaction) => (
+            {Object.entries(message.reactions).map(([emoji, reactions]) => (
               <button
-                key={`${reaction.emoji}-${reaction.count}`}
-                onClick={() => onReact(reaction.emoji)}
-                onKeyDown={(e) => handleKeyDown(e, () => onReact(reaction.emoji))}
+                key={emoji}
+                onClick={() => onReact(emoji)}
+                onKeyDown={(e) => handleKeyDown(e, () => onReact(emoji))}
                 className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={`React with ${reaction.emoji}, ${reaction.count} reaction${reaction.count !== 1 ? 's' : ''}`}
+                aria-label={`React with ${emoji}, ${reactions.length} reaction${reactions.length !== 1 ? 's' : ''}`}
               >
-                <span>{reaction.emoji}</span>
-                <span className="text-gray-600 dark:text-gray-300">{reaction.count}</span>
+                <span>{emoji}</span>
+                <span className="text-gray-600 dark:text-gray-300">{reactions.length}</span>
               </button>
             ))}
           </div>
@@ -137,38 +137,21 @@ const MessageItem: React.FC<MessageItemProps> = ({
               <div className="absolute bottom-full mb-2 z-10">
                 <EmojiPicker
                   onSelect={handleEmojiSelect}
-                  onClose={() => setShowEmojiPicker(false)}
                 />
               </div>
             )}
           </div>
 
-          {message.threadCount && message.threadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleThreadClick}
-              onKeyDown={(e) => handleKeyDown(e, handleThreadClick)}
-              aria-label={`Open thread, ${message.threadCount} repl${message.threadCount !== 1 ? 'ies' : 'y'}`}
-              className="p-1 text-xs"
-            >
-              <Icon name="message-circle" className="w-4 h-4" />
-              <span>{message.threadCount}</span>
-            </Button>
-          )}
-
-          {!message.threadCount && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleThreadClick}
-              onKeyDown={(e) => handleKeyDown(e, handleThreadClick)}
-              aria-label="Start thread"
-              className="p-1"
-            >
-              <Icon name="message-circle" className="w-4 h-4" />
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleThreadClick}
+            onKeyDown={(e) => handleKeyDown(e, handleThreadClick)}
+            aria-label="Start thread"
+            className="p-1"
+          >
+            <Icon name="message-circle" className="w-4 h-4" />
+          </Button>
 
           {onReply && (
             <Button

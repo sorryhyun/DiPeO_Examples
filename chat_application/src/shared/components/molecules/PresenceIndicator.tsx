@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatDate } from '../../utils/formatDate';
+import { formatDate } from '../../../utils/formatDate';
 
 interface PresenceState {
   online: boolean;

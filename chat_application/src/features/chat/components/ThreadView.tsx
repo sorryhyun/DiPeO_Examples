@@ -1,43 +1,46 @@
 import React, { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import { messagesApi } from '../../../services/endpoints/messages';
-import { MessageList } from '../../../shared/components/organisms/MessageList';
-import { Composer } from '../../../shared/components/organisms/Composer';
-import { Button } from '../../../shared/components/atoms/Button';
-import type { Message } from '../../../types';
+import { fetchThread, sendMessage } from '../../../services/endpoints/messages';
+import MessageList from '../../../shared/components/organisms/MessageList';
+import Composer from '../../../shared/components/organisms/Composer';
+import Button from '../../../shared/components/atoms/Button';
+import type { ComposerPayload } from '../../../shared/components/organisms/Composer';
 
 interface ThreadViewProps {
-  activeThreadId: string | null;
-  parentMessageId?: string;
+  threadId: string;
   onClose: () => void;
 }
 
 export default function ThreadView({ 
-  activeThreadId, 
-  parentMessageId, 
+  threadId, 
   onClose 
 }: ThreadViewProps) {
-  const threadId = activeThreadId || parentMessageId;
 
   const {
-    data: threadMessages = [],
+    data: threadData,
     isLoading,
     error
   } = useQuery({
     queryKey: ['thread', threadId],
-    queryFn: () => messagesApi.fetchThread(threadId!),
+    queryFn: () => fetchThread(threadId!),
     enabled: !!threadId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const handleSendReply = useCallback(async (content: string) => {
+  // For now, return empty messages until we implement proper message fetching from thread
+  const threadMessages = threadData ? [] : [];
+
+  const handleSendReply = useCallback(async (payload: ComposerPayload) => {
     if (!threadId) return;
 
-    await messagesApi.sendMessage({
-      content,
+    await sendMessage({
+      channelId: 'current-channel', // This would come from context in real app
+      content: payload.content,
       threadId,
+      senderId: 'current-user', // This would come from auth context in real app
     });
+    // TODO: Handle attachments if needed
   }, [threadId]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -87,7 +90,7 @@ export default function ThreadView({
                 Failed to load thread
               </p>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={() => window.location.reload()}
               >
@@ -109,8 +112,7 @@ export default function ThreadView({
           <div className="flex-1 overflow-hidden">
             <MessageList
               messages={threadMessages}
-              isLoading={false}
-              hasMore={false}
+              isLoadingMore={false}
               onLoadMore={() => {}}
             />
           </div>

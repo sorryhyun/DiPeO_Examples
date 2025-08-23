@@ -15,20 +15,23 @@ export const fetchChannels = async (options?: FetchChannelsOptions): Promise<Cha
   const queryString = params.toString();
   const endpoint = queryString ? `/api/channels?${queryString}` : '/api/channels';
   
-  return apiClient.get<Channel[]>(endpoint);
+  const response = await apiClient.get<Channel[]>(endpoint);
+  return response.data;
 };
 
 export const createChannel = async (payload: CreateChannelPayload): Promise<Channel> => {
-  return apiClient.post<Channel>('/api/channels', payload);
+  const response = await apiClient.post<Channel>('/api/channels', payload);
+  return response.data;
 };
 
 export const updateChannel = async (
   channelId: string,
   patch: UpdateChannelPayload
 ): Promise<Channel> => {
-  return apiClient.put<Channel>(`/api/channels/${channelId}`, patch);
+  const response = await apiClient.put<Channel>(`/api/channels/${channelId}`, patch);
+  return response.data;
 };
 
 export const joinChannel = async (channelId: string, userId: string): Promise<void> => {
-  return apiClient.post<void>(`/api/channels/${channelId}/join`, { userId });
+  await apiClient.post<void>(`/api/channels/${channelId}/join`, { userId });
 };

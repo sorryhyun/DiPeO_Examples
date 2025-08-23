@@ -1,10 +1,10 @@
-import React, { useState, useRef, KeyboardEvent } from 'react';
-import { Button } from '../atoms/Button';
-import { FileUploader } from '../molecules/FileUploader';
-import { EmojiPicker } from '../molecules/EmojiPicker';
+import { useState, useRef, KeyboardEvent } from 'react';
+import Button from '../atoms/Button';
+import FileUploader from '../molecules/FileUploader';
+import EmojiPicker from '../molecules/EmojiPicker';
 import { useToast } from '../../hooks/useToast';
 
-interface ComposerPayload {
+export interface ComposerPayload {
   content: string;
   attachments: File[];
 }
@@ -25,7 +25,7 @@ export default function Composer({
   const [isSending, setIsSending] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { showToast } = useToast();
+  const { addToast } = useToast();
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -184,7 +184,7 @@ export default function Composer({
           <Button
             onClick={handleSend}
             disabled={isDisabled || (!content.trim() && attachments.length === 0)}
-            loading={isSending}
+            isLoading={isSending}
             variant="primary"
             size="md"
             className="px-4"

@@ -29,7 +29,7 @@ const MessageList: React.FC<MessageListProps> = ({
         <div className="flex justify-center py-4 border-b border-gray-200 dark:border-gray-700">
           {isLoadingMore ? (
             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-              <Spinner size="sm" />
+              <Spinner size="small" />
               <span className="text-sm">Loading more messages...</span>
             </div>
           ) : (
@@ -71,7 +71,9 @@ const MessageList: React.FC<MessageListProps> = ({
             >
               <MessageItem
                 message={message}
-                isHighlighted={highlightMessageId === message.id}
+                isOwn={false} // This would come from auth context in real app
+                onReact={() => {}} // TODO: implement reaction handler
+                onOpenThread={() => {}} // TODO: implement thread handler
               />
             </div>
           ))

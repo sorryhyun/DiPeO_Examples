@@ -177,6 +177,36 @@ class MockSocket implements IMockSocket {
   broadcastTyping(typing: any): void {
     this.emit('typing', typing);
   }
+
+  // WebSocket-compatible aliases for WebSocketProvider
+  connect(): void {
+    this.start();
+  }
+
+  disconnect(): void {
+    this.stop();
+  }
+
+  on(eventType: string, handler: MockSocketHandler): void {
+    this.subscribe(eventType, handler);
+  }
+
+  off(eventType: string, handler: MockSocketHandler): void {
+    this.unsubscribe(eventType, handler);
+  }
+
+  send(data: any): void {
+    if (typeof data === 'string') {
+      try {
+        const message = JSON.parse(data);
+        this.emit(message.type, message.payload);
+      } catch (error) {
+        console.error('Error parsing message data:', error);
+      }
+    } else {
+      this.emit(data.type, data.payload);
+    }
+  }
 }
 
 // Create singleton instance

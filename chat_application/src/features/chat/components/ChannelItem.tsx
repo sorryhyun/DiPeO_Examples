@@ -1,11 +1,10 @@
 import React from 'react';
-import { Avatar } from '../../../shared/components/atoms/Avatar';
+import Avatar from '../../../shared/components/atoms/Avatar';
 import { formatDate } from '../../../utils/formatDate';
+import type { Channel } from '../../../types';
 
-interface Channel {
-  id: string;
-  name: string;
-  type: 'dm' | 'group';
+interface ChannelWithUI extends Omit<Channel, 'members'> {
+  type?: 'dm' | 'group';
   lastMessage?: {
     content: string;
     timestamp: string;
@@ -24,7 +23,7 @@ interface Channel {
 }
 
 interface ChannelItemProps {
-  channel: Channel;
+  channel: ChannelWithUI;
   active: boolean;
   onSelect: (id: string) => void;
 }
@@ -88,9 +87,8 @@ export const ChannelItem: React.FC<ChannelItemProps> = ({
     >
       <Avatar
         src={getChannelAvatar()}
-        alt={getChannelName()}
-        size="md"
-        fallback={getChannelName().charAt(0).toUpperCase()}
+        name={getChannelName()}
+        size={40}
       />
       
       <div className="flex-1 min-w-0">

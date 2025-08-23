@@ -1,5 +1,6 @@
 import { apiClient } from '../apiClient';
 import { FileMeta } from '../../types';
+import { devConfig } from '../../config/devConfig';
 
 export interface UploadProgressCallback {
   (progress: number): void;
@@ -32,7 +33,7 @@ export const uploadFile = async (
   }
 
   // In development mode, simulate upload with progress
-  if (import.meta.env.DEV) {
+  if (devConfig.enable_mock_data) {
     return new Promise((resolve) => {
       let progress = 0;
       let cancelled = false;
@@ -56,9 +57,8 @@ export const uploadFile = async (
             id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             name: file.name,
             size: file.size,
-            type: file.type,
+            mimeType: file.type,
             url: URL.createObjectURL(file), // Use object URL for preview
-            channelId: channelId || 'general',
             uploadedBy: 'current_user',
             uploadedAt: new Date().toISOString(),
           };

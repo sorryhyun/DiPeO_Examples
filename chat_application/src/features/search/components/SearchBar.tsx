@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Input } from '../../../shared/components/atoms/Input';
-import { Icon } from '../../../shared/components/atoms/Icon';
-import { useDebounce } from '../../../shared/hooks/useDebounce';
+import Input from '../../../shared/components/atoms/Input';
+import Icon from '../../../shared/components/atoms/Icon';
+import useDebounce from '../../../shared/hooks/useDebounce';
 
 interface SearchResult {
   id: string;

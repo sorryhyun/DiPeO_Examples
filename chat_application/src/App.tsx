@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
-import { AppRouter } from './routes/AppRouter';
-import { ErrorBoundary } from './shared/ErrorBoundary';
-import { Spinner } from './shared/components/atoms/Spinner';
+import AppRouter from './routes/AppRouter';
+import ErrorBoundary from './shared/ErrorBoundary';
+import Spinner from './shared/components/atoms/Spinner';
 
 const App: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const App: React.FC = () => {
           <Suspense 
             fallback={
               <div className="flex items-center justify-center h-full">
-                <Spinner size="lg" />
+                <Spinner size="large" />
               </div>
             }
           >

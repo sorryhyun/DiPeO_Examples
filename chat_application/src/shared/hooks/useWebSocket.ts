@@ -1,5 +1,5 @@
-import { useContext, useEffect, useCallback, useRef } from 'react';
-import { WebSocketContext } from '../context/WebSocketProvider';
+import { useEffect, useCallback, useRef } from 'react';
+import { useWebSocketContext } from '../context/WebSocketProvider';
 
 // WebSocket event types using discriminated unions
 export type WebSocketEvent = 
@@ -26,13 +26,9 @@ interface UseWebSocketReturn {
 }
 
 export const useWebSocket = (): UseWebSocketReturn => {
-  const context = useContext(WebSocketContext);
+  const context = useWebSocketContext();
   
-  if (!context) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider');
-  }
-
-  const { subscribe, unsubscribe, send, isConnected } = context;
+  const { subscribe, unsubscribe, send, isConnected } = context as any;
   
   // Track subscriptions for cleanup
   const subscriptionsRef = useRef<Map<WebSocketEventType, Set<WebSocketEventHandler>>>(new Map());

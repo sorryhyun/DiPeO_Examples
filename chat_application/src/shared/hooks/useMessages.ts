@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { messagesApi } from '../../services/endpoints/messages';
-import { Message, SendMessageRequest } from '../../types';
+import { fetchMessages, sendMessage, SendMessagePayload } from '../../services/endpoints/messages';
+import { Message } from '../../types';
 import { generateId } from '../../utils/generateId';
 
 interface UseMessagesOptions {
@@ -33,18 +33,19 @@ export const useMessages = ({ channelId }: UseMessagesOptions): UseMessagesRetur
     isFetchingNextPage
   } = useInfiniteQuery({
     queryKey,
-    queryFn: ({ pageParam = undefined }) => messagesApi.fetchMessages(channelId, pageParam),
-    getNextPageParam: (lastPage) => lastPage.nextCursor || undefined,
+    queryFn: ({ pageParam }) => fetchMessages(channelId, { cursor: pageParam }),
+    getNextPageParam: (lastPage: any) => lastPage.nextCursor || undefined,
+    initialPageParam: undefined,
     enabled: !!channelId,
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false,
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: async (messageData: SendMessageRequest) => {
-      return messagesApi.sendMessage(messageData);
+    mutationFn: async (messageData: SendMessagePayload) => {
+      return sendMessage(messageData);
     },
-    onMutate: async (messageData: SendMessageRequest) => {
+    onMutate: async (messageData: SendMessagePayload) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey });
 
@@ -56,13 +57,10 @@ export const useMessages = ({ channelId }: UseMessagesOptions): UseMessagesRetur
         id: generateId(),
         content: messageData.content,
         channelId: messageData.channelId,
-        userId: messageData.userId,
-        username: 'You', // This should come from auth context in real app
-        avatar: '', // This should come from auth context in real app
-        timestamp: Date.now(),
+        senderId: messageData.senderId,
+        createdAt: new Date().toISOString(),
         threadId: messageData.threadId,
-        reactions: [],
-        isOptimistic: true,
+        reactions: {},
       };
 
       // Optimistically update the cache
