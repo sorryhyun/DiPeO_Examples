@@ -9,8 +9,8 @@ interface TimerProps {
 
 const Timer: React.FC<TimerProps> = ({ seconds: propSeconds, running: propRunning, className = '' }) => {
   // Use props if provided, otherwise fall back to store
-  const storeSeconds = useStore((state) => state.timer.seconds);
-  const storeRunning = useStore((state) => state.timer.running);
+  const storeSeconds = useStore((state) => state.timeElapsed);
+  const storeRunning = useStore((state) => state.isGameActive && !state.isGameComplete);
   
   const seconds = propSeconds ?? storeSeconds;
   const running = propRunning ?? storeRunning;

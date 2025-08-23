@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 
 interface ConfettiOptions {
   duration?: number;
@@ -177,7 +177,7 @@ export const useConfetti = () => {
   }, []);
 
   // Cleanup on component unmount
-  React.useEffect(() => {
+  useEffect(() => {
     return cleanup;
   }, [cleanup]);
 

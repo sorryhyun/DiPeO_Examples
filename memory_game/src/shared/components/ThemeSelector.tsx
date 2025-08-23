@@ -1,57 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { themesService } from '../../services/themesService';
+import React from 'react';
 import { useTheme } from '../../providers/ThemeProvider';
-import { Theme } from '../../types';
 
 interface ThemeSelectorProps {
   className?: string;
 }
 
 export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) => {
-  const [themes, setThemes] = useState<Theme[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { currentTheme, setTheme } = useTheme();
+  const { currentTheme, setTheme, availableThemes } = useTheme();
 
-  useEffect(() => {
-    const loadThemes = async () => {
-      try {
-        setLoading(true);
-        const availableThemes = await themesService.getThemes();
-        setThemes(availableThemes);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load themes');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadThemes();
-  }, []);
-
-  const handleThemeSelect = async (theme: Theme) => {
-    try {
-      await setTheme(theme.id);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to set theme');
+  const handleThemeSelect = (themeId: string) => {
+    const theme = availableThemes.find(t => t.id === themeId);
+    if (theme) {
+      setTheme(theme);
     }
   };
-
-  if (loading) {
-    return (
-      <div className={`flex items-center justify-center p-4 ${className}`}>
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={`text-red-500 text-sm p-4 ${className}`}>
-        Error loading themes: {error}
-      </div>
-    );
-  }
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -59,7 +21,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) 
         Choose Theme
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-        {themes.map((theme) => (
+        {availableThemes.map((theme) => (
           <div
             key={theme.id}
             className={`
@@ -69,18 +31,16 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) 
                 : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
               }
             `}
-            onClick={() => handleThemeSelect(theme)}
+            onClick={() => handleThemeSelect(theme.id)}
           >
             <div className="text-center">
               {/* Theme preview icons */}
               <div className="flex justify-center space-x-1 mb-2">
-                {theme.previewIcons?.slice(0, 4).map((icon, index) => (
+                {theme.cards?.slice(0, 4).map((icon: string, index: number) => (
                   <span key={index} className="text-lg" title={icon}>
                     {icon}
                   </span>
-                )) || (
-                  <div className={`w-8 h-8 rounded ${theme.primaryColor || 'bg-gray-400'}`} />
-                )}
+                ))}
               </div>
               
               {/* Theme name */}
@@ -108,7 +68,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ className = '' }) 
         ))}
       </div>
       
-      {themes.length === 0 && (
+      {availableThemes.length === 0 && (
         <div className="text-gray-500 dark:text-gray-400 text-center py-8">
           No themes available
         </div>

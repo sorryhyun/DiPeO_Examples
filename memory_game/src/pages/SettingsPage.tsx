@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import { ThemeProvider } from '../providers/ThemeProvider';
-import { SoundProvider } from '../providers/SoundProvider';
+import React from 'react';
+import { useTheme } from '../providers/ThemeProvider';
+import { useSoundContext } from '../providers/SoundProvider';
 import { useGameStore } from '../state/store';
 import { useLocalStorage } from '../shared/hooks/useLocalStorage';
 import SoundToggle from '../shared/components/SoundToggle';
@@ -8,10 +8,10 @@ import ThemeSelector from '../shared/components/ThemeSelector';
 import Button from '../shared/components/Button';
 
 const SettingsPage: React.FC = () => {
-  const { mode, setMode } = useContext(ThemeProvider.Context);
-  const { muted, volume, setVolume } = useContext(SoundProvider.Context);
+  const { mode, setMode } = useTheme();
+  const { muted, volume, setVolume } = useSoundContext();
   
-  const { settings, updateSettings } = useGameStore();
+  const { updateSettings } = useGameStore();
   
   const [colorblindMode, setColorblindMode] = useLocalStorage<boolean>(
     'memorygame:v1:colorblind-mode',

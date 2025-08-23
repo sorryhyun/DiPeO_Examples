@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { ErrorBoundary } from './shared/components/ErrorBoundary';
+import ErrorBoundary from './shared/components/ErrorBoundary';
 import { ThemeProvider } from './providers/ThemeProvider';
 import { SoundProvider } from './providers/SoundProvider';
 import { WebSocketProvider } from './providers/WebSocketProvider';

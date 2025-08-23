@@ -3,9 +3,7 @@ import { themesService } from './themesService';
 import { seededShuffle } from '../utils/shuffle';
 import type { 
   DailyChallenge, 
-  Card, 
-  Theme, 
-  ApiResponse,
+  Card,
   Difficulty 
 } from '../types';
 
@@ -38,7 +36,7 @@ class DailyChallengeService {
         return response.data;
       }
       
-      throw new Error(response.error || 'Failed to fetch daily challenge');
+      throw new Error(response.error?.message || 'Failed to fetch daily challenge');
     } catch (error) {
       console.error('Error fetching daily challenge:', error);
       throw error;
@@ -52,7 +50,7 @@ class DailyChallengeService {
   async getChallengeDeck(seed: number, difficulty: Difficulty): Promise<Card[]> {
     try {
       // Get available themes
-      const themes = await themesService.getAllThemes();
+      const themes = await themesService.getThemes();
       
       if (themes.length === 0) {
         throw new Error('No themes available for challenge deck generation');
@@ -62,22 +60,24 @@ class DailyChallengeService {
       const themeIndex = seed % themes.length;
       const selectedTheme = themes[themeIndex];
 
+      // Determine deck size based on difficulty first
+      const deckSizes = {
+        easy: 12,    // 6 pairs
+        medium: 20,  // 10 pairs  
+        hard: 32,    // 16 pairs
+        expert: 40   // 20 pairs
+      };
+
+      const deckSize = deckSizes[difficulty] || deckSizes.medium;
+      const pairCount = deckSize / 2;
+
       // Get theme assets
-      const themeAssets = await themesService.getThemeAssets(selectedTheme.id);
+      const themeAssets = await themesService.getThemeAssets(selectedTheme.id, pairCount);
       
       if (!themeAssets || themeAssets.length === 0) {
         throw new Error(`No assets found for theme: ${selectedTheme.name}`);
       }
 
-      // Determine deck size based on difficulty
-      const deckSizes = {
-        easy: 12,    // 6 pairs
-        medium: 20,  // 10 pairs  
-        hard: 32     // 16 pairs
-      };
-
-      const deckSize = deckSizes[difficulty] || deckSizes.medium;
-      const pairCount = deckSize / 2;
 
       // Select assets for the challenge (deterministic based on seed)
       const shuffledAssets = seededShuffle([...themeAssets], seed);
@@ -87,22 +87,26 @@ class DailyChallengeService {
       const cards: Card[] = [];
       selectedAssets.forEach((asset, index) => {
         // Create two cards for each asset (matching pair)
+        const cardContent = asset.type === 'image' ? asset.url : asset.id;
+        
         cards.push({
           id: `${seed}-${index}-1`,
-          value: asset.value,
-          imageUrl: asset.imageUrl,
+          content: cardContent,
+          value: asset.id,
           isFlipped: false,
           isMatched: false,
-          themeId: selectedTheme.id
+          image: asset.type === 'image' ? asset.url : undefined,
+          pairId: `pair-${index}`
         });
 
         cards.push({
           id: `${seed}-${index}-2`,
-          value: asset.value,
-          imageUrl: asset.imageUrl,
+          content: cardContent,
+          value: asset.id,
           isFlipped: false,
           isMatched: false,
-          themeId: selectedTheme.id
+          image: asset.type === 'image' ? asset.url : undefined,
+          pairId: `pair-${index}`
         });
       });
 

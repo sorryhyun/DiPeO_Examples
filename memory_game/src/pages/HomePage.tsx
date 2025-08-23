@@ -1,19 +1,18 @@
-import React from 'react';
-import { Button } from '../shared/components/Button';
-import { ThemeSelector } from '../shared/components/ThemeSelector';
+import Button from '../shared/components/Button';
+import ThemeSelector from '../shared/components/ThemeSelector';
 import { useGameStore } from '../state/store';
 
 export default function HomePage() {
   const { startGame } = useGameStore();
 
   const handleStartGame = (difficulty: '4x4' | '6x6' | '8x8') => {
-    const gridSizes = {
-      '4x4': { rows: 4, cols: 4 },
-      '6x6': { rows: 6, cols: 6 },
-      '8x8': { rows: 8, cols: 8 }
+    const difficultyMap = {
+      '4x4': 'easy' as const,
+      '6x6': 'medium' as const,
+      '8x8': 'hard' as const
     };
     
-    startGame(gridSizes[difficulty]);
+    startGame(difficultyMap[difficulty], 'animals');
     window.location.hash = '#/game';
   };
 

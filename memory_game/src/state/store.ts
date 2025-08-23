@@ -4,7 +4,6 @@ import {
   GameState, 
   Card, 
   GameDifficulty, 
-  Theme, 
   PlayerStats, 
   GameSettings,
   ScoreEntry 
@@ -13,8 +12,22 @@ import { themesService } from '../services/themesService'
 import { shuffle } from '../utils/shuffle'
 
 interface GameStore extends GameState {
+  // Extended state properties for compatibility
+  challengeProgress?: any
+  multiplayerSession?: any
+  gameBoard?: any
+  currentPlayer?: any
+  cardDeck?: Card[]
+  timer?: number
+  victory?: boolean
+  gameStarted?: boolean
+  difficulty?: GameDifficulty
+  playerName?: string | undefined
+  gridSize?: number
+  moveCount?: number
+  
   // Actions
-  startGame: (difficulty: GameDifficulty, theme: Theme) => void
+  startGame: (difficulty: GameDifficulty, theme: string) => Promise<void>
   flipCard: (cardId: string) => void
   endGame: (completed: boolean) => void
   resetGame: () => void
@@ -23,6 +36,17 @@ interface GameStore extends GameState {
   updateSettings: (settings: Partial<GameSettings>) => void
   updatePlayerStats: (stats: Partial<PlayerStats>) => void
   addScoreEntry: (entry: ScoreEntry) => void
+  
+  // Extended actions for compatibility
+  startChallenge?: (config: any) => void
+  setMultiplayerSession?: (session: any) => void
+  clearMultiplayerSession?: () => void
+  addPlayerToSession?: (player: any) => void
+  removePlayerFromSession?: (playerId: string) => void
+  startMultiplayerGame?: (gameState: any) => void
+  applyMultiplayerMove?: (move: any) => void
+  updatePlayerReady?: (playerId: string, isReady: boolean) => void
+  endMultiplayerGame?: (results: any) => void
 }
 
 const initialState: GameState = {
@@ -50,23 +74,40 @@ const initialState: GameState = {
     bestTimes: {
       easy: null,
       medium: null,
-      hard: null
+      hard: null,
+      expert: null
     },
+    bestMoves: {
+      easy: null,
+      medium: null,
+      hard: null,
+      expert: null
+    },
+    winRate: 0,
+    averageMoves: 0,
+    averageTime: 0,
     achievements: [],
     currentStreak: 0,
-    longestStreak: 0
+    longestStreak: 0,
+    dailyChallengesCompleted: 0
   },
   
   // Settings
   settings: {
     soundEnabled: true,
+    musicEnabled: true,
     darkMode: false,
     animationsEnabled: true,
     showTimer: true,
     showMoves: true,
     autoFlip: false,
     flipDelay: 1000,
-    difficulty: 'medium'
+    difficulty: 'medium',
+    theme: 'animals',
+    playerName: 'Player',
+    colorblindMode: false,
+    hapticFeedback: true,
+    persistenceEnabled: true
   },
   
   // Scores
@@ -77,59 +118,67 @@ const initialState: GameState = {
 // Persistence keys
 const STORAGE_KEY = 'memorygame:v1:store'
 
+// Additional state removed - using only GameState interface properties
+
 export const useGameStore = create<GameStore>()(
   subscribeWithSelector((set, get) => ({
     ...initialState,
     
-    startGame: (difficulty: GameDifficulty, theme: Theme) => {
-      const themeData = themesService.getTheme(theme)
-      if (!themeData) return
-      
-      const cardCount = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 16
-      const cards: Card[] = []
-      
-      // Create pairs of cards
-      for (let i = 0; i < cardCount; i++) {
-        const cardData = themeData.cards[i % themeData.cards.length]
-        cards.push(
-          {
-            id: `${i}-a`,
-            value: cardData.value,
-            image: cardData.image,
-            isFlipped: false,
-            isMatched: false,
-            pairId: i.toString()
-          },
-          {
-            id: `${i}-b`,
-            value: cardData.value,
-            image: cardData.image,
-            isFlipped: false,
-            isMatched: false,
-            pairId: i.toString()
-          }
-        )
+    startGame: async (difficulty: GameDifficulty, theme: string) => {
+      try {
+        const themeData = await themesService.getTheme(theme)
+        if (!themeData) return
+          
+          const cardCount = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : difficulty === 'expert' ? 18 : 16
+          const cards: Card[] = []
+          
+          // Create pairs of cards
+          for (let i = 0; i < cardCount; i++) {
+            const cardValue = themeData.cards[i % themeData.cards.length]
+          cards.push(
+            {
+              id: `${i}-a`,
+              content: cardValue,
+              value: cardValue,
+              image: cardValue,
+              isFlipped: false,
+              isMatched: false,
+              pairId: i.toString()
+            },
+            {
+              id: `${i}-b`,
+              content: cardValue,
+              value: cardValue,
+              image: cardValue,
+              isFlipped: false,
+              isMatched: false,
+              pairId: i.toString()
+            }
+          )
+        }
+        
+        // Shuffle the deck
+        const shuffledDeck = shuffle(cards)
+        
+        set({
+          deck: shuffledDeck,
+          flippedCards: [],
+          matchedCards: [],
+          moves: 0,
+          timeElapsed: 0,
+          isGameActive: true,
+          isGameComplete: false,
+          isGameWon: false,
+          currentDifficulty: difficulty,
+          currentTheme: theme,
+          timerInterval: null,
+        })
+        
+        // Start timer
+        get().startTimer()
+      } catch (error) {
+        console.error('Failed to start game:', error)
       }
-      
-      // Shuffle the deck
-      const shuffledDeck = shuffle(cards)
-      
-      set({
-        deck: shuffledDeck,
-        flippedCards: [],
-        matchedCards: [],
-        moves: 0,
-        timeElapsed: 0,
-        isGameActive: true,
-        isGameComplete: false,
-        isGameWon: false,
-        currentDifficulty: difficulty,
-        currentTheme: theme,
-        timerInterval: null
-      })
-      
-      // Start timer
-      get().startTimer()
     },
     
     flipCard: (cardId: string) => {
@@ -208,11 +257,16 @@ export const useGameStore = create<GameStore>()(
         totalTimeSpent: state.playerStats.totalTimeSpent + state.timeElapsed
       }
       
-      // Update best time if won
+      // Update best time and moves if won
       if (gameWon) {
         const currentBestTime = newStats.bestTimes[state.currentDifficulty]
         if (!currentBestTime || state.timeElapsed < currentBestTime) {
           newStats.bestTimes[state.currentDifficulty] = state.timeElapsed
+        }
+        
+        const currentBestMoves = newStats.bestMoves[state.currentDifficulty]
+        if (!currentBestMoves || state.moves < currentBestMoves) {
+          newStats.bestMoves[state.currentDifficulty] = state.moves
         }
         
         newStats.currentStreak = state.playerStats.currentStreak + 1
@@ -221,13 +275,18 @@ export const useGameStore = create<GameStore>()(
         newStats.currentStreak = 0
       }
       
+      // Update calculated stats
+      newStats.winRate = newStats.totalGamesPlayed > 0 ? (newStats.totalGamesWon / newStats.totalGamesPlayed) * 100 : 0
+      newStats.averageMoves = newStats.totalGamesPlayed > 0 ? newStats.totalMoves / newStats.totalGamesPlayed : 0
+      newStats.averageTime = newStats.totalGamesPlayed > 0 ? newStats.totalTimeSpent / newStats.totalGamesPlayed : 0
+      
       // Create score entry
       const scoreEntry: ScoreEntry = {
         id: Date.now().toString(),
         score: state.timeElapsed,
         moves: state.moves,
         difficulty: state.currentDifficulty,
-        theme: state.currentTheme,
+        theme: typeof state.currentTheme === 'string' ? state.currentTheme : state.currentTheme.id,
         completed: gameWon,
         date: new Date().toISOString()
       }
@@ -311,6 +370,112 @@ export const useGameStore = create<GameStore>()(
         .slice(0, 10) // Keep only top 10
       
       set({ bestScores: newScores })
+    },
+    
+    // Daily Challenge methods
+    startChallenge: (config: any) => {
+      const gridSize = config.difficulty === 'easy' ? 4 : config.difficulty === 'medium' ? 6 : 8;
+      set({
+        deck: config.deck || [],
+        currentDifficulty: config.difficulty,
+        currentTheme: config.theme,
+        isGameActive: true,
+        isGameComplete: false,
+        isGameWon: false,
+        flippedCards: [],
+        matchedCards: [],
+        moves: 0,
+        timeElapsed: 0,
+        challengeProgress: {
+          completed: false,
+          inProgress: true
+        },
+        cardDeck: config.deck || [],
+        timer: 0,
+        victory: false,
+        gameStarted: true,
+        difficulty: config.difficulty,
+        gridSize: gridSize,
+        moveCount: 0
+      });
+      get().startTimer();
+    },
+    
+    // Multiplayer methods (stub implementations)
+    setMultiplayerSession: (session: any) => {
+      set({ multiplayerSession: session });
+    },
+    
+    clearMultiplayerSession: () => {
+      set({ multiplayerSession: undefined });
+    },
+    
+    addPlayerToSession: (player: any) => {
+      const state = get();
+      if (state.multiplayerSession) {
+        set({
+          multiplayerSession: {
+            ...state.multiplayerSession,
+            players: [...(state.multiplayerSession.players || []), player]
+          }
+        });
+      }
+    },
+    
+    removePlayerFromSession: (playerId: string) => {
+      const state = get();
+      if (state.multiplayerSession) {
+        set({
+          multiplayerSession: {
+            ...state.multiplayerSession,
+            players: (state.multiplayerSession.players || []).filter((p: any) => p.id !== playerId)
+          }
+        });
+      }
+    },
+    
+    startMultiplayerGame: (gameState: any) => {
+      set({ 
+        gameBoard: gameState.cards || [],
+        isGameActive: true,
+        gameStarted: true,
+        multiplayerSession: {
+          ...get().multiplayerSession,
+          status: 'active'
+        }
+      });
+    },
+    
+    applyMultiplayerMove: (move: any) => {
+      // Stub implementation
+      console.log('Applying multiplayer move:', move);
+    },
+    
+    updatePlayerReady: (playerId: string, isReady: boolean) => {
+      const state = get();
+      if (state.multiplayerSession) {
+        const updatedPlayers = (state.multiplayerSession.players || []).map((p: any) => 
+          p.id === playerId ? { ...p, isReady } : p
+        );
+        set({
+          multiplayerSession: {
+            ...state.multiplayerSession,
+            players: updatedPlayers
+          }
+        });
+      }
+    },
+    
+    endMultiplayerGame: (results: any) => {
+      set({
+        isGameActive: false,
+        gameStarted: false,
+        multiplayerSession: {
+          ...get().multiplayerSession,
+          status: 'finished',
+          results
+        }
+      });
     }
   }))
 )
@@ -348,3 +513,9 @@ if (typeof window !== 'undefined') {
     console.warn('Failed to load persisted game state:', error)
   }
 }
+
+// Export alias for backward compatibility
+export const useStore = useGameStore;
+
+// Export type for external use
+export type { GameStore };

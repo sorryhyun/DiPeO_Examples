@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from '../shared/components/Button';
-import { Grid } from '../shared/components/Grid';
-import { Card } from '../shared/components/Card';
+import { useEffect, useState } from 'react';
+import Button from '../shared/components/Button';
+import Grid from '../shared/components/Grid';
+import Card from '../shared/components/Card';
 import { dailyChallengeService } from '../services/dailyChallengeService';
 import { useGameStore } from '../state/store';
 import { DailyChallenge } from '../types';
@@ -29,7 +29,7 @@ export default function DailyChallengePage() {
       // Get preview deck for challenge
       if (todayChallenge) {
         const deck = await dailyChallengeService.getChallengeDeck(
-          todayChallenge.seed,
+          parseInt(todayChallenge.seed),
           todayChallenge.difficulty
         );
         setPreviewDeck(deck.slice(0, 8)); // Show first 8 cards as preview
@@ -46,11 +46,11 @@ export default function DailyChallengePage() {
 
     try {
       const challengeDeck = await dailyChallengeService.getChallengeDeck(
-        challenge.seed,
+        parseInt(challenge.seed),
         challenge.difficulty
       );
       
-      startChallenge({
+      startChallenge?.({
         seed: challenge.seed,
         difficulty: challenge.difficulty,
         theme: challenge.theme,
@@ -182,7 +182,7 @@ export default function DailyChallengePage() {
           {/* Challenge Description */}
           <div className="mb-6">
             <p className="text-gray-600 dark:text-gray-300">
-              {challenge.description || `Match all pairs in this ${gridSize}×${gridSize} grid using the ${challenge.theme} theme. This challenge uses a unique seed that creates a special card arrangement just for today!`}
+              Match all pairs in this {gridSize}×{gridSize} grid using the {challenge.theme} theme. This challenge uses a unique seed that creates a special card arrangement just for today!
             </p>
           </div>
 
@@ -198,7 +198,7 @@ export default function DailyChallengePage() {
                     key={index}
                     className="px-2 py-1 bg-yellow-200 dark:bg-yellow-800/30 text-yellow-800 dark:text-yellow-300 rounded text-sm"
                   >
-                    {reward}
+                    {reward.description}
                   </span>
                 ))}
               </div>

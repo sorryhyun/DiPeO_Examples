@@ -107,7 +107,7 @@ export function focusNextCard(
     return;
   }
   
-  const { columns, rows } = getGridDimensions(cards, container);
+  const { columns } = getGridDimensions(cards, container);
   let nextIndex: number;
   
   if (direction === 'right') {
@@ -149,7 +149,7 @@ export function focusPrevCard(
     return;
   }
   
-  const { columns, rows } = getGridDimensions(cards, container);
+  const { columns } = getGridDimensions(cards, container);
   let prevIndex: number;
   
   if (direction === 'left') {
@@ -301,21 +301,22 @@ export function trapFocus(container: Element): () => void {
   const firstElement = focusableElements[0];
   const lastElement = focusableElements[focusableElements.length - 1];
   
-  const handleTabKey = (e: KeyboardEvent) => {
-    if (e.key !== 'Tab') {
+  const handleTabKey = (e: Event) => {
+    const keyboardEvent = e as KeyboardEvent;
+    if (keyboardEvent.key !== 'Tab') {
       return;
     }
     
-    if (e.shiftKey) {
+    if (keyboardEvent.shiftKey) {
       // Shift + Tab
       if (document.activeElement === firstElement) {
-        e.preventDefault();
+        keyboardEvent.preventDefault();
         lastElement.focus();
       }
     } else {
       // Tab
       if (document.activeElement === lastElement) {
-        e.preventDefault();
+        keyboardEvent.preventDefault();
         firstElement.focus();
       }
     }

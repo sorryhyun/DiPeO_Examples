@@ -1,5 +1,5 @@
 import React from 'react';
-import { Achievement } from '../../../types';
+import { Achievement } from '../../types';
 
 interface AchievementBadgeProps {
   achievement: Achievement;
@@ -10,8 +10,10 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
   achievement, 
   className = '' 
 }) => {
-  const isCompleted = achievement.progress >= achievement.target;
-  const progressPercentage = Math.min((achievement.progress / achievement.target) * 100, 100);
+  const isCompleted = achievement.unlocked;
+  const progress = achievement.progress || 0;
+  const maxProgress = achievement.maxProgress || 100;
+  const progressPercentage = Math.min((progress / maxProgress) * 100, 100);
 
   const getAchievementIcon = (type: string) => {
     switch (type) {
@@ -65,7 +67,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
         }
         ${className}
       `}
-      aria-label={`Achievement: ${achievement.title}. ${achievement.description}. Progress: ${achievement.progress} of ${achievement.target}`}
+      aria-label={`Achievement: ${achievement.name}. ${achievement.description}. Progress: ${progress} of ${maxProgress}`}
       title={achievement.description}
     >
       {/* Icon */}
@@ -78,7 +80,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
           }
         `}
       >
-        {getAchievementIcon(achievement.type)}
+        {getAchievementIcon(achievement.category)}
       </div>
 
       {/* Content */}
@@ -90,7 +92,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
             : 'text-gray-900 dark:text-gray-100'
           }
         `}>
-          {achievement.title}
+          {achievement.name}
         </h3>
         
         <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
@@ -105,7 +107,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
                 Progress
               </span>
               <span className="text-gray-900 dark:text-gray-100 font-medium">
-                {achievement.progress}/{achievement.target}
+                {progress}/{maxProgress}
               </span>
             </div>
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">

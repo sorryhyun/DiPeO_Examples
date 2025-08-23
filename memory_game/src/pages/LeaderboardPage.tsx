@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { leaderboardService } from '../services/leaderboardService';
+import { useEffect, useState } from 'react';
+import leaderboardService from '../services/leaderboardService';
 import { LeaderboardList } from '../shared/components/LeaderboardList';
-import { Button } from '../shared/components/Button';
-import { LeaderboardEntry, Difficulty } from '../types';
+import Button from '../shared/components/Button';
+import { LeaderboardEntry, GameDifficulty } from '../types';
 
 interface LeaderboardPageState {
   entries: LeaderboardEntry[];
   loading: boolean;
   error: string | null;
-  selectedDifficulty: Difficulty | 'all';
+  selectedDifficulty: GameDifficulty | 'all';
 }
 
 export default function LeaderboardPage() {
@@ -19,7 +19,7 @@ export default function LeaderboardPage() {
     selectedDifficulty: 'all'
   });
 
-  const fetchLeaderboard = async (difficulty?: Difficulty) => {
+  const fetchLeaderboard = async (difficulty?: GameDifficulty | 'all') => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
@@ -41,7 +41,7 @@ export default function LeaderboardPage() {
     fetchLeaderboard(state.selectedDifficulty === 'all' ? undefined : state.selectedDifficulty);
   }, [state.selectedDifficulty]);
 
-  const handleDifficultyChange = (difficulty: Difficulty | 'all') => {
+  const handleDifficultyChange = (difficulty: GameDifficulty | 'all') => {
     setState(prev => ({ ...prev, selectedDifficulty: difficulty }));
   };
 
@@ -96,7 +96,7 @@ export default function LeaderboardPage() {
               >
                 All Difficulties
               </Button>
-              {(['easy', 'medium', 'hard'] as Difficulty[]).map(difficulty => (
+              {(['easy', 'medium', 'hard'] as GameDifficulty[]).map(difficulty => (
                 <Button
                   key={difficulty}
                   onClick={() => handleDifficultyChange(difficulty)}

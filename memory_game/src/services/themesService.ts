@@ -11,11 +11,18 @@ class ThemesService {
   async getThemes(): Promise<Theme[]> {
     try {
       const response = await apiClient.get<Theme[]>('/api/themes');
-      return response.data;
+      return response.data || [];
     } catch (error) {
       console.error('Failed to fetch themes:', error);
       throw new Error('Unable to load themes');
     }
+  }
+
+  /**
+   * Alias for getThemes - for backward compatibility
+   */
+  async getAllThemes(): Promise<Theme[]> {
+    return this.getThemes();
   }
 
   /**
@@ -28,12 +35,13 @@ class ThemesService {
         { params: { pairCount } }
       );
       
-      if (response.data.length < pairCount) {
+      const assets = response.data || [];
+      if (assets.length < pairCount) {
         throw new Error(`Theme ${themeId} has insufficient assets for ${pairCount} pairs`);
       }
       
       // Return only the requested number of assets
-      return response.data.slice(0, pairCount);
+      return assets.slice(0, pairCount);
     } catch (error) {
       console.error(`Failed to fetch assets for theme ${themeId}:`, error);
       throw new Error(`Unable to load assets for theme ${themeId}`);
@@ -46,6 +54,9 @@ class ThemesService {
   async getTheme(themeId: string): Promise<Theme> {
     try {
       const response = await apiClient.get<Theme>(`/api/themes/${themeId}`);
+      if (!response.data) {
+        throw new Error(`Theme ${themeId} not found`);
+      }
       return response.data;
     } catch (error) {
       console.error(`Failed to fetch theme ${themeId}:`, error);
@@ -71,6 +82,7 @@ export const themesService = new ThemesService();
 
 // Export individual methods for convenience
 export const getThemes = () => themesService.getThemes();
+export const getAllThemes = () => themesService.getAllThemes();
 export const getThemeAssets = (themeId: string, pairCount: number) => 
   themesService.getThemeAssets(themeId, pairCount);
 export const getTheme = (themeId: string) => themesService.getTheme(themeId);

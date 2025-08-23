@@ -1,15 +1,15 @@
 import { apiClient } from './apiClient';
-import type { LeaderboardEntry } from '../types';
+import type { LeaderboardEntry, GameDifficulty } from '../types';
 
 export interface GetTopParams {
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: GameDifficulty;
   limit?: number;
 }
 
 export interface SubmitScoreParams {
   playerName: string;
   score: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: GameDifficulty;
   timeElapsed: number;
   moves: number;
 }
@@ -30,7 +30,7 @@ export async function getTop(params: GetTopParams = {}): Promise<LeaderboardEntr
   
   try {
     const response = await apiClient.get<LeaderboardEntry[]>(`/api/leaderboard?${searchParams}`);
-    return response.data;
+    return response.data || [];
   } catch (error) {
     console.error('Failed to fetch leaderboard:', error);
     throw new Error('Unable to fetch leaderboard data');
@@ -53,6 +53,10 @@ export async function submitScore(params: SubmitScoreParams): Promise<Leaderboar
       timestamp: new Date().toISOString(),
     });
     
+    if (!response.data) {
+      throw new Error('Invalid response data');
+    }
+    
     return response.data;
   } catch (error) {
     console.error('Failed to submit score:', error);
@@ -66,7 +70,7 @@ export async function submitScore(params: SubmitScoreParams): Promise<Leaderboar
 export async function getPlayerScores(playerName: string): Promise<LeaderboardEntry[]> {
   try {
     const response = await apiClient.get<LeaderboardEntry[]>(`/api/leaderboard/player/${encodeURIComponent(playerName)}`);
-    return response.data;
+    return response.data || [];
   } catch (error) {
     console.error('Failed to fetch player scores:', error);
     throw new Error('Unable to fetch player scores');
@@ -76,12 +80,19 @@ export async function getPlayerScores(playerName: string): Promise<LeaderboardEn
 /**
  * Gets the player's rank for a specific difficulty
  */
-export async function getPlayerRank(playerName: string, difficulty: 'easy' | 'medium' | 'hard'): Promise<number | null> {
+export async function getPlayerRank(playerName: string, difficulty: GameDifficulty): Promise<number | null> {
   try {
     const response = await apiClient.get<{ rank: number | null }>(`/api/leaderboard/player/${encodeURIComponent(playerName)}/rank?difficulty=${difficulty}`);
-    return response.data.rank;
+    return response.data?.rank || null;
   } catch (error) {
     console.error('Failed to fetch player rank:', error);
     return null;
   }
 }
+
+export default {
+  getTop,
+  submitScore,
+  getPlayerScores,
+  getPlayerRank
+};

@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useCallback, ReactNode } from 'react';
 import { useLocalStorage } from '../shared/hooks/useLocalStorage';
-import { useSound } from '../shared/hooks/useSound';
 
 interface SoundSettings {
   muted: boolean;
@@ -12,6 +11,7 @@ interface SoundContextType {
   volume: number;
   setMuted: (muted: boolean) => void;
   setVolume: (volume: number) => void;
+  toggleSound: () => void;
   playSound: (identifier: string) => void;
 }
 
@@ -21,13 +21,12 @@ interface SoundProviderProps {
   children: ReactNode;
 }
 
+
 export const SoundProvider: React.FC<SoundProviderProps> = ({ children }) => {
   const [soundSettings, setSoundSettings] = useLocalStorage<SoundSettings>(
     'memorygame:v1:sound',
     { muted: false, volume: 0.7 }
   );
-
-  const { playSound: playSoundHook } = useSound();
 
   const setMuted = useCallback((muted: boolean) => {
     setSoundSettings(prev => ({ ...prev, muted }));
@@ -41,17 +40,26 @@ export const SoundProvider: React.FC<SoundProviderProps> = ({ children }) => {
     if (soundSettings.muted) return;
     
     try {
-      playSoundHook(identifier, soundSettings.volume);
+      const audio = new Audio(identifier);
+      audio.volume = Math.max(0, Math.min(1, soundSettings.volume));
+      audio.play().catch(error => {
+        console.warn('Failed to play sound:', identifier, error);
+      });
     } catch (error) {
       console.warn('Failed to play sound:', identifier, error);
     }
-  }, [playSoundHook, soundSettings.muted, soundSettings.volume]);
+  }, [soundSettings.muted, soundSettings.volume]);
+
+  const toggleSound = useCallback(() => {
+    setSoundSettings(prev => ({ ...prev, muted: !prev.muted }));
+  }, [setSoundSettings]);
 
   const value: SoundContextType = {
     muted: soundSettings.muted,
     volume: soundSettings.volume,
     setMuted,
     setVolume,
+    toggleSound,
     playSound,
   };
 

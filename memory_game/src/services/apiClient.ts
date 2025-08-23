@@ -1,14 +1,14 @@
-import { ApiResponse, ApiError } from '../types/index.js';
-import { mockServer } from './mockServer.js';
+import { ApiResponse, ApiError } from '../types/index';
+import mockServer from './mockServer';
 
 // Configuration for enabling mock mode
-const ENABLE_MOCK = process.env.NODE_ENV === 'development' && process.env.REACT_APP_ENABLE_MOCK_DATA === 'true';
+const ENABLE_MOCK = import.meta.env.MODE === 'development' || import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
 
 // Default timeout for requests
 const DEFAULT_TIMEOUT = 10000;
 
 // Base URL for API requests
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 /**
  * Handle fetch response and convert to ApiResponse format

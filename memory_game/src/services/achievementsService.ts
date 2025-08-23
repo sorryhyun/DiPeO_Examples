@@ -20,7 +20,7 @@ export class AchievementsService {
         return response.data;
       }
       
-      throw new Error(response.error || 'Failed to fetch achievements');
+      throw new Error(response.error?.message || 'Failed to fetch achievements');
     } catch (error) {
       console.error('Error fetching achievements:', error);
       throw error;
@@ -42,7 +42,7 @@ export class AchievementsService {
         return response.data;
       }
       
-      throw new Error(response.error || 'Failed to award achievement');
+      throw new Error(response.error?.message || 'Failed to award achievement');
     } catch (error) {
       console.error('Error awarding achievement:', error);
       throw error;

@@ -25,10 +25,13 @@ const Card: React.FC<CardProps> = ({
     }
   };
 
-  useKeyboardShortcuts({
-    ' ': handleClick,
-    Enter: handleClick
-  });
+  const { registerShortcut } = useKeyboardShortcuts();
+  
+  // Register keyboard shortcuts for this card when focused
+  React.useEffect(() => {
+    registerShortcut(' ', () => handleClick());
+    registerShortcut('enter', () => handleClick());
+  }, [registerShortcut]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === ' ' || event.key === 'Enter') {

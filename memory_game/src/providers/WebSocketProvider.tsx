@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
+import { WebSocketMessage } from '../types';
 
 // WebSocket connection states
 export enum WebSocketReadyState {
@@ -8,11 +9,8 @@ export enum WebSocketReadyState {
   CLOSED = 3,
 }
 
-interface WebSocketMessage {
-  type: string;
-  payload: any;
-  timestamp: number;
-}
+// Using WebSocketMessage from types/index.ts
+// Local interface removed to avoid conflicts
 
 interface WebSocketContextValue {
   sendMessage: (message: WebSocketMessage) => void;
@@ -40,8 +38,8 @@ class MockWebSocket {
 
   constructor() {
     // Import mock event emitter from services
-    import('../services/mockServer').then(({ mockWebSocket }) => {
-      this.mockEventEmitter = mockWebSocket;
+    import('../services/mockServer').then((module) => {
+      this.mockEventEmitter = (module as any).mockWebSocket;
       if (this.mockEventEmitter) {
         this.mockEventEmitter.on('message', (data: any) => {
           const event = new MessageEvent('message', { data: JSON.stringify(data) });
@@ -94,12 +92,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
   const messageHandlersRef = useRef<Set<(message: WebSocketMessage) => void>>(new Set());
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
 
-  const shouldUseMockWS = process.env.NODE_ENV === 'development' && 
-    (process.env.REACT_APP_USE_MOCK_WS === 'true' || process.env.REACT_APP_DISABLE_WEBSOCKET_IN_DEV === 'true');
-
   const connect = useCallback(() => {
     try {
+      // Always use mock WebSocket in development mode
+      const shouldUseMockWS = import.meta.env.MODE === 'development' || 
+        import.meta.env.VITE_USE_MOCK_WS === 'true' || 
+        import.meta.env.VITE_DISABLE_WEBSOCKET_IN_DEV === 'true' ||
+        !url || url.includes('localhost');
+
       if (shouldUseMockWS) {
+        console.log('Using mock WebSocket in development mode');
         wsRef.current = new MockWebSocket();
         setReadyState(WebSocketReadyState.OPEN);
         setReconnectAttempts(0);
@@ -138,7 +140,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
           const message: WebSocketMessage = {
             type: data.type || 'unknown',
             payload: data.payload || data,
-            timestamp: Date.now(),
+            timestamp: new Date().toISOString(),
+            from: data.from,
           };
 
           messageHandlersRef.current.forEach(handler => {
@@ -168,7 +171,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
       console.error('Failed to create WebSocket connection:', error);
       setReadyState(WebSocketReadyState.CLOSED);
     }
-  }, [url, autoReconnect, maxReconnectAttempts, reconnectInterval, reconnectAttempts, shouldUseMockWS]);
+  }, [url, autoReconnect, maxReconnectAttempts, reconnectInterval, reconnectAttempts]);
 
   const sendMessage = useCallback((message: WebSocketMessage) => {
     if (!wsRef.current) {
@@ -184,7 +187,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
     try {
       const serialized = JSON.stringify({
         ...message,
-        timestamp: message.timestamp || Date.now(),
+        timestamp: message.timestamp || new Date().toISOString(),
       });
       wsRef.current.send(serialized);
     } catch (error) {

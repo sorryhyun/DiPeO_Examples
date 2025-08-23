@@ -1,4 +1,4 @@
-import type { Difficulty } from '../types/index.ts';
+import type { Difficulty } from '../types/index';
 
 interface ScoreCalculationParams {
   moves: number;

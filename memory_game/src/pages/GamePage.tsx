@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { useStore } from '../state/store';
+import { useEffect } from 'react';
+import { useGameStore } from '../state/store';
 import Grid from '../shared/components/Grid';
 import Card from '../shared/components/Card';
 import Timer from '../shared/components/Timer';
 import MoveCounter from '../shared/components/MoveCounter';
 import SoundToggle from '../shared/components/SoundToggle';
 import Confetti from '../shared/components/Confetti';
-import { leaderboardService } from '../services/leaderboardService';
+import leaderboardService from '../services/leaderboardService';
 import type { Card as CardType } from '../types';
 
-const GamePage: React.FC = () => {
+export default function GamePage() {
   const {
     cardDeck,
     flippedCards,
@@ -27,7 +27,7 @@ const GamePage: React.FC = () => {
     startTimer,
     stopTimer,
     resetGame
-  } = useStore();
+  } = useGameStore();
 
   // Start timer when game begins
   useEffect(() => {
@@ -43,14 +43,13 @@ const GamePage: React.FC = () => {
     if (victory && gameStarted) {
       const submitScore = async () => {
         try {
-          const score = {
+          await leaderboardService.submitScore({
             playerName: playerName || 'Anonymous',
-            moves,
-            time: timer,
-            difficulty,
-            timestamp: Date.now()
-          };
-          await leaderboardService.submitScore(score);
+            score: timer || 0,
+            difficulty: difficulty as any,
+            timeElapsed: timer || 0,
+            moves
+          });
         } catch (error) {
           console.error('Failed to submit score:', error);
         }
@@ -64,7 +63,7 @@ const GamePage: React.FC = () => {
   const handleCardClick = (cardId: string) => {
     if (!gameStarted || victory || flippedCards.length >= 2) return;
     
-    const card = cardDeck.find((c: CardType) => c.id === cardId);
+    const card = cardDeck?.find((c: CardType) => c.id === cardId);
     if (!card || card.isMatched || flippedCards.includes(cardId)) return;
 
     flipCard(cardId);
@@ -72,7 +71,7 @@ const GamePage: React.FC = () => {
 
   const handleStartGame = () => {
     resetGame();
-    startGame();
+    startGame(difficulty || 'medium', currentTheme as string);
   };
 
   if (!gameStarted) {
@@ -125,22 +124,23 @@ const GamePage: React.FC = () => {
               🎉 Congratulations! 🎉
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
-              You completed the game in {moves} moves and {Math.floor(timer / 60)}:
-              {(timer % 60).toString().padStart(2, '0')}!
+              You completed the game in {moves} moves and {Math.floor((timer || 0) / 60)}:
+              {((timer || 0) % 60).toString().padStart(2, '0')}!
             </p>
           </div>
         )}
 
         {/* Game grid */}
         <div className="flex justify-center">
-          <Grid gridSize={gridSize}>
-            {cardDeck.map((card: CardType) => (
+          <Grid rows={gridSize || 4} cols={gridSize || 4}>
+            {(cardDeck || []).map((card: CardType) => (
               <Card
                 key={card.id}
-                card={card}
+                id={card.id}
+                content={card.content}
                 isFlipped={flippedCards.includes(card.id) || matchedCards.includes(card.id)}
                 isMatched={matchedCards.includes(card.id)}
-                onClick={() => handleCardClick(card.id)}
+                onFlip={handleCardClick}
                 disabled={victory || flippedCards.length >= 2}
               />
             ))}
@@ -154,16 +154,14 @@ const GamePage: React.FC = () => {
               Difficulty: <span className="capitalize">{difficulty}</span>
             </span>
             <span className="text-white font-medium">
-              Theme: <span className="capitalize">{currentTheme}</span>
+              Theme: <span className="capitalize">{typeof currentTheme === 'string' ? currentTheme : 'animals'}</span>
             </span>
             <span className="text-white font-medium">
-              Cards: {matchedCards.length}/{Math.floor(cardDeck.length / 2)} pairs
+              Cards: {matchedCards.length}/{Math.floor((cardDeck?.length || 0) / 2)} pairs
             </span>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default GamePage;
+}

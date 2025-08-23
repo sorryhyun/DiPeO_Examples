@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import type { PlayerStats, GameResult, ApiResponse } from '../types';
+import type { PlayerStats, GameResult } from '../types';
 
 /**
  * Service for managing player statistics and performance metrics
@@ -11,6 +11,9 @@ export class PlayerStatsService {
   async getPlayerStats(playerId: string): Promise<PlayerStats> {
     try {
       const response = await apiClient.get<PlayerStats>(`/api/player-stats?playerId=${playerId}`);
+      if (!response.data) {
+        throw new Error('No player stats found');
+      }
       return response.data;
     } catch (error) {
       console.error('Failed to fetch player stats:', error);
@@ -42,7 +45,7 @@ export class PlayerStatsService {
       const response = await apiClient.get<{ rank: number; totalPlayers: number }>(
         `/api/player-stats/ranking?playerId=${playerId}`
       );
-      return response.data;
+      return response.data || { rank: 0, totalPlayers: 0 };
     } catch (error) {
       console.error('Failed to fetch player ranking:', error);
       return { rank: 0, totalPlayers: 0 };
@@ -57,7 +60,7 @@ export class PlayerStatsService {
       const response = await apiClient.get<GameResult[]>(
         `/api/player-stats/recent?playerId=${playerId}&limit=${limit}`
       );
-      return response.data;
+      return response.data || [];
     } catch (error) {
       console.error('Failed to fetch recent games:', error);
       return [];
@@ -68,16 +71,13 @@ export class PlayerStatsService {
    * Calculates statistics update from a single game result
    */
   private calculateStatsUpdate(gameResult: GameResult) {
-    const { score, moves, timeElapsed, difficulty, completed } = gameResult;
+    const { moves, time, difficulty, won } = gameResult;
     
     return {
-      gamesPlayed: 1,
-      gamesCompleted: completed ? 1 : 0,
-      totalScore: score,
+      totalGamesPlayed: 1,
+      totalGamesWon: won ? 1 : 0,
       totalMoves: moves,
-      totalTime: timeElapsed,
-      bestScore: score,
-      bestTime: completed ? timeElapsed : null,
+      totalTimeSpent: time,
       difficulty,
       timestamp: Date.now()
     };
@@ -88,28 +88,23 @@ export class PlayerStatsService {
    */
   calculatePerformanceMetrics(stats: PlayerStats) {
     const {
-      gamesPlayed,
-      gamesCompleted,
-      totalScore,
-      totalMoves,
-      totalTime,
-      bestScore,
-      bestTime
+      totalGamesPlayed,
+      totalGamesWon,
+      winRate,
+      averageMoves,
+      averageTime
     } = stats;
 
-    const completionRate = gamesPlayed > 0 ? (gamesCompleted / gamesPlayed) * 100 : 0;
-    const averageScore = gamesCompleted > 0 ? totalScore / gamesCompleted : 0;
-    const averageMoves = gamesCompleted > 0 ? totalMoves / gamesCompleted : 0;
-    const averageTime = gamesCompleted > 0 ? totalTime / gamesCompleted : 0;
+    const completionRate = totalGamesPlayed > 0 ? (totalGamesWon / totalGamesPlayed) * 100 : 0;
 
     return {
       completionRate,
-      averageScore: Math.round(averageScore),
+      winRate,
       averageMoves: Math.round(averageMoves),
       averageTime: Math.round(averageTime),
-      bestScore,
-      bestTime,
-      efficiency: averageMoves > 0 ? Math.round((averageScore / averageMoves) * 100) / 100 : 0
+      totalGamesPlayed,
+      totalGamesWon,
+      efficiency: averageMoves > 0 ? Math.round((totalGamesWon / averageMoves) * 100) / 100 : 0
     };
   }
 }

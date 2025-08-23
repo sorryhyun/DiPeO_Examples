@@ -1,14 +1,12 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../shared/hooks/useLocalStorage';
+import { Theme } from '../types';
 
 type UIMode = 'light' | 'dark';
 
-type GameTheme = {
-  id: string;
-  name: string;
-  icons: string[];
-  description: string;
-};
+// Use the Theme type from the main types file
+// Local alias for backward compatibility
+type GameTheme = Theme;
 
 interface ThemeContextType {
   mode: UIMode;
@@ -24,26 +22,38 @@ const DEFAULT_THEMES: GameTheme[] = [
   {
     id: 'animals',
     name: 'Animals',
-    icons: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐧'],
-    description: 'Cute animal faces'
+    displayName: 'Animals',
+    cards: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐧'],
+    description: 'Cute animal faces',
+    preview: '🐶',
+    type: 'emoji'
   },
   {
     id: 'emojis',
     name: 'Emojis',
-    icons: ['😀', '😂', '😍', '🤔', '😎', '😴', '🤯', '🥳', '😇', '🤠', '🤖', '👻', '🎃', '🌟', '🔥', '💎'],
-    description: 'Fun emoji expressions'
+    displayName: 'Emojis',
+    cards: ['😀', '😂', '😍', '🤔', '😎', '😴', '🤯', '🥳', '😇', '🤠', '🤖', '👻', '🎃', '🌟', '🔥', '💎'],
+    description: 'Fun emoji expressions',
+    preview: '😀',
+    type: 'emoji'
   },
   {
     id: 'colors',
     name: 'Colors',
-    icons: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🔶', '🔷', '🔸', '🔹', '🔺', '🔻', '💫'],
-    description: 'Colorful shapes and symbols'
+    displayName: 'Colors',
+    cards: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🔶', '🔷', '🔸', '🔹', '🔺', '🔻', '💫'],
+    description: 'Colorful shapes and symbols',
+    preview: '🔴',
+    type: 'emoji'
   },
   {
     id: 'shapes',
     name: 'Shapes',
-    icons: ['⬜', '⬛', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⭐', '🔶', '🔷', '🔸', '🔹', '🔺', '🔻'],
-    description: 'Geometric shapes'
+    displayName: 'Shapes',
+    cards: ['⬜', '⬛', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⭐', '🔶', '🔷', '🔸', '🔹', '🔺', '🔻'],
+    description: 'Geometric shapes',
+    preview: '⬜',
+    type: 'emoji'
   }
 ];
 

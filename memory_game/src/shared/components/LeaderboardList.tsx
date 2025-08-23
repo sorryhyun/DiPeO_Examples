@@ -57,12 +57,12 @@ export const LeaderboardList: React.FC<LeaderboardListProps> = ({
               </h3>
               <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                 <span className="font-medium">Score: {entry.score.toLocaleString()}</span>
-                <span>Time: {Math.floor(entry.timeInSeconds / 60)}:{(entry.timeInSeconds % 60).toString().padStart(2, '0')}</span>
+                <span>Time: {Math.floor(entry.time / 60)}:{(entry.time % 60).toString().padStart(2, '0')}</span>
                 <span>Moves: {entry.moves}</span>
               </div>
-              {entry.achievedAt && (
+              {entry.date && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  {new Date(entry.achievedAt).toLocaleDateString()}
+                  {new Date(entry.date).toLocaleDateString()}
                 </p>
               )}
             </div>

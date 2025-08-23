@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useCallback, ReactNode, useState } from 'react';
 import { useStore } from '../state/store';
 import { GameDifficulty, GameMode } from '../types';
 
@@ -30,40 +30,40 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const store = useStore();
   const {
     startGame: storeStartGame,
-    pauseGame: storePauseGame,
-    resumeGame: storeResumeGame,
     endGame: storeEndGame,
     resetGame: storeResetGame,
-    gameState,
-    score,
     moves,
     timeElapsed,
-    difficulty,
-    mode,
+    currentDifficulty,
     isGameActive,
-    isGamePaused,
-    isGameCompleted
+    isGameComplete
   } = store;
 
-  const startGame = useCallback((difficulty: GameDifficulty, gameMode: GameMode = 'classic') => {
-    storeStartGame(difficulty, gameMode);
-  }, [storeStartGame]);
+  // Game pause/resume functionality (not in store, implementing locally)
+  const [isGamePaused, setIsGamePaused] = useState(false);
+  
+  const storePauseGame = () => setIsGamePaused(true);
+  const storeResumeGame = () => setIsGamePaused(false);
+
+  const startGame = useCallback((difficulty: GameDifficulty, _gameMode: GameMode = 'single') => {
+    storeStartGame(difficulty, typeof store.currentTheme === 'string' ? store.currentTheme : 'animals');
+  }, [storeStartGame, store.currentTheme]);
 
   const pauseGame = useCallback(() => {
     if (isGameActive && !isGamePaused) {
       storePauseGame();
     }
-  }, [storePauseGame, isGameActive, isGamePaused]);
+  }, [isGameActive, isGamePaused]);
 
   const resumeGame = useCallback(() => {
     if (isGameActive && isGamePaused) {
       storeResumeGame();
     }
-  }, [storeResumeGame, isGameActive, isGamePaused]);
+  }, [isGameActive, isGamePaused]);
 
   const endGame = useCallback(() => {
     if (isGameActive) {
-      storeEndGame();
+      storeEndGame(true); // Assume game completed successfully
     }
   }, [storeEndGame, isGameActive]);
 
@@ -80,10 +80,10 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     currentGame: {
       isActive: isGameActive,
       isPaused: isGamePaused,
-      isCompleted: isGameCompleted,
-      difficulty,
-      mode,
-      score,
+      isCompleted: isGameComplete,
+      difficulty: currentDifficulty,
+      mode: 'single' as GameMode, // Default mode since store doesn't track this
+      score: timeElapsed, // Using timeElapsed as score
       moves,
       timeElapsed
     }

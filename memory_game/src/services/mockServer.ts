@@ -1,4 +1,4 @@
-import { ApiResponse } from '../types';
+import { ApiResponse, ApiError } from '../types';
 import type {
   Player,
   Achievement,
@@ -14,111 +14,192 @@ let mockData = {
   players: [
     {
       id: '1',
-      email: 'player1@game.com',
       name: 'Player One',
-      role: 'player',
       avatar: '🎮',
-      createdAt: new Date('2024-01-01').toISOString()
+      score: 1800,
+      moves: 16,
+      matchedPairs: 8,
+      isActive: true,
+      isReady: true,
+      color: '#ff6b6b'
     },
     {
       id: '2',
-      email: 'player2@game.com',
-      name: 'Player Two', 
-      role: 'player',
+      name: 'Player Two',
       avatar: '🎯',
-      createdAt: new Date('2024-01-02').toISOString()
+      score: 1200,
+      moves: 20,
+      matchedPairs: 6,
+      isActive: false,
+      isReady: false,
+      color: '#4ecdc4'
     },
     {
       id: '3',
-      email: 'champion@game.com',
       name: 'Champion',
-      role: 'premium_player',
       avatar: '👑',
-      createdAt: new Date('2024-01-03').toISOString()
+      score: 2400,
+      moves: 12,
+      matchedPairs: 12,
+      isActive: true,
+      isReady: true,
+      color: '#45b7d1'
     }
   ] as Player[],
   
   leaderboard: [
-    { id: '1', playerId: '3', playerName: 'Champion', score: 2400, moves: 12, time: 45, difficulty: '8x8', theme: 'animals', createdAt: new Date('2024-01-15').toISOString() },
-    { id: '2', playerId: '1', playerName: 'Player One', score: 1800, moves: 16, time: 62, difficulty: '6x6', theme: 'emojis', createdAt: new Date('2024-01-14').toISOString() },
-    { id: '3', playerId: '2', playerName: 'Player Two', score: 1200, moves: 20, time: 89, difficulty: '4x4', theme: 'colors', createdAt: new Date('2024-01-13').toISOString() },
-    { id: '4', playerId: '3', playerName: 'Champion', score: 2100, moves: 14, time: 52, difficulty: '6x6', theme: 'shapes', createdAt: new Date('2024-01-12').toISOString() },
-    { id: '5', playerId: '1', playerName: 'Player One', score: 1500, moves: 18, time: 75, difficulty: '6x6', theme: 'animals', createdAt: new Date('2024-01-11').toISOString() }
+    { id: '1', rank: 1, playerName: 'Champion', score: 2400, moves: 12, time: 45, difficulty: 'expert', theme: 'animals', date: new Date('2024-01-15').toISOString(), avatar: '👑' },
+    { id: '2', rank: 2, playerName: 'Player One', score: 1800, moves: 16, time: 62, difficulty: 'hard', theme: 'emojis', date: new Date('2024-01-14').toISOString(), avatar: '🎮' },
+    { id: '3', rank: 3, playerName: 'Player Two', score: 1200, moves: 20, time: 89, difficulty: 'medium', theme: 'colors', date: new Date('2024-01-13').toISOString(), avatar: '🎯' },
+    { id: '4', rank: 4, playerName: 'Champion', score: 2100, moves: 14, time: 52, difficulty: 'hard', theme: 'shapes', date: new Date('2024-01-12').toISOString(), avatar: '👑' },
+    { id: '5', rank: 5, playerName: 'Player One', score: 1500, moves: 18, time: 75, difficulty: 'hard', theme: 'animals', date: new Date('2024-01-11').toISOString(), avatar: '🎮' }
   ] as LeaderboardEntry[],
 
   achievements: [
-    { id: 'first_win', name: 'First Victory', description: 'Win your first game', icon: '🏆', unlockedAt: new Date('2024-01-10').toISOString(), playerId: '1' },
-    { id: 'speed_demon', name: 'Speed Demon', description: 'Complete a game in under 30 seconds', icon: '⚡', unlockedAt: new Date('2024-01-12').toISOString(), playerId: '3' },
-    { id: 'memory_master', name: 'Memory Master', description: 'Complete 8x8 grid with less than 20 moves', icon: '🧠', unlockedAt: new Date('2024-01-15').toISOString(), playerId: '3' },
-    { id: 'perfectionist', name: 'Perfectionist', description: 'Complete a game without any wrong matches', icon: '💎', unlockedAt: null, playerId: '1' },
-    { id: 'daily_champion', name: 'Daily Champion', description: 'Win a daily challenge', icon: '🌟', unlockedAt: new Date('2024-01-14').toISOString(), playerId: '2' }
+    { id: 'first_win', name: 'First Victory', description: 'Win your first game', icon: '🏆', category: 'gameplay', points: 10, unlocked: true, unlockedAt: new Date('2024-01-10').toISOString(), rarity: 'common' },
+    { id: 'speed_demon', name: 'Speed Demon', description: 'Complete a game in under 30 seconds', icon: '⚡', category: 'gameplay', points: 25, unlocked: true, unlockedAt: new Date('2024-01-12').toISOString(), rarity: 'rare' },
+    { id: 'memory_master', name: 'Memory Master', description: 'Complete expert grid with less than 20 moves', icon: '🧠', category: 'gameplay', points: 50, unlocked: true, unlockedAt: new Date('2024-01-15').toISOString(), rarity: 'epic' },
+    { id: 'perfectionist', name: 'Perfectionist', description: 'Complete a game without any wrong matches', icon: '💎', category: 'gameplay', points: 100, unlocked: false, rarity: 'legendary', progress: 0, maxProgress: 1 },
+    { id: 'daily_champion', name: 'Daily Champion', description: 'Win a daily challenge', icon: '🌟', category: 'special', points: 30, unlocked: true, unlockedAt: new Date('2024-01-14').toISOString(), rarity: 'rare' }
   ] as Achievement[],
 
   dailyChallenge: {
     id: 'daily_2024_01_15',
     date: '2024-01-15',
-    difficulty: '6x6',
+    difficulty: 'hard',
     theme: 'space',
-    timeLimit: 180,
-    maxMoves: 25,
-    reward: { type: 'badge', value: 'space_explorer' },
+    seed: 'daily_seed_20240115',
+    targetMoves: 25,
+    targetTime: 180,
     completed: false,
-    attempts: 0,
-    bestScore: null
+    participants: 1247,
+    rewards: [
+      { type: 'points', value: 100, description: 'Daily challenge points', icon: '⭐' },
+      { type: 'badge', value: 'space_explorer', description: 'Space Explorer badge', icon: '🚀' }
+    ],
+    leaderboard: [
+      { id: '1', rank: 1, playerName: 'Champion', score: 2400, moves: 18, time: 95, difficulty: 'hard', theme: 'space', date: '2024-01-15', avatar: '👑' }
+    ]
   } as DailyChallenge,
 
   playerStats: {
     '1': { 
-      playerId: '1', 
-      gamesPlayed: 15, 
-      gamesWon: 12, 
-      totalScore: 18500, 
-      bestTime: 45, 
-      averageTime: 67, 
-      perfectGames: 2, 
-      currentStreak: 3, 
+      totalGamesPlayed: 15,
+      totalGamesWon: 12,
+      totalMoves: 240,
+      totalTimeSpent: 1620,
+      bestTimes: { easy: 25, medium: 35, hard: 45, expert: null },
+      bestMoves: { easy: 8, medium: 12, hard: 16, expert: null },
+      winRate: 0.8,
+      averageMoves: 16,
+      averageTime: 67,
+      currentStreak: 3,
       longestStreak: 5,
-      achievementsUnlocked: 2,
+      achievements: ['first_win', 'speed_demon'],
       favoriteTheme: 'animals',
-      totalPlayTime: 1620
+      dailyChallengesCompleted: 5
     },
     '2': { 
-      playerId: '2', 
-      gamesPlayed: 8, 
-      gamesWon: 6, 
-      totalScore: 9600, 
-      bestTime: 52, 
-      averageTime: 82, 
-      perfectGames: 1, 
-      currentStreak: 1, 
+      totalGamesPlayed: 8,
+      totalGamesWon: 6,
+      totalMoves: 160,
+      totalTimeSpent: 856,
+      bestTimes: { easy: 30, medium: 52, hard: null, expert: null },
+      bestMoves: { easy: 10, medium: 18, hard: null, expert: null },
+      winRate: 0.75,
+      averageMoves: 20,
+      averageTime: 82,
+      currentStreak: 1,
       longestStreak: 3,
-      achievementsUnlocked: 1,
+      achievements: ['first_win', 'daily_champion'],
       favoriteTheme: 'emojis',
-      totalPlayTime: 856
+      dailyChallengesCompleted: 2
     },
     '3': { 
-      playerId: '3', 
-      gamesPlayed: 25, 
-      gamesWon: 23, 
-      totalScore: 52100, 
-      bestTime: 28, 
-      averageTime: 41, 
-      perfectGames: 8, 
-      currentStreak: 12, 
+      totalGamesPlayed: 25,
+      totalGamesWon: 23,
+      totalMoves: 300,
+      totalTimeSpent: 2050,
+      bestTimes: { easy: 15, medium: 22, hard: 28, expert: 35 },
+      bestMoves: { easy: 6, medium: 8, hard: 12, expert: 18 },
+      winRate: 0.92,
+      averageMoves: 12,
+      averageTime: 41,
+      currentStreak: 12,
       longestStreak: 15,
-      achievementsUnlocked: 3,
+      achievements: ['first_win', 'speed_demon', 'memory_master'],
       favoriteTheme: 'shapes',
-      totalPlayTime: 2050
+      dailyChallengesCompleted: 10
     }
   } as Record<string, PlayerStats>,
 
   themes: [
-    { id: 'animals', name: 'Animals', description: 'Cute animal friends', preview: '🐱🐶🐰🦊', isPremium: false, unlocked: true },
-    { id: 'emojis', name: 'Emojis', description: 'Fun emoji expressions', preview: '😀😍🤔😎', isPremium: false, unlocked: true },
-    { id: 'colors', name: 'Colors', description: 'Vibrant color palette', preview: '🔴🟢🔵🟡', isPremium: false, unlocked: true },
-    { id: 'shapes', name: 'Shapes', description: 'Geometric patterns', preview: '⭐🔷🔸🔶', isPremium: false, unlocked: true },
-    { id: 'space', name: 'Space', description: 'Cosmic adventure', preview: '🚀🌌⭐🪐', isPremium: true, unlocked: true },
-    { id: 'ocean', name: 'Ocean', description: 'Deep sea creatures', preview: '🐙🐠🦈🐟', isPremium: true, unlocked: false }
+    { 
+      id: 'animals', 
+      name: 'Animals', 
+      displayName: 'Cute Animals',
+      description: 'Cute animal friends', 
+      preview: '🐱🐶🐰🦊', 
+      cards: ['🐱', '🐶', '🐰', '🦊', '🐼', '🐨', '🦁', '🐯', '🐸', '🐵', '🐷', '🐮', '🐭', '🐹', '🐻', '🐺', '🦒', '🦘', '🦫', '🦝'],
+      backgroundColor: '#f0f8ff',
+      cardColor: '#ffffff',
+      type: 'emoji'
+    },
+    { 
+      id: 'emojis', 
+      name: 'Emojis', 
+      displayName: 'Fun Emojis',
+      description: 'Fun emoji expressions', 
+      preview: '😀😍🤔😎', 
+      cards: ['😀', '😍', '🤔', '😎', '🥳', '🤯', '🥰', '😴', '😂', '🤩', '😇', '🤗', '🤫', '🤭', '😋', '😜', '🙃', '😊', '😉', '🤓'],
+      backgroundColor: '#fffacd',
+      cardColor: '#ffffff',
+      type: 'emoji'
+    },
+    { 
+      id: 'colors', 
+      name: 'Colors', 
+      displayName: 'Bright Colors',
+      description: 'Vibrant color palette', 
+      preview: '🔴🟢🔵🟡', 
+      cards: ['🔴', '🟢', '🔵', '🟡', '🟠', '🟣', '🔺', '🟤', '⚫', '⚪', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⬛', '⬜', '🔶'],
+      backgroundColor: '#f5f5f5',
+      cardColor: '#ffffff',
+      type: 'emoji'
+    },
+    { 
+      id: 'shapes', 
+      name: 'Shapes', 
+      displayName: 'Geometric Shapes',
+      description: 'Geometric patterns', 
+      preview: '⭐🔷🔸🔶', 
+      cards: ['⭐', '🔷', '🔸', '🔶', '🔹', '🔺', '⬜', '⬛', '💠', '🔻', '🔲', '🔳', '▪️', '▫️', '◾', '◽', '◼️', '◻️', '🔘', '🔯'],
+      backgroundColor: '#e6e6fa',
+      cardColor: '#ffffff',
+      type: 'emoji'
+    },
+    { 
+      id: 'space', 
+      name: 'Space', 
+      displayName: 'Cosmic Adventure',
+      description: 'Cosmic adventure', 
+      preview: '🚀🌌⭐🪐', 
+      cards: ['🚀', '🌌', '⭐', '🪐', '👽', '🛸', '🌟', '☄️', '🌙', '☀️', '🌍', '🌎', '🌏', '🔭', '🛰️', '💫', '✨', '🌠', '🌃', '🌑'],
+      backgroundColor: '#191970',
+      cardColor: '#ffffff',
+      type: 'emoji'
+    },
+    { 
+      id: 'ocean', 
+      name: 'Ocean', 
+      displayName: 'Deep Sea',
+      description: 'Deep sea creatures', 
+      preview: '🐙🐠🦈🐟', 
+      cards: ['🐙', '🐠', '🦈', '🐟', '🐚', '🦀', '🐡', '🦞', '🐬', '🐳', '🐋', '🦑', '🦐', '🦪', '🌊', '🏝️', '⚓', '🪸', '🐢', '🦭'],
+      backgroundColor: '#0066cc',
+      cardColor: '#ffffff',
+      type: 'emoji'
+    }
   ] as Theme[],
 
   multiplayerSessions: [] as MultiplayerSession[]
@@ -137,6 +218,33 @@ export const request = async <T>(
   await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 300));
 
   try {
+    // Handle paths with parameters
+    if (path.startsWith('/api/themes/') && path.includes('/assets')) {
+      // Handle /api/themes/{id}/assets
+      const themeId = path.split('/')[3];
+      const theme = mockData.themes.find(t => t.id === themeId);
+      if (!theme) {
+        throw new Error(`Theme ${themeId} not found`);
+      }
+      // Return theme cards as assets
+      const assets = theme.cards.map((card, index) => ({
+        id: `${themeId}-${index}`,
+        content: card,
+        type: theme.type || 'emoji'
+      }));
+      return { success: true, data: assets as T };
+    }
+    
+    if (path.startsWith('/api/themes/') && !path.includes('/assets')) {
+      // Handle /api/themes/{id}
+      const themeId = path.split('/')[3];
+      const theme = mockData.themes.find(t => t.id === themeId);
+      if (!theme) {
+        throw new Error(`Theme ${themeId} not found`);
+      }
+      return { success: true, data: theme as T };
+    }
+    
     switch (path) {
       case '/api/leaderboard':
         if (method === 'GET') {
@@ -148,8 +256,15 @@ export const request = async <T>(
         if (method === 'POST') {
           const newEntry: LeaderboardEntry = {
             id: generateId(),
-            ...payload,
-            createdAt: new Date().toISOString()
+            rank: mockData.leaderboard.length + 1,
+            playerName: payload.playerName,
+            score: payload.score,
+            moves: payload.moves,
+            time: payload.time,
+            difficulty: payload.difficulty,
+            theme: payload.theme,
+            date: new Date().toISOString(),
+            avatar: payload.avatar
           };
           mockData.leaderboard.push(newEntry);
           return { success: true, data: newEntry as T };
@@ -158,17 +273,15 @@ export const request = async <T>(
 
       case '/api/achievements':
         if (method === 'GET') {
-          const playerId = new URL(`http://localhost${path}`).searchParams.get('playerId');
-          const playerAchievements = mockData.achievements.filter(
-            a => a.playerId === playerId
-          );
-          return { success: true, data: playerAchievements as T };
+          // For now, return all achievements since Achievement doesn't have playerId property
+          // You might want to implement a different mechanism for player-specific achievements
+          return { success: true, data: mockData.achievements as T };
         }
         if (method === 'POST') {
           const achievement = mockData.achievements.find(a => a.id === payload.achievementId);
-          if (achievement && !achievement.unlockedAt) {
+          if (achievement && !achievement.unlocked) {
+            achievement.unlocked = true;
             achievement.unlockedAt = new Date().toISOString();
-            achievement.playerId = payload.playerId;
           }
           return { success: true, data: achievement as T };
         }
@@ -180,8 +293,9 @@ export const request = async <T>(
         }
         if (method === 'POST') {
           mockData.dailyChallenge.completed = payload.completed;
-          mockData.dailyChallenge.attempts = payload.attempts;
-          mockData.dailyChallenge.bestScore = payload.score;
+          if (payload.userScore) {
+            mockData.dailyChallenge.userScore = payload.userScore;
+          }
           return { success: true, data: mockData.dailyChallenge as T };
         }
         break;
@@ -208,7 +322,8 @@ export const request = async <T>(
         if (method === 'PUT') {
           const theme = mockData.themes.find(t => t.id === payload.themeId);
           if (theme) {
-            theme.unlocked = payload.unlocked;
+            // Themes don't have unlocked property in the interface, so we can't set it
+            // This might need to be handled differently based on your requirements
           }
           return { success: true, data: theme as T };
         }
@@ -216,15 +331,21 @@ export const request = async <T>(
 
       case '/api/multiplayer-session':
         if (method === 'POST') {
+          const hostPlayer = mockData.players.find(p => p.id === payload.hostId);
+          if (!hostPlayer) {
+            throw new Error('Host player not found');
+          }
+          
           const session: MultiplayerSession = {
             id: generateId(),
-            hostId: payload.hostId,
-            players: [payload.hostId],
-            status: 'waiting',
+            roomCode: Math.random().toString(36).substr(2, 6).toUpperCase(),
+            host: hostPlayer,
+            players: [hostPlayer],
+            maxPlayers: payload.maxPlayers || 4,
+            gameState: 'waiting',
+            deck: [],
             settings: payload.settings,
-            currentTurn: 0,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            startedAt: new Date().toISOString()
           };
           mockData.multiplayerSessions.push(session);
           return { success: true, data: session as T };
@@ -245,16 +366,17 @@ export const request = async <T>(
 
     throw new Error(`Method ${method} not supported for ${path}`);
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: new ApiError(errorMessage, 500),
       data: null as T
     };
   }
 };
 
 // Mock WebSocket implementation
-export const createMockWebSocket = (url: string) => {
+export const createMockWebSocket = (_url: string) => {
   const listeners: { [event: string]: ((data: any) => void)[] } = {};
   let isConnected = false;
 
