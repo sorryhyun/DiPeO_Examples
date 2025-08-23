@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from '../shared/components/Layout';
-import { Button } from '../shared/components/Button';
+import Button from '../shared/components/Button';
 import { Icon } from '../shared/components/Icon';
 import { NewsletterSignup } from '../features/newsletter/NewsletterSignup';
 import { clsx } from '../utils/clsx';

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { Button } from './Button';
+import Button from './Button';
 
 export const CookieBanner: React.FC = () => {
   const [cookieAccepted, setCookieAccepted] = useLocalStorage('cookieAccepted', false);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '../../shared/components/Button';
+import Button from '../../shared/components/Button';
 import { Spinner } from '../../shared/components/Spinner';
 import { pricingService } from '../../services/pricingService';
 import { analyticsService } from '../../services/analyticsService';

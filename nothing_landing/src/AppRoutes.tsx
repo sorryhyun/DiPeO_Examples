@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
 import PressKitPage from './pages/PressKitPage';
 import APIDocsPage from './pages/APIDocsPage';
-import StatusPage from './pages/StatusPage';
+import { StatusPage } from './pages/StatusPage';
 
 export default function AppRoutes() {
   return (

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Button } from '../../shared/components/Button';
+import Button from '../../shared/components/Button';
 
 interface Particle {
   id: number;

@@ -11,8 +11,8 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "@api_url",
-    "VITE_ENABLE_MOCKS": "@enable_mocks"
+    "VITE_API_URL": "https://mockapi.example.com",
+    "VITE_ENABLE_MOCKS": "true"
   },
   "build": {
     "env": {

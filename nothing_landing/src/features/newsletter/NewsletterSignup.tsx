@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '../../shared/components/Button';
+import Button from '../../shared/components/Button';
 import { Input } from '../../shared/components/Input';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
 import { useSound } from '../../shared/hooks/useSound';

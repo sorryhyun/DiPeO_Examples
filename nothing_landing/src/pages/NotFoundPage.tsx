@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../shared/components/Button';
+import Button from '../shared/components/Button';
 import { useSound } from '../shared/hooks/useSound';
 
 const NotFoundPage: React.FC = () => {

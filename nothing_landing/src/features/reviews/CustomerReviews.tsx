@@ -143,7 +143,7 @@ const CustomerReviews: React.FC = () => {
 
           {/* Indicators */}
           {fiveStarReviews.length > 1 && (
-            <divclassName="flex justify-center mt-6 space-x-2">
+            <div className="flex justify-center mt-6 space-x-2">
               {fiveStarReviews.map((_, index) => (
                 <button
                   key={index}

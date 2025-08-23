@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
 import { useTheme } from '../hooks/useTheme';
-import { Button } from './Button';
+import Button from './Button';
 import { Avatar } from './Avatar';
 import { Icon } from './Icon';
 

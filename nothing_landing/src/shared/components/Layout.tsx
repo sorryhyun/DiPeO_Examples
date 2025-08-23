@@ -1,9 +1,9 @@
 import React from 'react';
-import Header from './Header';
-import Footer from './Footer';
+import { Header } from './Header';
+import { Footer } from './Footer';
 import CookieBanner from './CookieBanner';
 import { useModal } from '../providers/ModalProvider';
-import Modal from './Modal';
+import { Modal } from './Modal';
 
 interface LayoutProps {
   children: React.ReactNode;
