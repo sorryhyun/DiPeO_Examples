@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import { useParallax } from '../../shared/hooks/useParallax';
-import { useTheme } from '../shared/hooks/useTheme';
+import { useTheme } from '../../shared/hooks/useTheme';
 
 interface VoidAnimationProps {
-  anchorRef?: React.RefObject<HTMLElement>;
   intensity?: number;
   speed?: number;
   className?: string;
@@ -18,7 +16,6 @@ interface Particle {
 }
 
 const VoidAnimation: React.FC<VoidAnimationProps> = ({
-  anchorRef,
   intensity = 0.3,
   speed = 1,
   className = ''
@@ -29,7 +26,6 @@ const VoidAnimation: React.FC<VoidAnimationProps> = ({
   const lastTimeRef = useRef<number>(0);
   
   const { theme } = useTheme();
-  const parallaxOffset = useParallax(anchorRef);
   
   const isDarkMode = theme === 'dark';
   const prefersReducedMotion = typeof window !== 'undefined' && 
@@ -60,9 +56,6 @@ const VoidAnimation: React.FC<VoidAnimationProps> = ({
   ) => {
     ctx.clearRect(0, 0, width, height);
     
-    // Apply parallax offset
-    const offsetY = parallaxOffset * 0.1;
-    
     ctx.font = '14px monospace';
     ctx.fillStyle = isDarkMode 
       ? 'rgba(34, 197, 94, 0.6)' // green-500 with opacity
@@ -78,14 +71,13 @@ const VoidAnimation: React.FC<VoidAnimationProps> = ({
         particle.x = Math.random() * width;
       }
       
-      // Apply parallax and draw
-      const drawY = particle.y + offsetY;
+      // Draw particle
       ctx.globalAlpha = particle.opacity;
-      ctx.fillText(particle.char, particle.x, drawY);
+      ctx.fillText(particle.char, particle.x, particle.y);
     });
     
     ctx.globalAlpha = 1;
-  }, [parallaxOffset, isDarkMode]);
+  }, [isDarkMode]);
 
   const animate = useCallback((currentTime: number) => {
     const canvas = canvasRef.current;

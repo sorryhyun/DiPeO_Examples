@@ -243,7 +243,7 @@ export type ComponentSize = 'sm' | 'md' | 'lg' | 'xl';
 export type ComponentVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 
 // Icon type
-export type IconName = 'menu' | 'close' | 'moon' | 'sun' | 'logo' | 'x' | 'arrow-right' | 'check' | 'star' | 'external' | 'chevron-up' | 'chevron-down' | 'check-circle' | 'exclamation-triangle' | 'x-circle' | 'wrench' | 'minus-circle';
+export type IconName = 'menu' | 'close' | 'moon' | 'sun' | 'logo' | 'x' | 'arrow-right' | 'check' | 'star' | 'external' | 'chevron-up' | 'chevron-down' | 'check-circle' | 'exclamation-triangle' | 'x-circle' | 'wrench' | 'minus-circle' | 'download';
 
 // Parallax types
 export interface ParallaxResult {

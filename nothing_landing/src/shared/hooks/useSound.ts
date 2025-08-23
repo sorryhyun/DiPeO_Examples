@@ -77,7 +77,7 @@ export function useSound(): UseSoundReturn {
     };
   }, []);
 
-  const play = useCallback((soundName?: string) => {
+  const play = useCallback((_soundName?: string) => {
     // Skip if muted, loading, or no audio element
     if (isMuted || isLoading || !audioRef.current) {
       return;

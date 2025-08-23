@@ -25,18 +25,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const labelClasses = clsx(
       'block text-sm font-medium mb-2',
-      {
-        'text-gray-700': variant === 'default',
-        'text-gray-200': variant === 'dark',
-      }
+      variant === 'default' && 'text-gray-700',
+      variant === 'dark' && 'text-gray-200'
     );
 
     const errorClasses = clsx(
       'mt-1 text-sm',
-      {
-        'text-red-600': variant === 'default',
-        'text-red-400': variant === 'dark',
-      }
+      variant === 'default' && 'text-red-600',
+      variant === 'dark' && 'text-red-400'
     );
 
     return (

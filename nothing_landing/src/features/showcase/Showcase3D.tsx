@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState, Suspense } from 'react';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import Spinner from '../../shared/components/Spinner';
 
 // Three.js component is defined below
@@ -163,10 +165,6 @@ const ThreeJSShowcase: React.FC<{ onError: () => void }> = ({ onError }) => {
 
     const initThreeJS = async () => {
       try {
-        // Dynamic import of Three.js to enable code splitting
-        const THREE = await import('three');
-        const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-
         if (!mountRef.current || !mounted) return;
 
         // Scene setup

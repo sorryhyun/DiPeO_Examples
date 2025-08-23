@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout } from '../shared/components/Layout';
+import Layout from '../shared/components/Layout';
 import Button from '../shared/components/Button';
 import { Icon } from '../shared/components/Icon';
 

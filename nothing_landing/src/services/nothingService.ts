@@ -19,23 +19,18 @@ class NothingService {
       console.warn('Failed to fetch nothing overview, using fallback data:', error);
       
       return {
-        usersViewingNothing: '∞',
-        nothingDelivered: '∞',
-        satisfactionRate: 100,
-        voidLevel: 'Maximum',
+        totalUsers: 0,
+        activeSubscriptions: 0,
+        totalRevenue: 0,
+        usersViewingNothing: 999999999,
         isOperational: true,
-        lastUpdated: new Date().toISOString(),
-        metrics: {
-          totalVoidiness: '∞',
-          activeNothingUsers: '∞',
-          nothingUptime: '100%',
-          existentialQueries: 0
+        status: 'perfectly nothing',
+        nothingMetrics: {
+          voidLevel: 100,
+          emptinessScore: 100,
+          nullificationRate: 100
         },
-        status: {
-          api: 'operational',
-          void: 'stable',
-          nothing: 'perfectly nothing'
-        }
+        lastUpdated: new Date().toISOString()
       };
     }
   }
@@ -48,8 +43,8 @@ class NothingService {
     try {
       const overview = await this.getOverview();
       return {
-        isOperational: overview.isOperational,
-        status: overview.status.nothing
+        isOperational: overview.isOperational ?? false,
+        status: overview.status ?? 'unknown'
       };
     } catch (error) {
       return {

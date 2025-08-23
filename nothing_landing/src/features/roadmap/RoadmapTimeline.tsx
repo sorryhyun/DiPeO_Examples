@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useIntersectionObserver } from '../../shared/hooks/useIntersectionObserver';
 
 interface RoadmapItem {
@@ -139,8 +139,7 @@ const TimelineItem: React.FC<{ item: RoadmapItem; index: number; isVisible: bool
 };
 
 export const RoadmapTimeline: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { isIntersecting } = useIntersectionObserver(containerRef, {
+  const { ref: containerRef, isIntersecting } = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '50px'
   });

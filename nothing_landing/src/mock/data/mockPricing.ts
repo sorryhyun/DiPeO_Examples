@@ -5,6 +5,7 @@ export const mockPricingTiers: PricingTier[] = [
     id: 'basic-nothing',
     name: 'Basic Nothing',
     price: 0,
+    interval: 'lifetime',
     period: 'forever',
     description: 'The essential void experience for nothing enthusiasts',
     features: [
@@ -15,18 +16,15 @@ export const mockPricingTiers: PricingTier[] = [
       'Nothing documentation',
       'Community access to discuss nothing'
     ],
-    cta: {
-      text: 'Get Nothing Free',
-      url: '/buy/basic-nothing',
-      primary: false
-    },
+    cta: 'Get Nothing Free',
     popular: false,
-    badge: null
+    badge: undefined
   },
   {
     id: 'pro-nothing',
     name: 'Pro Nothing',
     price: 0,
+    interval: 'lifetime',
     period: 'forever',
     description: 'Enhanced nothingness for serious void practitioners',
     features: [
@@ -39,11 +37,7 @@ export const mockPricingTiers: PricingTier[] = [
       'Nothing backup & restore',
       'Dark mode nothing (extra dark)'
     ],
-    cta: {
-      text: 'Upgrade to Pro Nothing',
-      url: '/buy/pro-nothing',
-      primary: true
-    },
+    cta: 'Upgrade to Pro Nothing',
     popular: true,
     badge: 'Most Popular'
   },
@@ -51,6 +45,7 @@ export const mockPricingTiers: PricingTier[] = [
     id: 'enterprise-nothing',
     name: 'Enterprise Nothing',
     price: 0,
+    interval: 'lifetime',
     period: 'forever',
     description: 'Industrial-grade nothing solutions for large organizations',
     features: [
@@ -65,12 +60,11 @@ export const mockPricingTiers: PricingTier[] = [
       '24/7 nothing monitoring',
       'Unlimited nothing seats'
     ],
-    cta: {
-      text: 'Contact Nothing Sales',
-      url: '/contact/enterprise-nothing',
-      primary: false
-    },
+    cta: 'Contact Nothing Sales',
     popular: false,
     badge: 'Enterprise'
   }
 ];
+
+// Export as mockPricing for backward compatibility
+export const mockPricing = mockPricingTiers;

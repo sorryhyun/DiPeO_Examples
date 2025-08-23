@@ -20,7 +20,6 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index })
       transition: {
         duration: 4 + (index % 3),
         repeat: Infinity,
-        ease: "easeInOut",
         delay: index * 0.5,
       }
     }

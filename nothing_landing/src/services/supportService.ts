@@ -11,7 +11,7 @@ export interface SupportReply {
   agent: string;
 }
 
-const generateFallbackReply = (message: string): SupportReply => {
+const generateFallbackReply = (_message: string): SupportReply => {
   const fallbackResponses = [
     "Thank you for reaching out about absolutely nothing. We appreciate your void inquiry.",
     "Your message about nothing has been received into the digital abyss. We'll respond with equal nothing.",

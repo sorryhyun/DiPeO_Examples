@@ -9,7 +9,7 @@ interface PricingService {
 const getAll = async (): Promise<PricingTier[]> => {
   try {
     const response = await apiClient.get('/api/pricing/nothing');
-    return response.data;
+    return response.data.plans || [];
   } catch (error) {
     console.error('Failed to fetch pricing tiers:', error);
     throw new Error('Unable to load pricing information. Please try again later.');

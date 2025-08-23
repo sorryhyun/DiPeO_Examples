@@ -1,11 +1,8 @@
 import React from 'react';
 import { useModal } from '../../shared/providers/ModalProvider';
-import { useParallax } from '../../shared/hooks/useParallax';
 
 export const ExistentialHero: React.FC = () => {
   const { openModal } = useModal();
-  const { offsetY } = useParallax();
-
   const handlePrimaryClick = () => {
     openModal('newsletter');
   };
@@ -17,15 +14,10 @@ export const ExistentialHero: React.FC = () => {
     }
   };
 
-  const heroTransform = {
-    transform: `translateY(${offsetY * 0.5}px)`,
-  };
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black text-white">
       <div 
         className="container mx-auto px-4 text-center z-10 relative"
-        style={heroTransform}
       >
         <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-tight">
           Absolutely{' '}
