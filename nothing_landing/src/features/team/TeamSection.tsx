@@ -39,10 +39,9 @@ export const TeamSection: React.FC = () => {
             >
               <div className="mb-4">
                 <Avatar
-                  src={member.image}
+                  src={member.avatar}
                   alt={`${member.name} - ${member.role}`}
                   size="lg"
-                  className="mx-auto"
                 />
               </div>
               

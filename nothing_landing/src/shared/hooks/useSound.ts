@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 
 interface UseSoundReturn {
   play: (soundName?: string) => void;
+  playSound: (soundName?: string) => void;
   toggleMute: () => void;
   isMuted: boolean;
   isLoading: boolean;
@@ -130,6 +131,7 @@ export function useSound(): UseSoundReturn {
 
   return {
     play,
+    playSound: play,
     toggleMute,
     isMuted,
     isLoading

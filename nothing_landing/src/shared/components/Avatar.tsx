@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 interface AvatarProps {
   name?: string;
   src?: string;
+  alt?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export const Avatar: React.FC<AvatarProps> = ({ 
   name = '', 
   src, 
+  alt,
   size = 'md' 
 }) => {
   const [imageError, setImageError] = useState(false);
@@ -60,7 +62,7 @@ export const Avatar: React.FC<AvatarProps> = ({
     return (
       <img
         src={src}
-        alt={name ? `${name}'s avatar` : 'User avatar'}
+        alt={alt || (name ? `${name}'s avatar` : 'User avatar')}
         className={baseClasses}
         onError={handleImageError}
         loading="lazy"

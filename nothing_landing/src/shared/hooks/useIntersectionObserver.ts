@@ -5,11 +5,14 @@ interface UseIntersectionObserverOptions {
   rootMargin?: string;
   threshold?: number | number[];
   once?: boolean;
+  triggerOnce?: boolean;
 }
 
 interface UseIntersectionObserverReturn {
   ref: (node: Element | null) => void;
+  elementRef: (node: Element | null) => void;
   isIntersecting: boolean;
+  isVisible: boolean;
 }
 
 export function useIntersectionObserver(
@@ -19,7 +22,8 @@ export function useIntersectionObserver(
     root = null,
     rootMargin = '0px',
     threshold = 0.1,
-    once = false
+    once = false,
+    triggerOnce = false
   } = options;
 
   const [isIntersecting, setIsIntersecting] = useState(false);
@@ -38,14 +42,14 @@ export function useIntersectionObserver(
         if (entry) {
           setIsIntersecting(entry.isIntersecting);
           
-          if (once && entry.isIntersecting && observerRef.current && elementRef.current) {
+          if ((once || triggerOnce) && entry.isIntersecting && observerRef.current && elementRef.current) {
             observerRef.current.unobserve(elementRef.current);
             observerRef.current = null;
           }
         }
       });
     },
-    [once]
+    [once, triggerOnce]
   );
 
   const ref = useCallback(
@@ -85,5 +89,10 @@ export function useIntersectionObserver(
     };
   }, []);
 
-  return { ref, isIntersecting };
+  return { 
+    ref, 
+    elementRef: ref, 
+    isIntersecting, 
+    isVisible: isIntersecting 
+  };
 }

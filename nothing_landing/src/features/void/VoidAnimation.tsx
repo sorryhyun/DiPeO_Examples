@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { useParallax } from '../../shared/hooks/useParallax';
-import { useTheme } from '../../shared/hooks/useTheme';
+import { useTheme } from '../shared/hooks/useTheme';
 
 interface VoidAnimationProps {
   anchorRef?: React.RefObject<HTMLElement>;

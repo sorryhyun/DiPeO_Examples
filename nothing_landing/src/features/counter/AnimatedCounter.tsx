@@ -19,7 +19,7 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ className = ''
   // Combine refs
   useEffect(() => {
     if (counterRef.current && intersectionRef) {
-      intersectionRef.current = counterRef.current;
+      intersectionRef(counterRef.current);
     }
   }, [intersectionRef]);
 
@@ -170,7 +170,7 @@ export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ className = ''
       </div>
 
       {/* Custom CSS for recursive loading animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes loading-recursive {
           0% {
             width: 0%;

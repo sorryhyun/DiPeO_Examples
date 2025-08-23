@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useFetch } from '../../shared/hooks/useFetch';
-import { testimonialService } from '../../services/testimonialService';
+import testimonialService from '../../services/testimonialService';
 import { Avatar } from '../../shared/components/Avatar';
-import { Spinner } from '../../shared/components/Spinner';
+import Spinner from '../../shared/components/Spinner';
 import type { Testimonial } from '../../types';
 
 interface TestimonialCardProps {

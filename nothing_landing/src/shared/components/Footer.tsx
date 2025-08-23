@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { clsx } from '../utils/clsx';
-import { AffiliateCTA } from '../features/affiliate/AffiliateCTA';
+import clsx from '../../utils/clsx';
+import { AffiliateCTA } from '../../features/affiliate/AffiliateCTA';
 
 interface FooterProps {
   className?: string;

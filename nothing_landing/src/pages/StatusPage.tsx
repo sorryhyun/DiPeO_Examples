@@ -240,7 +240,7 @@ export const StatusPage: React.FC = () => {
                 ))
               ) : (
                 <div className="px-6 py-8 text-center">
-                  <Icon name="inbox" className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <Icon name="external" className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400">
                     No status events in the selected timeframe
                   </p>
@@ -289,10 +289,7 @@ export const StatusPage: React.FC = () => {
                   <Icon name="x" className="w-5 h-5" />
                 </button>
               </div>
-              <NewsletterSignup 
-                onSuccess={() => setShowNewsletter(false)}
-                variant="status"
-              />
+              <NewsletterSignup />
             </div>
           </div>
         </div>

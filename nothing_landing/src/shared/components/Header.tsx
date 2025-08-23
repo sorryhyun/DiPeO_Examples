@@ -15,11 +15,17 @@ export const Header: React.FC = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const handleAuthClick = () => {
+  const handleAuthClick = async () => {
     if (currentUser) {
       logout();
     } else {
-      login();
+      // In a real app, this would open a login modal
+      // For demo purposes, using default credentials
+      try {
+        await login('demo@nothing.com', 'demo');
+      } catch (error) {
+        console.error('Login failed:', error);
+      }
     }
   };
 

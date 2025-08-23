@@ -1,22 +1,7 @@
 import React from 'react';
 import { useIntersectionObserver } from '../../shared/hooks/useIntersectionObserver';
 import { mockCaseStudies } from '../../mock/data/mockCaseStudies';
-
-interface CaseStudy {
-  id: string;
-  title: string;
-  company: string;
-  summary: string;
-  metrics: {
-    label: string;
-    value: string;
-    improvement: string;
-  }[];
-  testimonial: string;
-  author: string;
-  role: string;
-  link: string;
-}
+import type { CaseStudy } from '../../types';
 
 export const CaseStudies: React.FC = () => {
   const { elementRef, isVisible } = useIntersectionObserver({
@@ -94,16 +79,16 @@ const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy, delay, isVisib
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-4">
-        {caseStudy.metrics.map((metric, index) => (
+        {Object.entries(caseStudy.metrics).map(([key, value], index) => (
           <div key={index} className="text-center">
             <div className="text-2xl font-bold text-black dark:text-white mb-1">
-              {metric.value}
+              {typeof value === 'number' ? `${value}%` : value}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {metric.label}
+              {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
             </div>
             <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-              {metric.improvement}
+              +{value}%
             </div>
           </div>
         ))}
@@ -118,10 +103,10 @@ const CaseStudyCard: React.FC<CaseStudyCardProps> = ({ caseStudy, delay, isVisib
       <div className="flex items-center justify-between">
         <div>
           <div className="font-semibold text-gray-900 dark:text-white text-sm">
-            {caseStudy.author}
+            {caseStudy.clientName}
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            {caseStudy.role}
+            {caseStudy.clientTitle}
           </div>
         </div>
         <a 

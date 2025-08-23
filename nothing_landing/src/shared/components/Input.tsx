@@ -1,5 +1,5 @@
 import React, { forwardRef, InputHTMLAttributes } from 'react';
-import { clsx } from '../../utils/clsx';
+import clsx from '../../utils/clsx';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
   label?: string;
@@ -14,19 +14,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const inputClasses = clsx(
       'w-full px-4 py-3 border rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2',
-      {
-        // Default variant
-        'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500/20': 
-          variant === 'default' && !error,
-        'bg-white border-red-300 text-gray-900 placeholder-gray-500 focus:border-red-500 focus:ring-red-500/20': 
-          variant === 'default' && error,
-        
-        // Dark variant
-        'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400 focus:ring-purple-400/20': 
-          variant === 'dark' && !error,
-        'bg-gray-800 border-red-400 text-white placeholder-gray-400 focus:border-red-400 focus:ring-red-400/20': 
-          variant === 'dark' && error,
-      },
+      // Default variant
+      variant === 'default' && !error && 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500 focus:ring-purple-500/20',
+      variant === 'default' && error && 'bg-white border-red-300 text-gray-900 placeholder-gray-500 focus:border-red-500 focus:ring-red-500/20',
+      // Dark variant
+      variant === 'dark' && !error && 'bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-purple-400 focus:ring-purple-400/20',
+      variant === 'dark' && error && 'bg-gray-800 border-red-400 text-white placeholder-gray-400 focus:border-red-400 focus:ring-red-400/20',
       className
     );
 

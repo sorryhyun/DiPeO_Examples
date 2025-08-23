@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import Modal from '../components/Modal';
+import { Modal } from '../components/Modal';
 
 interface ModalState {
   isOpen: boolean;
@@ -67,6 +67,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         <Modal
           isOpen={modalState.isOpen}
           onClose={closeModal}
+          children={modalState.props.children || null}
           {...modalState.props}
         />
       )}

@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect, Suspense } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { X, MessageCircle, Send, Minimize2, Maximize2 } from 'lucide-react';
-import { Button } from '../../shared/components/Button';
+import Button from '../../shared/components/Button';
 import { Input } from '../../shared/components/Input';
 import { Avatar } from '../../shared/components/Avatar';
-import { Spinner } from '../../shared/components/Spinner';
+import Spinner from '../../shared/components/Spinner';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
-import { supportService } from '../../services/supportService';
+import supportService, { SupportMessage } from '../../services/supportService';
 
 interface Message {
   id: string;
@@ -51,7 +51,11 @@ const SupportChatWidget: React.FC<SupportChatWidgetProps> = ({
     setIsLoading(true);
 
     try {
-      const response = await supportService.sendMessage(inputValue.trim());
+      const supportMessage: SupportMessage = {
+        text: inputValue.trim(),
+        sessionId: `session_${Date.now()}`
+      };
+      const response = await supportService.sendMessage(supportMessage);
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -138,7 +142,7 @@ const SupportChatWidget: React.FC<SupportChatWidgetProps> = ({
             <Avatar 
               src="/api/placeholder/32/32" 
               alt="Support Bot"
-              className="w-8 h-8"
+              size="sm"
             />
             <div>
               <h3 className="text-white font-semibold text-sm">Nothing™ Support</h3>

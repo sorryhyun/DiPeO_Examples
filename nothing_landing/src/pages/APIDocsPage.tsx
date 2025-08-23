@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout } from '../shared/components/Layout';
+import Layout from '../shared/components/Layout';
 
 interface APIEndpoint {
   method: string;

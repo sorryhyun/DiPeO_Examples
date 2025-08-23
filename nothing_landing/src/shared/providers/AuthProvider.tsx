@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useMockAuth } from '../hooks/useMockAuth';
 import { User, AuthContextType } from '../../types';
@@ -15,17 +15,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useLocalStorage<User | null>('auth_user', null);
   const mockAuth = useMockAuth();
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<void> => {
     try {
-      const user = await mockAuth.login(email, password);
-      if (user) {
-        setCurrentUser(user);
-        return true;
+      const result = await mockAuth.login(email, password);
+      if (result && result.user) {
+        setCurrentUser(result.user);
+      } else {
+        throw new Error('Invalid credentials');
       }
-      return false;
     } catch (error) {
       console.error('Login failed:', error);
-      return false;
+      throw error;
     }
   };
 
@@ -35,10 +35,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const value: AuthContextType = {
+    user: currentUser,
     currentUser,
     login,
     logout,
     isAuthenticated: !!currentUser,
+    isLoading: false,
   };
 
   return (

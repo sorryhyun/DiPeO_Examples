@@ -101,12 +101,6 @@ export const FAQSection: React.FC = () => {
     });
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent, itemId: string) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleItem(itemId);
-    }
-  };
 
   return (
     <section className="py-16 px-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">

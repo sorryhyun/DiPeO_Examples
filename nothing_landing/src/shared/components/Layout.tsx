@@ -10,7 +10,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { isOpen, content, onClose } = useModal();
+  const { isModalOpen, modalProps, closeModal } = useModal();
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -24,9 +24,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       
       <CookieBanner />
       
-      {isOpen && content && (
-        <Modal onClose={onClose}>
-          {content}
+      {isModalOpen && (
+        <Modal 
+          isOpen={isModalOpen} 
+          onClose={closeModal}
+        >
+          {modalProps.children}
         </Modal>
       )}
     </div>

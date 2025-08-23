@@ -8,8 +8,8 @@ async function bootstrap() {
   // Initialize mock server in development
   if (process.env.NODE_ENV === 'development') {
     try {
-      const { server } = await import('./mock/server')
-      await server.start()
+      const { start } = await import('./mock/server')
+      await start()
       console.log('Mock server started')
     } catch (error) {
       console.warn('Failed to start mock server:', error)

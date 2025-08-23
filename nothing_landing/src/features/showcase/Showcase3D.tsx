@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState, Suspense } from 'react';
-import { Spinner } from '../../shared/components/Spinner';
+import Spinner from '../../shared/components/Spinner';
 
-// Lazy load Three.js components to avoid bundling if not needed
-const ThreeJSShowcase = React.lazy(() => import('./ThreeJSShowcase'));
+// Three.js component is defined below
 
 interface Showcase3DProps {
   className?: string;

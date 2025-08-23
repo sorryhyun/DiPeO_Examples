@@ -3,7 +3,7 @@ import Button from '../../shared/components/Button';
 import { Input } from '../../shared/components/Input';
 import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
 import { useSound } from '../../shared/hooks/useSound';
-import { newsletterService } from '../../services/newsletterService';
+import newsletterService from '../../services/newsletterService';
 
 interface NewsletterSignupProps {
   className?: string;

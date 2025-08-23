@@ -21,6 +21,7 @@ export interface User {
   role: AuthRole;
   createdAt: string;
   lastActive?: string;
+  lastLoginAt?: string;
 }
 
 // Testimonial interface
@@ -31,6 +32,7 @@ export interface Testimonial {
   company?: string;
   avatar?: string;
   content: string;
+  quote: string;
   rating: number;
   featured?: boolean;
   createdAt: string;
@@ -43,10 +45,14 @@ export interface PricingTier {
   description: string;
   price: number;
   interval: 'month' | 'year' | 'lifetime';
+  period?: string;
   features: string[];
   highlighted?: boolean;
   popular?: boolean;
+  featured?: boolean;
+  badge?: string;
   comingSoon?: boolean;
+  cta?: string;
 }
 
 // FAQ item interface
@@ -65,6 +71,8 @@ export interface TeamMember {
   role: string;
   bio: string;
   avatar?: string;
+  avatarUrl?: string;
+  expertise?: string[];
   social?: {
     twitter?: string;
     linkedin?: string;
@@ -77,13 +85,27 @@ export interface TeamMember {
 export interface CaseStudy {
   id: string;
   title: string;
-  description: string;
-  client: string;
+  company: string;
   industry: string;
+  summary: string;
+  challenge?: string;
+  solution?: string;
   results: string[];
+  metrics: {
+    improvement: number;
+    satisfaction: number;
+    roi: number;
+    timeToValue: number;
+  };
+  testimonial: string;
+  clientName: string;
+  clientTitle: string;
+  duration?: string;
+  tags?: string[];
   image?: string;
+  link: string;
   featured?: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 // Roadmap item interface
@@ -156,10 +178,31 @@ export interface AnalyticsEvent {
 
 // Modal context interface
 export interface ModalContextType {
-  isOpen: boolean;
-  content: React.ReactNode | null;
-  openModal: (content: React.ReactNode) => void;
+  openModal: (key: string, props?: Record<string, any>) => void;
   closeModal: () => void;
+  isModalOpen: boolean;
+  modalKey: string | null;
+  modalProps: Record<string, any>;
+  isOpen?: boolean;
+  content?: any;
+  onClose?: () => void;
+}
+
+// Modal props interface
+export interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children?: React.ReactNode;
+}
+
+// Auth context interface
+export interface AuthContextType {
+  user: User | null;
+  currentUser?: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 // Sound preferences interface
@@ -169,7 +212,45 @@ export interface SoundPreferences {
   mutedSounds: string[];
 }
 
+// Nothing overview interface for dashboard/stats
+export interface NothingOverview {
+  totalUsers: number;
+  activeSubscriptions: number;
+  totalRevenue: number;
+  usersViewingNothing?: number;
+  isOperational?: boolean;
+  status?: string;
+  nothingMetrics: {
+    voidLevel: number;
+    emptinessScore: number;
+    nullificationRate: number;
+  };
+  lastUpdated: string;
+}
+
+// Checkout response interface
+export interface CheckoutResponse {
+  success: boolean;
+  checkoutUrl?: string;
+  sessionId?: string;
+  error?: string;
+  message?: string;
+}
+
 // Export utility types
 export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 export type ComponentSize = 'sm' | 'md' | 'lg' | 'xl';
 export type ComponentVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+
+// Icon type
+export type IconName = 'menu' | 'close' | 'moon' | 'sun' | 'logo' | 'x' | 'arrow-right' | 'check' | 'star' | 'external' | 'chevron-up' | 'chevron-down' | 'check-circle' | 'exclamation-triangle' | 'x-circle' | 'wrench' | 'minus-circle';
+
+// Parallax types
+export interface ParallaxResult {
+  offsetY: number;
+}
+
+export interface UseParallaxOptions {
+  speed?: number;
+  rootMargin?: string;
+}

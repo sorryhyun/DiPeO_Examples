@@ -1,6 +1,6 @@
 import React from 'react';
-import { useModal } from '../shared/providers/ModalProvider';
-import { useParallax } from '../shared/hooks/useParallax';
+import { useModal } from '../../shared/providers/ModalProvider';
+import { useParallax } from '../../shared/hooks/useParallax';
 
 export const ExistentialHero: React.FC = () => {
   const { openModal } = useModal();

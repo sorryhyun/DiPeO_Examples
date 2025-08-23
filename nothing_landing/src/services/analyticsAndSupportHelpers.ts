@@ -3,7 +3,14 @@
  * Shared utilities for building standardized payloads across analytics and support services
  */
 
-import { v4 as uuidv4 } from 'uuid';
+// Simple UUID v4 replacement since uuid package is not installed
+function uuidv4(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 
 // Types for analytics events
 export interface BaseEventPayload {

@@ -1,8 +1,8 @@
 import React from 'react';
-import { clsx } from '../../utils/clsx';
+import clsx from '../../utils/clsx';
 
 interface IconProps {
-  name: 'moon' | 'sun' | 'logo' | 'menu' | 'close' | 'arrow-right' | 'check' | 'star' | 'external';
+  name: 'moon' | 'sun' | 'logo' | 'menu' | 'close' | 'x' | 'arrow-right' | 'check' | 'star' | 'external' | 'chevron-up' | 'chevron-down';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
 }
@@ -87,6 +87,27 @@ export const Icon: React.FC<IconProps> = ({ name, size = 'md', className }) => {
       return (
         <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      );
+    
+    case 'x':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      );
+    
+    case 'chevron-up':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        </svg>
+      );
+    
+    case 'chevron-down':
+      return (
+        <svg className={iconClass} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       );
     

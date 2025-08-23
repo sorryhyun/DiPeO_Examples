@@ -4,7 +4,7 @@
  */
 
 // API client for HTTP requests
-export { default as apiClient } from './apiClient';
+export { apiClient } from './apiClient';
 
 // Class name utility for conditional styling
 export { default as clsx } from './clsx';

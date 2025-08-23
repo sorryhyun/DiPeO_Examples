@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, StarIcon } from '@heroicons/react/24/solid';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { mockTestimonials } from '../../mock/data/mockTestimonials';
-import type { Testimonial } from '../../types';
 
 const CustomerReviews: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,7 +41,7 @@ const CustomerReviews: React.FC = () => {
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
-      <StarIcon
+      <Star
         key={index}
         className={`h-5 w-5 ${
           index < rating ? 'text-yellow-400' : 'text-gray-300'
@@ -110,10 +109,10 @@ const CustomerReviews: React.FC = () => {
               <div className="flex items-center justify-center">
                 <div className="text-center">
                   <div className="font-semibold text-gray-900 dark:text-white">
-                    {currentReview.author}
+                    {currentReview.name}
                   </div>
                   <div className="text-gray-600 dark:text-gray-400">
-                    {currentReview.title}
+                    {currentReview.role}
                   </div>
                 </div>
               </div>
@@ -127,7 +126,7 @@ const CustomerReviews: React.FC = () => {
                   className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white dark:bg-gray-700 shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
                   aria-label="Previous review"
                 >
-                  <ChevronLeftIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  <ChevronLeft className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                 </button>
                 
                 <button
@@ -135,7 +134,7 @@ const CustomerReviews: React.FC = () => {
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 rounded-full bg-white dark:bg-gray-700 shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
                   aria-label="Next review"
                 >
-                  <ChevronRightIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  <ChevronRight className="h-6 w-6 text-gray-600 dark:text-gray-300" />
                 </button>
               </>
             )}

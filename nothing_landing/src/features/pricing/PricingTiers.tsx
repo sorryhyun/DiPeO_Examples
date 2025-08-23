@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../../shared/components/Button';
-import { Spinner } from '../../shared/components/Spinner';
-import { pricingService } from '../../services/pricingService';
-import { analyticsService } from '../../services/analyticsService';
+import Spinner from '../../shared/components/Spinner';
+import pricingService from '../../services/pricingService';
+import analyticsService from '../../services/analyticsService';
 import { PricingTier } from '../../types';
 
 interface PricingCardProps {
@@ -86,7 +86,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ tier, onCheckout, isCheckingO
       >
         {isCheckingOut ? (
           <>
-            <Spinner size="small" className="mr-2" />
+            <Spinner size="sm" className="mr-2" />
             Processing...
           </>
         ) : (
@@ -155,7 +155,7 @@ export const PricingTiers: React.FC = () => {
       <section className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <Spinner size="large" />
+            <Spinner size="lg" />
             <p className="mt-4 text-gray-600 dark:text-gray-400">
               Loading our absolutely nothing pricing tiers...
             </p>

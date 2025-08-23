@@ -10,8 +10,10 @@ export const MoneyBackBadge: React.FC<MoneyBackBadgeProps> = ({ className = '' }
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = () => {
-    openModal(
-      <div className="p-6 max-w-2xl">
+    openModal('money-back-guarantee', {
+      title: 'Absolutely Nothing™ Money-Back Guarantee',
+      children: (
+        <div className="p-6 max-w-2xl">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Absolutely Nothing™ Money-Back Guarantee
         </h2>
@@ -34,8 +36,9 @@ export const MoneyBackBadge: React.FC<MoneyBackBadgeProps> = ({ className = '' }
             nature of nothingness and the paradox of guaranteeing the absence of everything.
           </p>
         </div>
-      </div>
-    );
+        </div>
+      )
+    });
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {

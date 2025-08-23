@@ -124,3 +124,11 @@ export async function del<T = any>(
 // Export the error class for use in services
 export { ApiClientError };
 export type { ApiError, RequestOptions };
+
+// Create and export apiClient object
+export const apiClient = {
+  get,
+  post,
+  put,
+  delete: del
+};

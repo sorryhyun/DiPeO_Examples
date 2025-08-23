@@ -1,9 +1,10 @@
 import type { User } from '../types';
+import { AuthRole } from '../types';
 
 interface MockUser {
   email: string;
   password: string;
-  role: 'user' | 'admin';
+  role: AuthRole;
   name: string;
 }
 
@@ -12,19 +13,19 @@ const MOCK_USERS: MockUser[] = [
   {
     email: 'user@nothing.com',
     password: 'nothing123',
-    role: 'user',
+    role: AuthRole.USER,
     name: 'Nothing User'
   },
   {
     email: 'admin@nothing.com',
     password: 'admin123',
-    role: 'admin',
+    role: AuthRole.ADMIN,
     name: 'Nothing Admin'
   },
   {
     email: 'demo@nothing.com',
     password: 'demo',
-    role: 'user',
+    role: AuthRole.USER,
     name: 'Demo User'
   }
 ];
@@ -87,9 +88,16 @@ export const useMockAuth = () => {
     }
   };
 
+  const logout = async (): Promise<void> => {
+    // Simulate logout delay
+    await new Promise(resolve => setTimeout(resolve, 200));
+    // In a real app, this would clear tokens/session
+  };
+
   return {
     login,
-    verify
+    verify,
+    logout
   };
 };
 

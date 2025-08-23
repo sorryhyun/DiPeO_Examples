@@ -259,7 +259,7 @@ export const VoidSimulator: React.FC<VoidSimulatorProps> = ({ onClose }) => {
         <p className="text-xs text-gray-500">
           {particles.length} particles of nothingness simulated
         </p>
-        <Button variant="secondary" onClick={onClose}>
+        <Button variant="outline" onClick={onClose}>
           Close Simulator
         </Button>
       </div>
