@@ -51,7 +51,8 @@ class ApiClient {
     // In dev mode with mock data enabled, use mock server
     if (devConfig.enable_mock_data) {
       try {
-        const response = await mockServer.handle(path, method, body);
+        const headers = this.getHeaders(options?.getAuthToken);
+        const response = await mockServer.handle(path, method, body, headers);
         return response as ApiResponse<T>;
       } catch (error) {
         const apiError = new Error(error instanceof Error ? error.message : 'Mock server error') as ApiError;

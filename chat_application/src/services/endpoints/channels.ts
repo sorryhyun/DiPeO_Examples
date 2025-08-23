@@ -15,8 +15,8 @@ export const fetchChannels = async (options?: FetchChannelsOptions): Promise<Cha
   const queryString = params.toString();
   const endpoint = queryString ? `/api/channels?${queryString}` : '/api/channels';
   
-  const response = await apiClient.get<Channel[]>(endpoint);
-  return response.data;
+  const response = await apiClient.get<{channels: Channel[], nextCursor?: string}>(endpoint);
+  return response.data.channels || response.data;
 };
 
 export const createChannel = async (payload: CreateChannelPayload): Promise<Channel> => {

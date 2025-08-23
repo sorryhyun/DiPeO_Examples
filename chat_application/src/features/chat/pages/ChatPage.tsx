@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import ChannelList from '../components/ChannelList';
 import ChannelView from '../components/ChannelView';
 import ThreadView from '../components/ThreadView';
@@ -7,9 +7,12 @@ import Button from '../../../shared/components/atoms/Button';
 import Icon from '../../../shared/components/atoms/Icon';
 import { useQuery } from '@tanstack/react-query';
 import { fetchChannels } from '../../../services/endpoints/channels';
+import { useAuth } from '../../../shared/context/AuthProvider';
 
 const ChatPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { signOut, user } = useAuth();
   const [selectedChannelId, setSelectedChannelId] = useState<string | undefined>(
     searchParams.get('channel') || undefined
   );
@@ -53,8 +56,34 @@ const ChatPage: React.FC = () => {
     setIsThreadViewOpen(false);
   };
 
+  const handleSignOut = () => {
+    signOut();
+    navigate('/login');
+  };
+
   return (
-    <div className="flex h-full bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+        <div className="flex justify-between items-center">
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Chat Application</h1>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {user?.displayName || user?.email}
+            </span>
+            <Button
+              onClick={handleSignOut}
+              variant="secondary"
+              size="sm"
+            >
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
       {/* Mobile channel list toggle */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
@@ -144,6 +173,7 @@ const ChatPage: React.FC = () => {
             aria-hidden="true"
           />
         )}
+      </div>
       </div>
     </div>
   );

@@ -49,9 +49,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               }
             }
           } catch (error) {
-            // Invalid stored data, clear it
+            // Invalid stored data or token expired, clear it
+            console.log('Auth verification failed, clearing stored credentials');
             localStorage.removeItem(AUTH_TOKEN_KEY);
             localStorage.removeItem(AUTH_USER_KEY);
+            setToken(null);
+            setUser(null);
           }
         }
       }

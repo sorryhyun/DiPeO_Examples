@@ -13,7 +13,7 @@ export const devConfig: DevConfig = {
   enable_mock_data: true,
   mock_auth_users: true,
   mock_api_endpoints: true,
-  disable_websocket_in_dev: false,
+  disable_websocket_in_dev: true,
   use_localstorage_persistence: true,
 };
 

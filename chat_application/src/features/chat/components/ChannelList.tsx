@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { fetchChannels } from '../../../services/endpoints/channels';
 import useDebounce from '../../../shared/hooks/useDebounce';
 import Input from '../../../shared/components/atoms/Input';
 import Spinner from '../../../shared/components/atoms/Spinner';
+import Button from '../../../shared/components/atoms/Button';
+import Icon from '../../../shared/components/atoms/Icon';
 import { ChannelItem } from './ChannelItem';
 import type { Channel } from '../../../types';
 
@@ -15,6 +18,7 @@ interface ChannelListProps {
 export default function ChannelList({ selectedChannelId, onSelect }: ChannelListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const navigate = useNavigate();
 
   const { data: channels = [], isLoading, error } = useQuery({
     queryKey: ['channels'],
@@ -46,7 +50,7 @@ export default function ChannelList({ selectedChannelId, onSelect }: ChannelList
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 space-y-3">
         <Input
           type="text"
           placeholder="Search channels..."
@@ -54,6 +58,15 @@ export default function ChannelList({ selectedChannelId, onSelect }: ChannelList
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full"
         />
+        <Button
+          onClick={() => navigate('/channels')}
+          variant="primary"
+          size="sm"
+          className="w-full"
+        >
+          <Icon name="plus" size="sm" className="mr-2" />
+          Create Channel
+        </Button>
       </div>
       
       <div className="flex-1 overflow-y-auto">

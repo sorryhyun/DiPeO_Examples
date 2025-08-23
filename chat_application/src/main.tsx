@@ -8,6 +8,7 @@ import { AuthProvider } from './shared/context/AuthProvider'
 import { WebSocketProvider } from './shared/context/WebSocketProvider'
 import { ThemeProvider } from './shared/context/ThemeProvider'
 import { I18nProvider } from './shared/context/I18nProvider'
+import { ToastProvider } from './shared/hooks/useToast'
 import ErrorBoundary from './shared/ErrorBoundary'
 
 // Dev configuration and mocks
@@ -35,7 +36,9 @@ root.render(
         <WebSocketProvider>
           <ThemeProvider>
             <I18nProvider>
-              <App />
+              <ToastProvider>
+                <App />
+              </ToastProvider>
             </I18nProvider>
           </ThemeProvider>
         </WebSocketProvider>

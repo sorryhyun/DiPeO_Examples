@@ -100,6 +100,27 @@ const handlers: Record<string, HandlerFunction> = {
     return createApiResponse(user);
   },
 
+  'GET /api/users/me': (_query: URLSearchParams, _params: Record<string, string>, _body?: any, headers?: Record<string, string>): ApiResponse<User | null> => {
+    // Check for authorization header
+    const authHeader = headers?.['Authorization'] || headers?.['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return createApiResponse(null, false, 'Unauthorized');
+    }
+    
+    // In a real app, you'd verify the token. For mock, just return first user if token exists
+    const token = authHeader.replace('Bearer ', '');
+    if (token && token.startsWith('mock-token-')) {
+      // Extract user ID from mock token format: mock-token-{userId}-{timestamp}
+      const userId = token.split('-')[2];
+      const user = findById(store.users, userId);
+      if (user) {
+        return createApiResponse(user);
+      }
+    }
+    
+    return createApiResponse(null, false, 'Invalid token');
+  },
+
   // Channels endpoints
   'GET /api/channels': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{channels: Channel[], nextCursor?: string}> => {
     const { items, nextCursor } = paginate(store.channels, query.get('cursor') || undefined);
@@ -354,6 +375,14 @@ const findHandler = (method: string, path: string): { handler: Function; params:
   // Direct match
   if (handlers[key as keyof typeof handlers]) {
     return { handler: handlers[key as keyof typeof handlers], params: {} };
+  }
+  
+  // Check for exact path matches first (like /api/users/me)
+  for (const pattern in handlers) {
+    const [patternMethod, patternPath] = pattern.split(' ');
+    if (patternMethod === method && patternPath === path) {
+      return { handler: handlers[pattern as keyof typeof handlers], params: {} };
+    }
   }
   
   // Pattern match

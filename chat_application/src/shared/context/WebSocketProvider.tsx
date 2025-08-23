@@ -35,11 +35,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
 
   const getWebSocketUrl = (): string => {
     // In production, use environment variable or default
-    return process.env.REACT_APP_WEBSOCKET_URL || 'ws://localhost:8000/ws';
+    // Vite uses import.meta.env instead of process.env
+    return import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
   };
 
   const shouldUseMockSocket = (): boolean => {
-    return devConfig.enable_mock_data && devConfig.disable_websocket_in_dev !== false;
+    return devConfig.enable_mock_data && devConfig.disable_websocket_in_dev;
   };
 
   const emitToSubscribers = useCallback((eventType: string, payload: any) => {

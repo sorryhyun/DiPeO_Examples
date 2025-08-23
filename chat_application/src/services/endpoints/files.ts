@@ -107,8 +107,8 @@ export const uploadFile = async (
 export const listFiles = async (channelId?: string): Promise<FileMeta[]> => {
   try {
     const params = channelId ? { channelId } : {};
-    const response = await apiClient.get('/api/files', { params });
-    return response.data;
+    const response = await apiClient.get<{files: FileMeta[], nextCursor?: string}>('/api/files', { params });
+    return response.data.files || response.data;
   } catch (error) {
     throw new Error(`Failed to list files: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }

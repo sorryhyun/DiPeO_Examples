@@ -70,8 +70,8 @@ export const getUser = async (userId: string): Promise<User> => {
  * List all users
  */
 export const listUsers = async (): Promise<User[]> => {
-  const response = await apiClient.get<User[]>('/api/users');
-  return response.data;
+  const response = await apiClient.get<{users: User[], nextCursor?: string}>('/api/users');
+  return response.data.users || response.data;
 };
 
 /**
