@@ -10,10 +10,8 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useOutsideClick<HTMLDivElement>(onClose);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
-
-  useOutsideClick(dialogRef, onClose);
 
   useEffect(() => {
     if (isOpen) {

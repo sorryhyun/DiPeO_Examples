@@ -22,7 +22,7 @@ const EMOJI_LIST = [
   { emoji: '🚀', label: 'rocket' }
 ];
 
-export default function EmojiPicker({ onSelect, onEmojiSelect, onClose, className = '' }: EmojiPickerProps) {
+export default function EmojiPicker({ onSelect, onEmojiSelect, className = '' }: EmojiPickerProps) {
   const [focusedIndex, setFocusedIndex] = useState(0);
   const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 

@@ -1,15 +1,15 @@
 import { generateId } from '../../utils/generateId';
-import { devConfig } from '../../config/devConfig';
-import type { User, Channel, Message, FileMeta, PresenceState, Reaction } from '../../types';
+import { AppConfig } from '../../config/appConfig';
+import type { User, Channel, Message, FileMeta, Role } from '../../types';
 
-// Create users based on devConfig mock_auth_users
-const users: User[] = devConfig.mock_auth_users.map(mockUser => ({
-  id: generateId(),
-  email: mockUser.email,
+// Create users based on AppConfig mock_auth_users
+const users: User[] = AppConfig.mock_auth_users?.map(mockUser => ({
+  id: mockUser.id,
+  email: mockUser.username + '@example.com', // Generate email from username
   displayName: mockUser.displayName,
-  avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockUser.email}`,
-  role: mockUser.role
-}));
+  avatar: mockUser.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockUser.username}`,
+  role: 'member' as Role // Default role since MockUser doesn't have role
+})) || [];
 
 // Create channels
 const channels: Channel[] = [
@@ -124,6 +124,7 @@ const files: FileMeta[] = [
   {
     id: generateId(),
     name: 'project-spec.pdf',
+    type: 'application/pdf',
     size: 2456789,
     mimeType: 'application/pdf',
     url: '/api/files/project-spec.pdf',
@@ -134,6 +135,7 @@ const files: FileMeta[] = [
   {
     id: generateId(),
     name: 'team-photo.jpg',
+    type: 'image/jpeg',
     size: 1234567,
     mimeType: 'image/jpeg',
     url: '/api/files/team-photo.jpg',
@@ -144,6 +146,7 @@ const files: FileMeta[] = [
   {
     id: generateId(),
     name: 'meeting-notes.docx',
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     size: 567890,
     mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     url: '/api/files/meeting-notes.docx',
@@ -153,13 +156,46 @@ const files: FileMeta[] = [
   }
 ];
 
-// Create presence data for users
-const presence: PresenceState[] = users.map(user => ({
+// Create presence data for users (using extended interface for mock)
+const presence = users.map(user => ({
   userId: user.id,
+  channelId: channels[0].id, // Default to general channel
   online: true,
   lastSeen: new Date().toISOString(),
-  status: 'available'
+  status: 'available' as const
 }));
+
+// Create some sample reactions  
+const reactions = [
+  {
+    id: generateId(),
+    messageId: messages[0].id,
+    emoji: '👍',
+    userId: users[1]?.id || users[0].id,
+    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+  },
+  {
+    id: generateId(),
+    messageId: messages[0].id,
+    emoji: '👍',
+    userId: users[2]?.id || users[0].id,
+    createdAt: new Date(Date.now() - 4 * 60 * 1000).toISOString()
+  }
+];
+
+// Create some sample threads
+const threads = [
+  {
+    id: generateId(),
+    channelId: channels[0].id,
+    parentMessageId: messages[2].id,
+    messageIds: [],
+    title: 'Discussion thread',
+    createdAt: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+    updatedAt: new Date(Date.now() - 3 * 60 * 1000).toISOString(),
+    messageCount: 0
+  }
+];
 
 // Export seed data
 export const mockData = {
@@ -168,8 +204,8 @@ export const mockData = {
   messages,
   files,
   presence,
-  reactions: [], // Empty for now
-  threads: [] // Empty for now
+  reactions,
+  threads
 };
 
 // Function to get a deep clone of all mock data to prevent mutation

@@ -232,7 +232,7 @@ This showcase represents:
 
 ## 📚 Learn More
 
-- **[DiPeO Framework](https://github.com/soryhyun/DiPeO)** - The AI orchestration system
+- **[DiPeO Framework](https://github.com/sorryhyun/DiPeO)** - The AI orchestration system
 - **[Generation Process Video](https://youtube.com/...)** - Watch it being built
 - **[Technical Blog Post](https://blog.example.com/...)** - Deep dive into how it works
 - **[Try It Yourself](https://dipeo.ai/try)** - Generate your own app
@@ -263,7 +263,7 @@ This showcase is MIT licensed. The generated code is yours to use freely.
 
 ### 🌟 Star this repo if you're amazed by what AI can build! 🌟
 
-**[Generate Your Own](https://github.com/soryhyun/DiPeO)** | **[Live Demo](https://your-demo.vercel.app)** | **[Watch Video](https://youtube.com)**
+**[Generate Your Own](https://github.com/sorryhyun/DiPeO)** | **[Live Demo](https://your-demo.vercel.app)** | **[Watch Video](https://youtube.com)**
 
 *Built with ❤️ by AI, showcased by humans*
 

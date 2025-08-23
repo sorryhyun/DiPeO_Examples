@@ -14,7 +14,7 @@ interface I18nProviderProps {
 }
 
 interface Translations {
-  [key: string]: string;
+  [key: string]: string | Record<string, string>;
 }
 
 const STORAGE_KEY = 'dipeo-language';

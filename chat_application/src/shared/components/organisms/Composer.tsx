@@ -57,9 +57,9 @@ export default function Composer({
       // Restore content on failure
       setContent(originalContent);
       setAttachments(originalAttachments);
-      showToast({
+      addToast({
         type: 'error',
-        message: 'Failed to send message. Please try again.'
+        title: 'Failed to send message. Please try again.'
       });
     } finally {
       setIsSending(false);

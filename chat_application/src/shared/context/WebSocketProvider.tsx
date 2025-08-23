@@ -151,9 +151,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     if (shouldUseMockSocket()) {
       mockSocket.disconnect();
       mockSocket.off('message', handleMessage);
-      mockSocket.off('connect');
-      mockSocket.off('disconnect');
-      mockSocket.off('error');
+      // Note: In a real implementation, you'd pass the handler functions
+      // For simplicity in mock, we'll just disconnect
+      // mockSocket.off('connect', connectHandler);
+      // mockSocket.off('disconnect', disconnectHandler);
+      // mockSocket.off('error', errorHandler);
     } else if (wsRef.current) {
       wsRef.current.close(1000, 'Component unmounting');
       wsRef.current = null;

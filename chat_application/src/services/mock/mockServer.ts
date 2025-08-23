@@ -1,11 +1,42 @@
-import { ApiResponse } from '../../types';
+import { ApiResponse, User, Channel, Message, FileMeta, Reaction, Thread } from '../../types';
+
+// Extended types for mock server that include additional fields needed for backend operations
+interface MockReaction extends Reaction {
+  id: string;
+  messageId: string;
+}
+
+interface MockPresenceState {
+  userId: string;
+  channelId: string;
+  online: boolean;
+  status: 'available' | 'away' | 'busy' | 'invisible';
+  lastSeen: string;
+}
+
+interface MockThread extends Thread {
+  channelId: string;
+  title?: string;
+  updatedAt: string;
+  messageCount: number;
+}
 import { mockData, getMockData } from './mockData';
 import { mockSocket } from './mockSocket';
 import { generateId } from '../../utils/generateId';
 import { devConfig } from '../../config/devConfig';
 
 // In-memory store for mock data
-let store = {
+interface MockStore {
+  users: User[];
+  channels: Channel[];
+  messages: Message[];
+  files: FileMeta[];
+  presence: MockPresenceState[];
+  reactions: MockReaction[];
+  threads: MockThread[];
+}
+
+let store: MockStore = {
   users: [...mockData.users],
   channels: [...mockData.channels],
   messages: [...mockData.messages],
@@ -20,14 +51,23 @@ const findById = <T extends { id: string }>(collection: T[], id: string): T | un
   return collection.find(item => item.id === id);
 };
 
-// Helper function to parse query parameters
-const parseQuery = (url: string): URLSearchParams => {
-  const urlObj = new URL(url, 'http://localhost');
-  return urlObj.searchParams;
+// Helper function to create proper API response with timestamp
+const createApiResponse = <T>(data: T, success: boolean = true, error?: string): ApiResponse<T> => {
+  return {
+    data,
+    success,
+    error,
+    timestamp: new Date().toISOString()
+  };
 };
 
 // Helper function to paginate results
-const paginate = <T>(items: T[], cursor?: string, limit: number = 50): { items: T[]; nextCursor?: string } => {
+interface PaginatedResult<T> {
+  items: T[];
+  nextCursor?: string;
+}
+
+const paginate = <T>(items: T[], cursor?: string, limit: number = 50): PaginatedResult<T> => {
   const startIndex = cursor ? parseInt(cursor, 10) : 0;
   const endIndex = startIndex + limit;
   const paginatedItems = items.slice(startIndex, endIndex);
@@ -36,65 +76,52 @@ const paginate = <T>(items: T[], cursor?: string, limit: number = 50): { items: 
   return { items: paginatedItems, nextCursor };
 };
 
+// Handler function type
+type HandlerFunction = (
+  query: URLSearchParams,
+  params: Record<string, string>,
+  body?: any,
+  headers?: Record<string, string>
+) => ApiResponse<any>;
+
 // Mock handlers for different endpoints
-const handlers = {
+const handlers: Record<string, HandlerFunction> = {
   // Users endpoints
-  'GET /api/users': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/users': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{users: User[], nextCursor?: string}> => {
     const { items, nextCursor } = paginate(store.users, query.get('cursor') || undefined);
-    return {
-      data: { users: items, nextCursor },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ users: items, nextCursor });
   },
 
-  'GET /api/users/:id': (query: URLSearchParams, params: Record<string, string>): ApiResponse<any> => {
+  'GET /api/users/:id': (_query: URLSearchParams, params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<User | null> => {
     const user = findById(store.users, params.id);
     if (!user) {
-      return {
-        data: null,
-        success: false,
-        error: { message: 'User not found', code: 'USER_NOT_FOUND' }
-      };
+      return createApiResponse(null, false, 'User not found');
     }
-    return {
-      data: user,
-      success: true,
-      error: null
-    };
+    return createApiResponse(user);
   },
 
   // Channels endpoints
-  'GET /api/channels': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/channels': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{channels: Channel[], nextCursor?: string}> => {
     const { items, nextCursor } = paginate(store.channels, query.get('cursor') || undefined);
-    return {
-      data: { channels: items, nextCursor },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ channels: items, nextCursor });
   },
 
-  'POST /api/channels': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
-    const newChannel = {
+  'POST /api/channels': (_query: URLSearchParams, _params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<Channel> => {
+    const newChannel: Channel = {
       id: generateId(),
-      name: body.name,
-      description: body.description || '',
-      isPrivate: body.isPrivate || false,
+      name: body?.name || '',
+      description: body?.description || '',
+      private: body?.private || false,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      memberIds: body.memberIds || []
+      members: body?.members || []
     };
     
     store.channels.push(newChannel);
-    return {
-      data: newChannel,
-      success: true,
-      error: null
-    };
+    return createApiResponse(newChannel);
   },
 
   // Messages endpoints
-  'GET /api/messages': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/messages': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{messages: Message[], nextCursor?: string}> => {
     const channelId = query.get('channelId');
     const threadId = query.get('threadId');
     
@@ -113,25 +140,22 @@ const handlers = {
     
     const { items, nextCursor } = paginate(messages, query.get('cursor') || undefined);
     
-    return {
-      data: { messages: items, nextCursor },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ messages: items, nextCursor });
   },
 
-  'POST /api/messages': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
-    const newMessage = {
+  'POST /api/messages': (_query: URLSearchParams, _params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<Message> => {
+    const newMessage: Message = {
       id: generateId(),
-      content: body.content,
-      channelId: body.channelId,
-      authorId: body.authorId,
-      threadId: body.threadId || null,
-      attachments: body.attachments || [],
+      content: body?.content || '',
+      channelId: body?.channelId || '',
+      senderId: body?.senderId || body?.authorId || '',
+      threadId: body?.threadId,
+      attachments: body?.attachments || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      editedAt: null,
-      reactions: []
+      reactions: {},
+      edited: false,
+      deleted: false
     };
     
     store.messages.push(newMessage);
@@ -139,28 +163,20 @@ const handlers = {
     // Emit real-time event via mock socket
     mockSocket.emit('message', newMessage);
     
-    return {
-      data: newMessage,
-      success: true,
-      error: null
-    };
+    return createApiResponse(newMessage);
   },
 
-  'PUT /api/messages/:id': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
+  'PUT /api/messages/:id': (_query: URLSearchParams, params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<Message | null> => {
     const message = findById(store.messages, params.id);
     if (!message) {
-      return {
-        data: null,
-        success: false,
-        error: { message: 'Message not found', code: 'MESSAGE_NOT_FOUND' }
-      };
+      return createApiResponse(null, false, 'Message not found');
     }
     
-    const updatedMessage = {
+    const updatedMessage: Message = {
       ...message,
-      content: body.content || message.content,
+      content: body?.content || message.content,
       updatedAt: new Date().toISOString(),
-      editedAt: new Date().toISOString()
+      edited: true
     };
     
     const index = store.messages.findIndex(msg => msg.id === params.id);
@@ -168,65 +184,47 @@ const handlers = {
     
     mockSocket.emit('message_updated', updatedMessage);
     
-    return {
-      data: updatedMessage,
-      success: true,
-      error: null
-    };
+    return createApiResponse(updatedMessage);
   },
 
-  'DELETE /api/messages/:id': (query: URLSearchParams, params: Record<string, string>): ApiResponse<any> => {
+  'DELETE /api/messages/:id': (_query: URLSearchParams, params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{success: boolean}> => {
     const index = store.messages.findIndex(msg => msg.id === params.id);
     if (index === -1) {
-      return {
-        data: null,
-        success: false,
-        error: { message: 'Message not found', code: 'MESSAGE_NOT_FOUND' }
-      };
+      return createApiResponse({success: false}, false, 'Message not found');
     }
     
     store.messages.splice(index, 1);
     mockSocket.emit('message_deleted', { id: params.id });
     
-    return {
-      data: { success: true },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ success: true });
   },
 
   // Files endpoints
-  'GET /api/files': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/files': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{files: FileMeta[], nextCursor?: string}> => {
     const { items, nextCursor } = paginate(store.files, query.get('cursor') || undefined);
-    return {
-      data: { files: items, nextCursor },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ files: items, nextCursor });
   },
 
-  'POST /api/files': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
-    const newFile = {
+  'POST /api/files': (_query: URLSearchParams, _params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<FileMeta> => {
+    const newFile: FileMeta = {
       id: generateId(),
-      name: body.name,
-      size: body.size,
-      type: body.type,
-      url: body.url || `https://mock-cdn.example.com/files/${generateId()}`,
-      uploadedBy: body.uploadedBy,
-      createdAt: new Date().toISOString()
+      name: body?.name || '',
+      size: body?.size || 0,
+      type: body?.type || '',
+      mimeType: body?.mimeType || body?.type || '',
+      url: body?.url || `https://mock-cdn.example.com/files/${generateId()}`,
+      uploadedBy: body?.uploadedBy || '',
+      uploadedAt: new Date().toISOString(),
+      channelId: body?.channelId
     };
     
     store.files.push(newFile);
     
-    return {
-      data: newFile,
-      success: true,
-      error: null
-    };
+    return createApiResponse(newFile);
   },
 
   // Presence endpoints
-  'GET /api/presence': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/presence': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{presence: MockPresenceState[]}> => {
     const channelId = query.get('channelId');
     let presence = store.presence;
     
@@ -234,22 +232,19 @@ const handlers = {
       presence = presence.filter(p => p.channelId === channelId);
     }
     
-    return {
-      data: { presence },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ presence });
   },
 
-  'POST /api/presence': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
+  'POST /api/presence': (_query: URLSearchParams, _params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<MockPresenceState> => {
     const existingIndex = store.presence.findIndex(p => 
       p.userId === body.userId && p.channelId === body.channelId
     );
     
-    const presenceData = {
-      userId: body.userId,
-      channelId: body.channelId,
-      status: body.status || 'online',
+    const presenceData: MockPresenceState = {
+      userId: body?.userId || '',
+      channelId: body?.channelId || '',
+      online: body?.online !== false, // Default to true
+      status: body?.status || 'available',
       lastSeen: new Date().toISOString()
     };
     
@@ -261,15 +256,11 @@ const handlers = {
     
     mockSocket.emit('presence_updated', presenceData);
     
-    return {
-      data: presenceData,
-      success: true,
-      error: null
-    };
+    return createApiResponse(presenceData);
   },
 
   // Reactions endpoints
-  'GET /api/reactions': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/reactions': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{reactions: MockReaction[]}> => {
     const messageId = query.get('messageId');
     let reactions = store.reactions;
     
@@ -277,55 +268,39 @@ const handlers = {
       reactions = reactions.filter(r => r.messageId === messageId);
     }
     
-    return {
-      data: { reactions },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ reactions });
   },
 
-  'POST /api/reactions': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
-    const newReaction = {
+  'POST /api/reactions': (_query: URLSearchParams, _params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<MockReaction> => {
+    const newReaction: MockReaction = {
       id: generateId(),
-      messageId: body.messageId,
-      userId: body.userId,
-      emoji: body.emoji,
+      messageId: body?.messageId || '',
+      userId: body?.userId || '',
+      emoji: body?.emoji || '',
       createdAt: new Date().toISOString()
     };
     
     store.reactions.push(newReaction);
     mockSocket.emit('reaction_added', newReaction);
     
-    return {
-      data: newReaction,
-      success: true,
-      error: null
-    };
+    return createApiResponse(newReaction);
   },
 
-  'DELETE /api/reactions/:id': (query: URLSearchParams, params: Record<string, string>): ApiResponse<any> => {
+  'DELETE /api/reactions/:id': (_query: URLSearchParams, params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{success: boolean}> => {
     const index = store.reactions.findIndex(r => r.id === params.id);
     if (index === -1) {
-      return {
-        data: null,
-        success: false,
-        error: { message: 'Reaction not found', code: 'REACTION_NOT_FOUND' }
-      };
+      return createApiResponse({success: false}, false, 'Reaction not found');
     }
     
     const reaction = store.reactions[index];
     store.reactions.splice(index, 1);
     mockSocket.emit('reaction_removed', { id: params.id, messageId: reaction.messageId });
     
-    return {
-      data: { success: true },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ success: true });
   },
 
   // Threads endpoints
-  'GET /api/threads': (query: URLSearchParams): ApiResponse<any> => {
+  'GET /api/threads': (query: URLSearchParams, _params: Record<string, string>, _body?: any, _headers?: Record<string, string>): ApiResponse<{threads: MockThread[], nextCursor?: string}> => {
     const channelId = query.get('channelId');
     let threads = store.threads;
     
@@ -335,19 +310,16 @@ const handlers = {
     
     const { items, nextCursor } = paginate(threads, query.get('cursor') || undefined);
     
-    return {
-      data: { threads: items, nextCursor },
-      success: true,
-      error: null
-    };
+    return createApiResponse({ threads: items, nextCursor });
   },
 
-  'POST /api/threads': (query: URLSearchParams, params: Record<string, string>, body: any): ApiResponse<any> => {
-    const newThread = {
+  'POST /api/threads': (_query: URLSearchParams, _params: Record<string, string>, body?: any, _headers?: Record<string, string>): ApiResponse<MockThread> => {
+    const newThread: MockThread = {
       id: generateId(),
-      channelId: body.channelId,
-      parentMessageId: body.parentMessageId,
-      title: body.title || null,
+      channelId: body?.channelId || '',
+      parentMessageId: body?.parentMessageId || '',
+      messageIds: [],
+      title: body?.title,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       messageCount: 0
@@ -355,11 +327,7 @@ const handlers = {
     
     store.threads.push(newThread);
     
-    return {
-      data: newThread,
-      success: true,
-      error: null
-    };
+    return createApiResponse(newThread);
   }
 };
 
@@ -432,23 +400,12 @@ const handleRequest = (
     const match = findHandler(method.toUpperCase(), path);
     
     if (!match) {
-      return {
-        data: null,
-        success: false,
-        error: { message: `Handler not found for ${method} ${path}`, code: 'HANDLER_NOT_FOUND' }
-      };
+      return createApiResponse(null, false, `Handler not found for ${method} ${path}`);
     }
     
     return match.handler(query, match.params, body, headers);
   } catch (error) {
-    return {
-      data: null,
-      success: false,
-      error: { 
-        message: error instanceof Error ? error.message : 'Unknown error', 
-        code: 'INTERNAL_ERROR' 
-      }
-    };
+    return createApiResponse(null, false, error instanceof Error ? error.message : 'Unknown error');
   }
 };
 
@@ -501,5 +458,5 @@ export const mockServer = setupMocks();
 // Export the main handler for use by apiClient
 export { handleRequest };
 
-// Export store access for testing/debugging
-export const getMockStore = () => ({ ...store });
+// Export store access for testing/debugging (commented out to avoid unused warning)
+// export const getMockStore = () => ({ ...store });

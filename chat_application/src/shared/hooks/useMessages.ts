@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchMessages, sendMessage, SendMessagePayload } from '../../services/endpoints/messages';
+import { fetchMessages, sendMessage as apiSendMessage, SendMessagePayload } from '../../services/endpoints/messages';
 import { Message } from '../../types';
 import { generateId } from '../../utils/generateId';
 
@@ -43,7 +43,7 @@ export const useMessages = ({ channelId }: UseMessagesOptions): UseMessagesRetur
 
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: SendMessagePayload) => {
-      return sendMessage(messageData);
+      return apiSendMessage(messageData);
     },
     onMutate: async (messageData: SendMessagePayload) => {
       // Cancel outgoing refetches
@@ -90,14 +90,14 @@ export const useMessages = ({ channelId }: UseMessagesOptions): UseMessagesRetur
 
       return { previousMessages, optimisticMessage };
     },
-    onError: (error, messageData, context) => {
+    onError: (error, _, context) => {
       // Rollback to previous state
       if (context?.previousMessages) {
         queryClient.setQueryData(queryKey, context.previousMessages);
       }
       console.error('Failed to send message:', error);
     },
-    onSuccess: (data, messageData, context) => {
+    onSuccess: (data, _, context) => {
       // Remove optimistic message and replace with real message
       queryClient.setQueryData(queryKey, (old: any) => {
         if (!old?.pages || !context?.optimisticMessage) return old;
@@ -122,10 +122,10 @@ export const useMessages = ({ channelId }: UseMessagesOptions): UseMessagesRetur
   });
 
   const sendMessage = async (content: string, threadId?: string) => {
-    const messageData: SendMessageRequest = {
+    const messageData: SendMessagePayload = {
       content,
       channelId,
-      userId: 'current-user-id', // This should come from auth context
+      senderId: 'current-user-id', // This should come from auth context
       threadId,
     };
 

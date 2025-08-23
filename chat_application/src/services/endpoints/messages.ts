@@ -1,6 +1,5 @@
 import { apiClient } from '../apiClient';
-import { Message, MessagePayload, Thread, ReactionPayload, PaginationOptions, SearchOptions } from '../../types';
-import { generateId } from '../../utils/generateId';
+import { Message, Thread, ReactionPayload, PaginationOptions, SearchOptions } from '../../types';
 
 export interface FetchMessagesOptions extends PaginationOptions {
   cursor?: string;
@@ -49,18 +48,7 @@ export const sendMessage = async (payload: SendMessagePayload): Promise<Message>
     throw new Error('Channel ID and content are required');
   }
 
-  // Create optimistic message with generated ID
-  const optimisticMessage: MessagePayload = {
-    id: generateId(),
-    channelId: payload.channelId,
-    content: payload.content.trim(),
-    senderId: payload.senderId,
-    timestamp: new Date().toISOString(),
-    attachments: payload.attachments || [],
-    threadId: payload.threadId,
-    reactions: [],
-    isOptimistic: true
-  };
+  // Note: In a real implementation, you might want to return an optimistic message
 
   try {
     const response = await apiClient.post('/api/messages', payload);
@@ -90,16 +78,16 @@ export const fetchThread = async (threadId: string): Promise<Thread> => {
 export const reactToMessage = async (
   messageId: string,
   emoji: string,
-  userId: string
+  action: 'add' | 'remove' = 'add'
 ): Promise<void> => {
-  if (!messageId || !emoji || !userId) {
-    throw new Error('Message ID, emoji, and user ID are required');
+  if (!messageId || !emoji) {
+    throw new Error('Message ID and emoji are required');
   }
 
   const payload: ReactionPayload = {
     messageId,
     emoji,
-    userId
+    action
   };
 
   await apiClient.post('/api/reactions', payload);
@@ -110,7 +98,7 @@ export const reactToMessage = async (
  */
 export const searchMessages = async (
   query: string,
-  options: SearchMessagesOptions = {}
+  options: Omit<SearchMessagesOptions, 'query'> = {}
 ): Promise<{ messages: Message[]; total: number }> => {
   if (!query?.trim()) {
     throw new Error('Search query is required');

@@ -56,6 +56,7 @@ export const uploadFile = async (
           const mockFile: FileMeta = {
             id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             name: file.name,
+            type: file.type,
             size: file.size,
             mimeType: file.type,
             url: URL.createObjectURL(file), // Use object URL for preview
@@ -71,11 +72,6 @@ export const uploadFile = async (
           });
         }
       }, 100 + Math.random() * 200); // Random interval for realistic feel
-      
-      const cancel = () => {
-        cancelled = true;
-        clearInterval(interval);
-      };
     });
   }
 

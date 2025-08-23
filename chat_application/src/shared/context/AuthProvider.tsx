@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signIn as apiSignIn, getCurrentUser, SignInResponse } from '../../services/endpoints/users';
+import { signIn as apiSignIn, getCurrentUser } from '../../services/endpoints/users';
 import { devConfig } from '../../config/devConfig';
 import { User } from '../../types';
 

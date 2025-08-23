@@ -205,6 +205,14 @@ export interface SearchOptions {
   after?: string;
 }
 
+export interface SearchMessagesOptions {
+  query: string;
+  channelId?: string;
+  limit?: number;
+  before?: string;
+  after?: string;
+}
+
 // Call types
 export interface CallState {
   id: string;

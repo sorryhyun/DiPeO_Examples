@@ -45,8 +45,8 @@ const MessageItem: React.FC<MessageItemProps> = ({
       <div className="flex-shrink-0 relative">
         <Avatar
           src={undefined} // TODO: Get user avatar from senderId
-          alt={`User ${message.senderId}`}
-          size="md"
+          name={`User ${message.senderId}`}
+          size={32}
         />
         <PresenceIndicator 
           presence={{ online: true }} // TODO: Get user presence from senderId

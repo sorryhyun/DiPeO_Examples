@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { generateId } from '../../../utils/generateId';
 
 interface AvatarProps {
   src?: string;

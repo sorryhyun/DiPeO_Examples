@@ -10,8 +10,8 @@ import { fetchChannels } from '../../../services/endpoints/channels';
 
 const ChatPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
-    searchParams.get('channel') || null
+  const [selectedChannelId, setSelectedChannelId] = useState<string | undefined>(
+    searchParams.get('channel') || undefined
   );
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
   const [isChannelListOpen, setIsChannelListOpen] = useState(false);

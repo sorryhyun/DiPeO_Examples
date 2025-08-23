@@ -12,7 +12,7 @@ interface ChannelViewProps {
   onThreadSelect?: (threadId: string) => void;
 }
 
-const ChannelView: React.FC<ChannelViewProps> = ({ channelId, onThreadSelect }) => {
+const ChannelView: React.FC<ChannelViewProps> = ({ channelId }) => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
