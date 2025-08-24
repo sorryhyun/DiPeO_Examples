@@ -1,15 +1,23 @@
 import { useCallback, useRef, useEffect } from 'react';
 
 interface ThreeSetupCallback {
-  (scene: any, camera: any, renderer: any): void;
+  (scene: any, camera: any, renderer: any): any;
+}
+
+interface UseThreeOptions {
+  canvas: HTMLCanvasElement | null;
+  onInit?: ThreeSetupCallback;
+  onError?: () => void;
 }
 
 interface UseThreeReturn {
-  canvasRef: (element: HTMLCanvasElement | null) => void;
-  dispose: () => void;
+  scene: any;
+  camera: any;
+  renderer: any;
+  cleanup: () => void;
 }
 
-export const useThree = (setup?: ThreeSetupCallback): UseThreeReturn => {
+export const useThree = (options: UseThreeOptions): UseThreeReturn => {
   const sceneRef = useRef<any>(null);
   const cameraRef = useRef<any>(null);
   const rendererRef = useRef<any>(null);
@@ -60,7 +68,8 @@ export const useThree = (setup?: ThreeSetupCallback): UseThreeReturn => {
     rendererRef.current.setSize(width, height);
   }, []);
 
-  const canvasRef = useCallback(async (element: HTMLCanvasElement | null) => {
+  const initializeThree = useCallback(async () => {
+    const element = options.canvas;
     if (!element) {
       dispose();
       return;
@@ -96,8 +105,8 @@ export const useThree = (setup?: ThreeSetupCallback): UseThreeReturn => {
       rendererRef.current = renderer;
 
       // Call setup callback if provided
-      if (setup) {
-        setup(scene, camera, renderer);
+      if (options.onInit) {
+        options.onInit(scene, camera, renderer);
       }
 
       // Add resize listener
@@ -112,9 +121,18 @@ export const useThree = (setup?: ThreeSetupCallback): UseThreeReturn => {
 
     } catch (error) {
       console.warn('Three.js failed to initialize:', error);
-      // Graceful fallback - element remains but without 3D content
+      if (options.onError) {
+        options.onError();
+      }
     }
-  }, [setup, handleResize, dispose]);
+  }, [options, handleResize, dispose]);
+
+  // Initialize when canvas is provided
+  useEffect(() => {
+    if (options.canvas) {
+      initializeThree();
+    }
+  }, [initializeThree]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -125,17 +143,9 @@ export const useThree = (setup?: ThreeSetupCallback): UseThreeReturn => {
   }, [handleResize, dispose]);
 
   return {
-    canvasRef,
-    dispose
+    scene: sceneRef.current,
+    camera: cameraRef.current,
+    renderer: rendererRef.current,
+    cleanup: dispose
   };
 };
-```
-
-/*
-## SELF-CHECK
-- [x] Uses `@/` imports only - N/A for this hook (only React imports needed)
-- [x] Uses providers/hooks (no direct DOM/localStorage side effects) - Only manages canvas/WebGL context
-- [x] Reads config from `@/app/config` - N/A for this utility hook
-- [x] Exports default named component - Exports named hook `useThree`
-- [x] Adds basic ARIA and keyboard handlers (where relevant) - N/A for Three.js hook
-*/

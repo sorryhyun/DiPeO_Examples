@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Testimonial } from '@/types';
-import { testimonialService } from '@/services/testimonialService';
-import { analyticsService } from '@/services/analyticsService';
+import { fetchTestimonials } from '@/services/testimonialService';
+import { sendEvent } from '@/services/analyticsService';
 import { Button } from '@/shared/components/Button';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
 
@@ -67,7 +67,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ className = '' }) => {
     const loadInitialReviews = async () => {
       setLoading(true);
       try {
-        const initialReviews = await testimonialService.fetchTestimonials();
+        const initialReviews = await fetchTestimonials();
         setReviews(initialReviews);
         setInitialized(true);
       } catch (error) {
@@ -84,17 +84,20 @@ export const Reviews: React.FC<ReviewsProps> = ({ className = '' }) => {
     setLoadingMore(true);
     
     // Track analytics event
-    await analyticsService.trackEvent({
-      type: 'reviews_load_more',
+    await sendEvent({
+      event: 'reviews_load_more',
+      category: 'interaction',
       properties: {
-        current_count: reviews.length,
-        timestamp: Date.now()
-      }
+        current_count: reviews.length
+      },
+      sessionId: 'session-' + Date.now(),
+      timestamp: new Date().toISOString(),
+      page: '/reviews'
     });
 
     try {
       // Mock infinite loading by appending the same testimonials
-      const moreReviews = await testimonialService.fetchTestimonials();
+      const moreReviews = await fetchTestimonials();
       
       // Add slight delay to simulate network request
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -154,7 +157,7 @@ export const Reviews: React.FC<ReviewsProps> = ({ className = '' }) => {
           <Button
             onClick={handleLoadMore}
             disabled={loadingMore}
-            variant="outline"
+            variant="secondary"
             size="lg"
             className="min-w-[200px]"
             aria-label="Load more reviews"

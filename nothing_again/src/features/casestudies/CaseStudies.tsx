@@ -176,7 +176,7 @@ export const CaseStudies: React.FC = () => {
 
         {selectedCaseStudy && (
           <Modal
-            isOpen={true}
+            open={true}
             onClose={closeCaseStudy}
             title={selectedCaseStudy.title}
           >

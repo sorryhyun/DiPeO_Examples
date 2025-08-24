@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Button } from '@/shared/components/Button';
 import { SilentSound } from '@/shared/components/SilentSound';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { newsletterService } from '@/services/newsletterService';
+import newsletterService from '@/services/newsletterService';
 import { trackEvent } from '@/utils/analytics';
 
 interface NewsletterFormProps {
@@ -51,37 +51,49 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
     setMessage(null);
 
     try {
-      const response = await newsletterService.subscribe(email);
+      await newsletterService.subscribe({
+        email,
+        source: 'newsletter_form'
+      });
       
-      if (response.success) {
-        setIsSubscribed(true);
-        setMessage({
-          type: 'success',
-          text: 'Successfully subscribed to absolutely nothing! You will receive exactly zero emails about our non-existent updates.'
-        });
-        setEmail('');
-        setPlaySuccess(true);
-        
-        trackEvent('newsletter_signup', {
+      setIsSubscribed(true);
+      setMessage({
+        type: 'success',
+        text: 'Successfully subscribed to absolutely nothing! You will receive exactly zero emails about our non-existent updates.'
+      });
+      setEmail('');
+      setPlaySuccess(true);
+      
+      trackEvent({
+        event: 'newsletter_signup',
+        category: 'conversion',
+        properties: {
           email_domain: email.split('@')[1],
-          variant,
-          timestamp: new Date().toISOString()
-        });
-        
-        onSuccess?.();
-      } else {
-        throw new Error(response.error || 'Subscription failed');
-      }
+          variant
+        },
+        sessionId: 'session-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
+      });
+      
+      onSuccess?.();
     } catch (error) {
       setMessage({
         type: 'error',
         text: 'Failed to subscribe to nothing. Even our failures are meaningless. Please try again.'
       });
       
-      trackEvent('newsletter_signup_error', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        variant,
-        email_domain: email.split('@')[1]
+      trackEvent({
+        event: 'newsletter_signup_error',
+        category: 'error',
+        properties: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          variant,
+          email_domain: email.split('@')[1]
+        },
+        sessionId: 'session-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
       });
     } finally {
       setIsSubmitting(false);
@@ -190,7 +202,7 @@ export const NewsletterForm: React.FC<NewsletterFormProps> = ({
       {/* Silent sound effect on successful subscription */}
       {playSuccess && (
         <SilentSound 
-          onComplete={() => setPlaySuccess(false)}
+          onSilenceComplete={() => setPlaySuccess(false)}
           duration={1000}
         />
       )}

@@ -225,7 +225,7 @@ export const PressKit: React.FC = () => {
       {/* Asset Preview Modal */}
       {selectedAsset && (
         <Modal
-          isOpen={isModalOpen}
+          open={isModalOpen}
           onClose={handleCloseModal}
           title={selectedAsset.name}
         >

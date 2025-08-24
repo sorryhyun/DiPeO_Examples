@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/shared/components/Button';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { supportService } from '@/services/supportService';
+import supportService from '@/services/supportService';
 import { trackEvent } from '@/utils/analytics';
 
 interface Message {
@@ -70,7 +70,7 @@ export const SupportChatBot: React.FC<SupportChatBotProps> = ({ className = '' }
     });
 
     try {
-      const response = await supportService.sendSupportMessage(userMessage.text);
+      const response = await supportService.sendMessage(userMessage.text);
       
       // Simulate typing delay
       setTimeout(() => {

@@ -20,17 +20,17 @@ This is a **complete, production-ready React application** built entirely by AI.
 - **Components Created**: 24 React components
 - **Ready for Production**: Yes, including TypeScript, testing, and deployment configs
 
-## 🎨 Features Implemented by AI
+## 🎨 Examples
 
 The AI successfully implemented:
 
-### Core Features
-- ✅ **Authentication System** - Complete login/logout flow with JWT tokens
-- ✅ **Real-time Chat** - WebSocket-based messaging with typing indicators
-- ✅ **File Management** - Upload, download, and preview files
-- ✅ **Search Functionality** - Full-text search with filters
-- ✅ **Dark Mode** - System-aware theme switching
-- ✅ **Internationalization** - Multi-language support ready
+### V1
+- https://di-pe-o-examples-q688.vercel.app/
+- https://di-pe-o-examples-cyh2.vercel.app/
+- https://di-pe-o-examples.vercel.app/
+
+### V2
+- https://di-pe-o-examples-pt54.vercel.app/login
 
 ### Technical Implementation
 - ✅ **TypeScript** - Fully typed with strict mode

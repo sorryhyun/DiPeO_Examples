@@ -117,8 +117,7 @@ export const VoidAnimationSystem: React.FC<VoidAnimationSystemProps> = ({
         }}
       >
         <MatrixRain
-          density={config.matrixDensity}
-          character="0"
+          intensity={config.matrixDensity / 100}
           className="w-full h-full text-gray-400/30 dark:text-gray-600/30"
         />
       </div>
@@ -133,7 +132,7 @@ export const VoidAnimationSystem: React.FC<VoidAnimationSystemProps> = ({
       >
         <RecursiveLoader
           depth={config.loaderComplexity}
-          size={mode === 'heavy' ? 120 : mode === 'light' ? 60 : 80}
+          size={mode === 'heavy' ? 'lg' : mode === 'light' ? 'sm' : 'md'}
           className="text-gray-500/20 dark:text-gray-400/20"
         />
       </div>

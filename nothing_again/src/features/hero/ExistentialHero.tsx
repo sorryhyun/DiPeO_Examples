@@ -49,9 +49,11 @@ export const ExistentialHero: React.FC = () => {
 
   const handlePrimaryCTA = () => {
     trackEvent({
-      type: 'cta_click',
+      event: 'cta_click',
       category: 'hero',
-      label: 'get_started',
+      properties: {
+        label: 'get_started'
+      },
       timestamp: Date.now()
     });
 
@@ -64,9 +66,11 @@ export const ExistentialHero: React.FC = () => {
 
   const handleSecondaryCTA = () => {
     trackEvent({
-      type: 'cta_click',
+      event: 'cta_click',
       category: 'hero',
-      label: 'learn_more',
+      properties: {
+        label: 'learn_more'
+      },
       timestamp: Date.now()
     });
 

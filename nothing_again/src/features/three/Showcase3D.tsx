@@ -1,6 +1,5 @@
 import React, { useRef, useState, useCallback, useMemo } from 'react';
 import { useThree } from '@/shared/hooks/useThree';
-import { useGSAP } from '@/shared/hooks/useGSAP';
 
 interface Showcase3DProps {
   className?: string;
@@ -17,7 +16,7 @@ export const Showcase3D: React.FC<Showcase3DProps> = ({ className = '' }) => {
   const [isWebGLSupported, setIsWebGLSupported] = useState(true);
 
   // Three.js scene setup
-  const { scene, camera, renderer, cleanup } = useThree({
+  const { scene, camera, cleanup } = useThree({
     canvas: canvasRef.current,
     onInit: (scene, camera, renderer) => {
       // Create a simple geometric shape representing "nothing"
@@ -52,10 +51,10 @@ export const Showcase3D: React.FC<Showcase3DProps> = ({ className = '' }) => {
   });
 
   // GSAP animation for auto-rotation
-  useGSAP(() => {
-    if (!scene || !isAutoRotating) return;
+  React.useEffect(() => {
+    if (!scene || !isAutoRotating || !(window as any).gsap) return;
 
-    const mesh = scene.children.find(child => child.type === 'Mesh');
+    const mesh = scene.children.find((child: any) => child.type === 'Mesh');
     if (!mesh) return;
 
     const timeline = (window as any).gsap.timeline({ repeat: -1, ease: 'none' });
@@ -73,7 +72,7 @@ export const Showcase3D: React.FC<Showcase3DProps> = ({ className = '' }) => {
   const updateMeshRotation = useCallback(() => {
     if (!scene || isAutoRotating) return;
 
-    const mesh = scene.children.find(child => child.type === 'Mesh');
+    const mesh = scene.children.find((child: any) => child.type === 'Mesh');
     if (mesh) {
       mesh.rotation.x = rotation.x;
       mesh.rotation.y = rotation.y;

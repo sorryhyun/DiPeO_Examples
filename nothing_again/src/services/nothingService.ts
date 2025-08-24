@@ -8,11 +8,7 @@ export const getNothingOverview = async (): Promise<ApiResponse<NothingProduct>>
   try {
     return await apiGet<NothingProduct>('/api/nothing');
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch nothing overview',
-      data: null
-    };
+    throw error;
   }
 };
 
@@ -23,11 +19,7 @@ export const login = async (credentials: LoginCredentials): Promise<ApiResponse<
   try {
     return await apiPost<User>('/api/nothing/login', credentials);
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Login failed',
-      data: null
-    };
+    throw error;
   }
 };
 
@@ -38,11 +30,7 @@ export const getStatus = async (): Promise<ApiResponse<{ status: string; uptime:
   try {
     return await apiGet<{ status: string; uptime: number; void_level: number }>('/api/nothing/status');
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch status',
-      data: null
-    };
+    throw error;
   }
 };
 
@@ -53,11 +41,7 @@ export const subscribeToNothing = async (email: string): Promise<ApiResponse<{ m
   try {
     return await apiPost<{ message: string }>('/api/nothing/subscribe', { email });
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Subscription failed',
-      data: null
-    };
+    throw error;
   }
 };
 
@@ -76,10 +60,17 @@ export const getNothingAnalytics = async (): Promise<ApiResponse<{
       void_efficiency: number;
     }>('/api/nothing/analytics');
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch analytics',
-      data: null
-    };
+    throw error;
   }
 };
+
+// Export as default object for easier consumption
+const nothingService = {
+  getNothingOverview,
+  login,
+  getStatus,
+  subscribeToNothing,
+  getNothingAnalytics
+};
+
+export default nothingService;

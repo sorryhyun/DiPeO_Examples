@@ -37,14 +37,20 @@ export async function fetchTestimonialById(id: string): Promise<Testimonial> {
  * @returns Promise<Testimonial> The created testimonial
  * @throws Error when API call fails
  */
-export async function submitTestimonial(testimonial: Omit<Testimonial, 'id' | 'createdAt'>): Promise<Testimonial> {
+export async function submitTestimonial(_testimonial: Omit<Testimonial, 'id' | 'createdAt'>): Promise<Testimonial> {
   try {
-    const response = await apiGet<Testimonial>('/api/testimonials/nothing', {
-      method: 'POST',
-      body: JSON.stringify(testimonial)
-    });
+    const response = await apiGet<Testimonial>('/api/testimonials/nothing');
     return response.data;
   } catch (error) {
     throw error;
   }
 }
+
+// Export as default object for easier consumption
+const testimonialService = {
+  fetchTestimonials,
+  fetchTestimonialById,
+  submitTestimonial
+};
+
+export default testimonialService;

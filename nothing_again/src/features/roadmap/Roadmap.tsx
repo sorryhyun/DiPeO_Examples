@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react';
-import { useGSAP } from '@/shared/hooks/useGSAP';
 
 interface RoadmapMilestone {
   id: string;
@@ -92,7 +91,7 @@ export const Roadmap: React.FC = () => {
   const timelineRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  useGSAP(() => {
+  useEffect(() => {
     if (!containerRef.current || !timelineRef.current) return;
 
     const timeline = timelineRef.current;

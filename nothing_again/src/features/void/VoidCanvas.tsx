@@ -23,7 +23,7 @@ export const VoidCanvas: React.FC<VoidCanvasProps> = ({
   const particleSystemRef = useRef<THREE.Points>();
   const rotatingMeshRef = useRef<THREE.Mesh>();
 
-  const setupScene = (scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) => {
+  const setupScene = (scene: THREE.Scene, camera: THREE.PerspectiveCamera, _renderer: THREE.WebGLRenderer) => {
     // Create particle system representing zeros/nothing
     const particleGeometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
@@ -83,75 +83,70 @@ export const VoidCanvas: React.FC<VoidCanvasProps> = ({
     }
   };
 
-  const animate = (scene: THREE.Scene, camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) => {
-    const tick = () => {
-      // Rotate the mesh
-      if (rotatingMeshRef.current) {
-        rotatingMeshRef.current.rotation.x += rotationSpeed;
-        rotatingMeshRef.current.rotation.y += rotationSpeed * 0.7;
-      }
 
-      // Animate particles
-      if (particleSystemRef.current) {
-        const positions = particleSystemRef.current.geometry.attributes.position;
-        const positionArray = positions.array as Float32Array;
-        
-        for (let i = 0; i < positionArray.length; i += 3) {
-          positionArray[i + 1] -= 0.05; // Drift particles down
-          
-          // Reset particles that fall too far
-          if (positionArray[i + 1] < -50) {
-            positionArray[i + 1] = 50;
-            positionArray[i] = (Math.random() - 0.5) * 100;
-            positionArray[i + 2] = (Math.random() - 0.5) * 100;
-          }
-        }
-        
-        positions.needsUpdate = true;
-      }
-
-      renderer.render(scene, camera);
-      animationFrameRef.current = requestAnimationFrame(tick);
-    };
-
-    tick();
-  };
-
-  const { initialize, cleanup } = useThree({
+  const { cleanup } = useThree({
     canvas: canvasRef.current,
-    setupScene,
-    animate
+    onInit: (scene, camera, renderer) => {
+      setupScene(scene, camera, renderer);
+      // Start custom animation loop
+      const customAnimate = () => {
+        // Rotate the mesh
+        if (rotatingMeshRef.current) {
+          rotatingMeshRef.current.rotation.x += rotationSpeed;
+          rotatingMeshRef.current.rotation.y += rotationSpeed * 0.7;
+        }
+
+        // Animate particles
+        if (particleSystemRef.current) {
+          const positions = particleSystemRef.current.geometry.attributes.position;
+          const positionArray = positions.array as Float32Array;
+          
+          for (let i = 0; i < positionArray.length; i += 3) {
+            positionArray[i + 1] -= 0.05; // Drift particles down
+            
+            // Reset particles that fall too far
+            if (positionArray[i + 1] < -50) {
+              positionArray[i + 1] = 50;
+              positionArray[i] = (Math.random() - 0.5) * 100;
+              positionArray[i + 2] = (Math.random() - 0.5) * 100;
+            }
+          }
+          
+          positions.needsUpdate = true;
+        }
+
+        renderer.render(scene, camera);
+        animationFrameRef.current = requestAnimationFrame(customAnimate);
+      };
+      customAnimate();
+    }
   });
 
-  const { contextSafe } = useGSAP();
+  const { isReady } = useGSAP();
 
   useEffect(() => {
-    if (canvasRef.current) {
-      initialize();
-    }
-
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
       cleanup();
     };
-  }, [initialize, cleanup]);
+  }, [cleanup]);
 
   // Performance monitoring
   useEffect(() => {
-    if (performanceHints) {
-      const logPerformance = contextSafe(() => {
+    if (performanceHints && isReady) {
+      const logPerformance = () => {
         const fps = Math.round(1000 / 16.67); // Rough FPS calculation
         if (fps < 30) {
           console.warn('VoidCanvas: Low FPS detected, consider reducing particle count');
         }
-      });
+      };
 
       const interval = setInterval(logPerformance, 5000);
       return () => clearInterval(interval);
     }
-  }, [performanceHints, contextSafe]);
+  }, [performanceHints, isReady]);
 
   return (
     <div className={`relative ${className}`} role="img" aria-label="Void canvas animation">

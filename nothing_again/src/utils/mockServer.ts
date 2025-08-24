@@ -20,8 +20,10 @@ const mockNothingProduct: NothingProduct = {
   name: 'Absolutely Nothing™',
   description: 'The ultimate void experience. Zero features, infinite possibilities.',
   version: '∞.0.0',
-  price: 0,
-  features: []
+  features: [],
+  benefits: ['Ultimate emptiness', 'Perfect nothingness', 'Infinite void space'],
+  uptime: 100,
+  deliveredFeatures: 0
 };
 
 const mockTestimonials: Testimonial[] = [
@@ -32,7 +34,9 @@ const mockTestimonials: Testimonial[] = [
     company: 'Void Corp',
     content: 'Nothing has transformed our business by providing exactly what we needed: absolutely nothing.',
     rating: 5,
-    avatar: '/generated/avatar-placeholder.jpg'
+    avatar: '/generated/avatar-placeholder.jpg',
+    createdAt: '2024-01-15T10:30:00Z',
+    verified: true
   },
   {
     id: '2',
@@ -41,7 +45,9 @@ const mockTestimonials: Testimonial[] = [
     company: 'Blank Solutions',
     content: 'I was skeptical at first, but Nothing delivered exactly what was promised. Nothing.',
     rating: 5,
-    avatar: '/generated/avatar-placeholder.jpg'
+    avatar: '/generated/avatar-placeholder.jpg',
+    createdAt: '2024-02-10T14:22:00Z',
+    verified: true
   },
   {
     id: '3',
@@ -50,7 +56,9 @@ const mockTestimonials: Testimonial[] = [
     company: 'Less Is More Ltd',
     content: 'After using Nothing for months, I can confidently say it has given me nothing but satisfaction.',
     rating: 5,
-    avatar: '/generated/avatar-placeholder.jpg'
+    avatar: '/generated/avatar-placeholder.jpg',
+    createdAt: '2024-03-05T09:15:00Z',
+    verified: false
   }
 ];
 
@@ -59,25 +67,37 @@ const mockPricingTiers: PricingTier[] = [
     id: 'basic-nothing',
     name: 'Basic Nothing',
     price: 0,
+    currency: 'USD',
+    interval: 'month',
     description: 'Perfect for individuals who want nothing',
     features: ['0 features', '0 support', '0 guarantees', 'Infinite emptiness'],
-    popular: false
+    limitations: ['Limited to basic nothingness', 'No premium void access'],
+    popular: false,
+    ctaText: 'Start with Nothing'
   },
   {
     id: 'pro-nothing',
     name: 'Pro Nothing',
     price: 0,
+    currency: 'USD',
+    interval: 'month',
     description: 'Advanced nothing for professionals',
     features: ['0 premium features', '0 priority support', '0 advanced tools', 'Professional-grade emptiness'],
-    popular: true
+    limitations: ['Advanced void limitations apply'],
+    popular: true,
+    ctaText: 'Go Pro with Nothing'
   },
   {
     id: 'enterprise-nothing',
     name: 'Enterprise Nothing',
     price: 0,
+    currency: 'USD',
+    interval: 'year',
     description: 'Nothing at scale for enterprises',
     features: ['0 enterprise features', '0 dedicated support', '0 compliance tools', 'Enterprise-level void'],
-    popular: false
+    limitations: ['Enterprise-grade void restrictions'],
+    popular: false,
+    ctaText: 'Scale Nothing Enterprise'
   }
 ];
 
@@ -138,10 +158,11 @@ function mockFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Respon
         if (url.includes('/api/support/nothing')) {
           const supportResponse: SupportMessage = {
             id: Date.now().toString(),
-            message: 'Thank you for contacting Nothing support. We are unable to help you with anything, as we specialize in nothing.',
+            content: 'Thank you for contacting Nothing support. We are unable to help you with anything, as we specialize in nothing.',
             userId: 'support-bot',
             timestamp: new Date().toISOString(),
-            type: 'response'
+            isFromUser: false,
+            status: 'delivered'
           };
           resolve(createMockResponse<SupportMessage>(supportResponse));
           return;

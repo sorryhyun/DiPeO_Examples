@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { useFetch } from '@/shared/hooks/useFetch';
 import { LoadingSpinner } from '@/shared/components/LoadingSpinner';
-import { analyticsService } from '@/services/analyticsService';
+import { getDashboardData } from '@/services/analyticsService';
 
 interface AnalyticsMetrics {
   totalEvents: number;
@@ -91,8 +91,9 @@ const SimpleChart = ({ data, title }: { data: ChartData[], title: string }) => {
 };
 
 const AnalyticsDashboardContent = () => {
-  const { data: analytics, error } = useFetch<AnalyticsMetrics>(() => 
-    analyticsService.getDashboardData()
+  const { data: analytics, error } = useFetch<AnalyticsMetrics>(
+    'dashboard-analytics',
+    () => getDashboardData()
   );
 
   if (error) {

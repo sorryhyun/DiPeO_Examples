@@ -92,7 +92,7 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
 
       {/* Modal with full testimonial */}
       <Modal
-        isOpen={isModalOpen}
+        open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={`Testimonial from ${testimonial.name}`}
       >

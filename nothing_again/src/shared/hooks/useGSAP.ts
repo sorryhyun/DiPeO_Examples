@@ -11,6 +11,7 @@ export interface GSAPTimelineConfig {
 export interface UseGSAPReturn {
   timeline: gsap.core.Timeline | null;
   setRef: (element: HTMLElement | null) => void;
+  setupGSAP: (element: HTMLElement, callback: (timeline: gsap.core.Timeline) => void) => void;
   isReady: boolean;
 }
 
@@ -89,6 +90,33 @@ export const useGSAP = (config?: GSAPTimelineConfig): UseGSAPReturn => {
     }
   }, [gsap, config]);
 
+  // Setup GSAP with callback function
+  const setupGSAP = useCallback((element: HTMLElement, callback: (timeline: gsap.core.Timeline) => void) => {
+    if (!gsap) return;
+    
+    // Set the element reference
+    elementRef.current = element;
+    
+    // Kill existing timeline if it exists
+    if (timelineRef.current) {
+      timelineRef.current.kill();
+    }
+
+    // Create new timeline with config
+    timelineRef.current = gsap.timeline({
+      paused: config?.paused ?? false,
+      delay: config?.delay ?? 0,
+      repeat: config?.repeat ?? 0,
+      yoyo: config?.yoyo ?? false,
+      ease: config?.ease ?? 'power2.out',
+    });
+
+    // Execute the callback with the timeline
+    if (timelineRef.current) {
+      callback(timelineRef.current);
+    }
+  }, [gsap, config]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -102,6 +130,7 @@ export const useGSAP = (config?: GSAPTimelineConfig): UseGSAPReturn => {
   return {
     timeline: timelineRef.current,
     setRef,
+    setupGSAP,
     isReady,
   };
 };

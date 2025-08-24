@@ -18,6 +18,12 @@ export interface User {
   name: string;
   createdAt: string;
   subscription?: 'basic' | 'pro' | 'enterprise';
+  role?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
 }
 
 export interface AuthUser extends User {
@@ -97,11 +103,11 @@ export interface NewsletterPayload {
 // Analytics types
 export interface AnalyticsEvent {
   event: string;
-  category: 'interaction' | 'conversion' | 'navigation' | 'error';
+  category: 'interaction' | 'conversion' | 'navigation' | 'error' | 'hero';
   properties?: Record<string, any>;
   userId?: string;
   sessionId?: string;
-  timestamp: string;
+  timestamp: string | number;
   page?: string;
   referrer?: string;
 }

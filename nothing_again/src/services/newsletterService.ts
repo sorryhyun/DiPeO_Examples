@@ -33,18 +33,26 @@ export const subscribe = async (payload: NewsletterPayload): Promise<void> => {
 
     // Track successful newsletter signup
     trackEvent({
-      type: 'newsletter_signup',
-      email: cleanedPayload.email,
-      timestamp: new Date().toISOString(),
-      source: 'newsletter_form'
+      event: 'newsletter_signup',
+      category: 'conversion',
+      properties: {
+        email_domain: cleanedPayload.email.split('@')[1],
+        source: 'newsletter_form'
+      },
+      userId: 'anonymous',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     // Track failed newsletter signup
     trackEvent({
-      type: 'newsletter_signup_failed',
-      email: cleanedPayload.email,
-      timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error'
+      event: 'newsletter_signup_failed',
+      category: 'error',
+      properties: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        email_domain: cleanedPayload.email.split('@')[1]
+      },
+      userId: 'anonymous',
+      timestamp: new Date().toISOString()
     });
 
     // Re-throw with user-friendly message
@@ -70,8 +78,12 @@ export const unsubscribe = async (email: string): Promise<void> => {
     });
 
     trackEvent({
-      type: 'newsletter_unsubscribe',
-      email: email.trim().toLowerCase(),
+      event: 'newsletter_unsubscribe',
+      category: 'interaction',
+      properties: {
+        email_domain: email.split('@')[1]
+      },
+      userId: 'anonymous',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -81,3 +93,11 @@ export const unsubscribe = async (email: string): Promise<void> => {
     throw new Error('Failed to unsubscribe. Please try again later.');
   }
 };
+
+// Export as default object for easier consumption
+const newsletterService = {
+  subscribe,
+  unsubscribe
+};
+
+export default newsletterService;

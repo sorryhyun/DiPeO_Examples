@@ -13,7 +13,9 @@ const teamMembers: TeamMember[] = [
       twitter: 'https://twitter.com/voidmcempty',
       github: 'https://github.com/voidmcempty',
       linkedin: 'https://linkedin.com/in/voidmcempty'
-    }
+    },
+    expertise: ['Existential Philosophy', 'Void Engineering', 'Absolute Nothingness'],
+    yearsOfNothing: 20
   },
   {
     id: '2',
@@ -24,7 +26,9 @@ const teamMembers: TeamMember[] = [
     socialLinks: {
       twitter: 'https://twitter.com/sarahnull',
       linkedin: 'https://linkedin.com/in/sarahnull'
-    }
+    },
+    expertise: ['Void Methodologies', 'Empty Space Optimization', 'Nothing Development'],
+    yearsOfNothing: 15
   },
   {
     id: '3',
@@ -35,7 +39,9 @@ const teamMembers: TeamMember[] = [
     socialLinks: {
       github: 'https://github.com/marcuszero',
       linkedin: 'https://linkedin.com/in/marcuszero'
-    }
+    },
+    expertise: ['Nothing Optimization', 'Zero-Point Productivity', 'Advanced Nothingness Techniques'],
+    yearsOfNothing: 12
   },
   {
     id: '4',
@@ -46,7 +52,9 @@ const teamMembers: TeamMember[] = [
     socialLinks: {
       twitter: 'https://twitter.com/lunaabsence',
       linkedin: 'https://linkedin.com/in/lunaabsence'
-    }
+    },
+    expertise: ['Minimalist Design', 'UI/UX for Nothing', 'Visual Emptiness'],
+    yearsOfNothing: 8
   }
 ];
 

@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { setAuthToken } from '@/utils/apiClient';
-import { nothingService } from '@/services/nothingService';
+import nothingService from '@/services/nothingService';
 import { DEFAULT_APP_CONFIG } from '@/constants/appConfig';
 import type { User } from '@/types/index';
 
@@ -91,18 +91,4 @@ export const useAuth = (): AuthContextType => {
   return context;
 };
 
-// Export AuthProvider as named export for AppProvider integration
-export { AuthProvider };
-```
-
-<!-- 
-SELF-CHECK:
-- [x] Uses `@/` imports only
-- [x] Uses providers/hooks (useLocalStorage hook instead of direct localStorage)
-- [x] Reads config from `@/constants/appConfig`
-- [x] Exports named useAuth hook and AuthProvider
-- [x] Adds proper TypeScript types and error handling
-- [x] Implements context pattern as specified in architecture
-- [x] Integrates with apiClient for auth token management
-- [x] Supports both mock and real authentication modes
--->
+// AuthProvider is already exported above

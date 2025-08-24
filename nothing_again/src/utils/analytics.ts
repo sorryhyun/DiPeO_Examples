@@ -11,13 +11,14 @@ export const trackEvent = async (event: AnalyticsEvent): Promise<void> => {
     // In development mode with mock data enabled, log events to console
     if (DEFAULT_APP_CONFIG.development_mode.enable_mock_data) {
       console.log('[Analytics Dev]', {
-        type: event.type,
+        event: event.event,
         category: event.category,
-        action: event.action,
-        label: event.label,
-        value: event.value,
-        timestamp: new Date().toISOString(),
-        ...event.metadata
+        properties: event.properties,
+        userId: event.userId,
+        sessionId: event.sessionId,
+        timestamp: event.timestamp,
+        page: event.page,
+        referrer: event.referrer
       });
     }
 
@@ -36,16 +37,16 @@ export const trackEvent = async (event: AnalyticsEvent): Promise<void> => {
  */
 export const trackPageView = (pageName: string, additionalData?: Record<string, any>): Promise<void> => {
   return trackEvent({
-    type: 'page_view',
+    event: 'page_view',
     category: 'navigation',
-    action: 'view',
-    label: pageName,
-    metadata: {
+    properties: {
       page: pageName,
       url: typeof window !== 'undefined' ? window.location.href : '',
-      timestamp: Date.now(),
       ...additionalData
-    }
+    },
+    sessionId: 'session-' + Date.now(),
+    timestamp: new Date().toISOString(),
+    page: pageName
   });
 };
 
@@ -58,16 +59,16 @@ export const trackButtonClick = (
   additionalData?: Record<string, any>
 ): Promise<void> => {
   return trackEvent({
-    type: 'interaction',
-    category: 'button',
-    action: 'click',
-    label: buttonName,
-    metadata: {
+    event: 'button_click',
+    category: 'interaction',
+    properties: {
       button: buttonName,
       context: context || 'unknown',
-      timestamp: Date.now(),
       ...additionalData
-    }
+    },
+    sessionId: 'session-' + Date.now(),
+    timestamp: new Date().toISOString(),
+    page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
   });
 };
 
@@ -80,17 +81,17 @@ export const trackFormSubmission = (
   additionalData?: Record<string, any>
 ): Promise<void> => {
   return trackEvent({
-    type: 'conversion',
-    category: 'form',
-    action: success ? 'submit_success' : 'submit_error',
-    label: formName,
-    value: success ? 1 : 0,
-    metadata: {
+    event: success ? 'form_submit_success' : 'form_submit_error',
+    category: 'conversion',
+    properties: {
       form: formName,
       success,
-      timestamp: Date.now(),
+      value: success ? 1 : 0,
       ...additionalData
-    }
+    },
+    sessionId: 'session-' + Date.now(),
+    timestamp: new Date().toISOString(),
+    page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
   });
 };
 
@@ -103,16 +104,17 @@ export const trackNothingEvent = (
   additionalData?: Record<string, any>
 ): Promise<void> => {
   return trackEvent({
-    type: 'nothing_interaction',
-    category: 'nothing',
-    action,
-    label: `nothing_${intensity}`,
-    value: 0, // Always zero for nothing events
-    metadata: {
+    event: 'nothing_interaction',
+    category: 'interaction',
+    properties: {
+      action,
       intensity,
       nothing_level: 'absolute',
-      timestamp: Date.now(),
+      value: 0, // Always zero for nothing events
       ...additionalData
-    }
+    },
+    sessionId: 'session-' + Date.now(),
+    timestamp: new Date().toISOString(),
+    page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
   });
 };

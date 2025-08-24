@@ -73,13 +73,3 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
 
   return [storedValue, setValue];
 }
-```
-
-<!--
-## SELF-CHECK
-- [x] Uses `@/` imports only - importing from @/constants/appConfig
-- [x] Uses providers/hooks (no direct DOM/localStorage side effects) - properly checks window availability and config
-- [x] Reads config from `@/app/config` - reads DEFAULT_APP_CONFIG.development_mode.use_localstorage_persistence
-- [x] Exports default named component - exports named useLocalStorage function
-- [x] Adds basic ARIA and keyboard handlers (where relevant) - N/A for this hook
--->

@@ -191,7 +191,7 @@ export const ComparisonChart: React.FC = () => {
                     {item.nothing}
                   </div>
                   <div className="mt-2">
-                    <GuaranteeBadge size="xs" />
+                    <GuaranteeBadge size="sm" />
                   </div>
                 </div>
                 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { checkoutService } from '@/services/checkoutService';
+import checkoutService from '@/services/checkoutService';
 import { PricingTier } from '@/types';
 import { Button } from '@/shared/components/Button';
 
