@@ -21,17 +21,31 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ className = '' }) =>
   const handleAccept = () => {
     setCookieAccepted(true);
     setIsVisible(false);
-    trackEvent('cookie_banner_accepted', {
+    trackEvent({
+      event: 'cookie_banner_accepted',
+      category: 'interaction',
+      properties: {
+        timestamp: new Date().toISOString(),
+        action: 'accept'
+      },
+      sessionId: 'session-' + Date.now(),
       timestamp: new Date().toISOString(),
-      action: 'accept'
+      page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
     });
   };
 
   const handleDismiss = () => {
     setIsVisible(false);
-    trackEvent('cookie_banner_dismissed', {
+    trackEvent({
+      event: 'cookie_banner_dismissed',
+      category: 'interaction',
+      properties: {
+        timestamp: new Date().toISOString(),
+        action: 'dismiss'
+      },
+      sessionId: 'session-' + Date.now(),
       timestamp: new Date().toISOString(),
-      action: 'dismiss'
+      page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
     });
   };
 

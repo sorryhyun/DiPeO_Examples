@@ -51,12 +51,12 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
             <span className="text-white font-semibold text-sm">
-              {testimonial.name.charAt(0)}
+              {testimonial.author.charAt(0)}
             </span>
           </div>
           <div>
             <p className="font-medium text-sm text-gray-900 dark:text-white">
-              {testimonial.name}
+              {testimonial.author}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               {testimonial.role}
@@ -66,9 +66,9 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
 
         {/* Quote Snippet */}
         <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-          "{testimonial.quote.length > 80 
-            ? testimonial.quote.substring(0, 80) + '...' 
-            : testimonial.quote}"
+          "{testimonial.content.length > 80 
+            ? testimonial.content.substring(0, 80) + '...' 
+            : testimonial.content}"
         </p>
 
         {/* Expand Indicator */}
@@ -94,19 +94,19 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
       <Modal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={`Testimonial from ${testimonial.name}`}
+        title={`Testimonial from ${testimonial.author}`}
       >
         <div className="space-y-4">
           {/* Full Avatar and Info */}
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
               <span className="text-white font-bold text-xl">
-                {testimonial.name.charAt(0)}
+                {testimonial.author.charAt(0)}
               </span>
             </div>
             <div>
               <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
-                {testimonial.name}
+                {testimonial.author}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
                 {testimonial.role}
@@ -119,7 +119,7 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
 
           {/* Full Quote */}
           <blockquote className="text-gray-800 dark:text-gray-200 leading-relaxed text-base border-l-4 border-purple-500 pl-4">
-            "{testimonial.quote}"
+            "{testimonial.content}"
           </blockquote>
 
           {/* Rating if available */}
@@ -149,7 +149,7 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
               Nothing™ Case Study: The Complete Absence Experience
             </h4>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Discover how {testimonial.name} achieved unprecedented levels of nothing 
+              Discover how {testimonial.author} achieved unprecedented levels of nothing 
               through our revolutionary absolutely-nothing-as-a-service platform.
             </p>
             <div className="flex gap-4 text-sm">
@@ -170,7 +170,8 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
         </div>
       </Modal>
 
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes float {
           0%, 100% {
             transform: translateY(0px) rotate(0deg);
@@ -186,7 +187,7 @@ export const TestimonialsBubble: React.FC<TestimonialsBubbleProps> = ({
         .animate-float {
           animation: float infinite ease-in-out;
         }
-      `}</style>
+      `}} />
     </>
   );
 };

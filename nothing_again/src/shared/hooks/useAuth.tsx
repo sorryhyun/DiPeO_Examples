@@ -38,7 +38,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           id: mockUser.id,
           email: mockUser.email,
           name: mockUser.name,
-          role: mockUser.role
+          role: mockUser.role,
+          createdAt: mockUser.createdAt
         };
       } else {
         // Use real authentication service

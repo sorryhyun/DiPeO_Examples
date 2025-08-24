@@ -18,7 +18,7 @@ export const Showcase3D: React.FC<Showcase3DProps> = ({ className = '' }) => {
   // Three.js scene setup
   const { scene, camera, cleanup } = useThree({
     canvas: canvasRef.current,
-    onInit: (scene, camera, renderer) => {
+    onInit: (scene, camera, _renderer) => {
       // Create a simple geometric shape representing "nothing"
       const geometry = new (window as any).THREE.TorusKnotGeometry(1, 0.3, 100, 16);
       const material = new (window as any).THREE.MeshPhongMaterial({

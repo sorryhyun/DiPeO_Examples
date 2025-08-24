@@ -23,10 +23,12 @@ export const Header: React.FC = () => {
 
   const handleNavClick = (section: string) => {
     trackEvent({
-      type: 'navigation',
-      action: 'nav_click',
-      section,
-      timestamp: Date.now()
+      event: 'nav_click',
+      category: 'navigation',
+      properties: {
+        section,
+      },
+      timestamp: Date.now(),
     });
     
     // Smooth scroll to section
@@ -41,10 +43,12 @@ export const Header: React.FC = () => {
 
   const handleSignUpClick = () => {
     trackEvent({
-      type: 'cta',
-      action: 'signup_click',
-      location: 'header',
-      timestamp: Date.now()
+      event: 'signup_click',
+      category: 'conversion',
+      properties: {
+        location: 'header',
+      },
+      timestamp: Date.now(),
     });
     
     handleNavClick('newsletter');
@@ -52,10 +56,12 @@ export const Header: React.FC = () => {
 
   const handleThemeToggle = () => {
     trackEvent({
-      type: 'ui',
-      action: 'theme_toggle',
-      value: theme === 'light' ? 'dark' : 'light',
-      timestamp: Date.now()
+      event: 'theme_toggle',
+      category: 'interaction',
+      properties: {
+        value: theme === 'light' ? 'dark' : 'light',
+      },
+      timestamp: Date.now(),
     });
     
     toggleTheme();

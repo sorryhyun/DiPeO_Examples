@@ -5,7 +5,6 @@ import type {
   Testimonial, 
   PricingTier, 
   SupportMessage, 
-  NewsletterPayload, 
   AnalyticsEvent,
   NothingProduct 
 } from '@/types/index';
@@ -30,9 +29,11 @@ const mockTestimonials: Testimonial[] = [
   {
     id: '1',
     author: 'Jane Void',
+    name: 'Jane Void',
     role: 'Chief Nothing Officer',
     company: 'Void Corp',
     content: 'Nothing has transformed our business by providing exactly what we needed: absolutely nothing.',
+    quote: 'Nothing has transformed our business by providing exactly what we needed: absolutely nothing.',
     rating: 5,
     avatar: '/generated/avatar-placeholder.jpg',
     createdAt: '2024-01-15T10:30:00Z',
@@ -41,9 +42,11 @@ const mockTestimonials: Testimonial[] = [
   {
     id: '2',
     author: 'John Empty',
+    name: 'John Empty',
     role: 'Emptiness Consultant',
     company: 'Blank Solutions',
     content: 'I was skeptical at first, but Nothing delivered exactly what was promised. Nothing.',
+    quote: 'I was skeptical at first, but Nothing delivered exactly what was promised. Nothing.',
     rating: 5,
     avatar: '/generated/avatar-placeholder.jpg',
     createdAt: '2024-02-10T14:22:00Z',
@@ -52,9 +55,11 @@ const mockTestimonials: Testimonial[] = [
   {
     id: '3',
     author: 'Sarah Zero',
+    name: 'Sarah Zero',
     role: 'Minimalism Expert',
     company: 'Less Is More Ltd',
     content: 'After using Nothing for months, I can confidently say it has given me nothing but satisfaction.',
+    quote: 'After using Nothing for months, I can confidently say it has given me nothing but satisfaction.',
     rating: 5,
     avatar: '/generated/avatar-placeholder.jpg',
     createdAt: '2024-03-05T09:15:00Z',

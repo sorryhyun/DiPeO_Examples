@@ -34,7 +34,14 @@ export const StatusPage: React.FC = () => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    trackEvent('status_refresh', { timestamp: new Date().toISOString() });
+    trackEvent({
+      event: 'status_refresh',
+      category: 'interaction',
+      properties: { timestamp: new Date().toISOString() },
+      sessionId: 'session-' + Date.now(),
+      timestamp: new Date().toISOString(),
+      page: 'status'
+    });
     
     // Simulate refresh delay
     setTimeout(() => {
@@ -44,7 +51,14 @@ export const StatusPage: React.FC = () => {
   };
 
   useEffect(() => {
-    trackEvent('status_page_view', { timestamp: new Date().toISOString() });
+    trackEvent({
+      event: 'status_page_view',
+      category: 'navigation',
+      properties: { timestamp: new Date().toISOString() },
+      sessionId: 'session-' + Date.now(),
+      timestamp: new Date().toISOString(),
+      page: 'status'
+    });
   }, []);
 
   const getStatusColor = (status: StatusMetric['status']) => {

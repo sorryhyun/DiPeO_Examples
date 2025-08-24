@@ -44,9 +44,23 @@ export const SupportChatBot: React.FC<SupportChatBotProps> = ({ className = '' }
     setIsOpen(newIsOpen);
     
     if (newIsOpen) {
-      trackEvent('support_chat_opened', { user_id: user?.id });
+      trackEvent({
+        event: 'support_chat_opened',
+        category: 'interaction',
+        properties: { user_id: user?.id },
+        sessionId: 'session-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        page: 'support'
+      });
     } else {
-      trackEvent('support_chat_closed', { user_id: user?.id });
+      trackEvent({
+        event: 'support_chat_closed',
+        category: 'interaction',
+        properties: { user_id: user?.id },
+        sessionId: 'session-' + Date.now(),
+        timestamp: new Date().toISOString(),
+        page: 'support'
+      });
     }
   };
 
@@ -64,9 +78,16 @@ export const SupportChatBot: React.FC<SupportChatBotProps> = ({ className = '' }
     setInputValue('');
     setIsLoading(true);
 
-    trackEvent('support_message_sent', { 
-      user_id: user?.id,
-      message_length: userMessage.text.length
+    trackEvent({
+      event: 'support_message_sent',
+      category: 'interaction',
+      properties: { 
+        user_id: user?.id,
+        message_length: userMessage.text.length
+      },
+      sessionId: 'session-' + Date.now(),
+      timestamp: new Date().toISOString(),
+      page: 'support'
     });
 
     try {
@@ -108,7 +129,14 @@ export const SupportChatBot: React.FC<SupportChatBotProps> = ({ className = '' }
 
   const clearChat = () => {
     setMessages([]);
-    trackEvent('support_chat_cleared', { user_id: user?.id });
+    trackEvent({
+      event: 'support_chat_cleared',
+      category: 'interaction',
+      properties: { user_id: user?.id },
+      sessionId: 'session-' + Date.now(),
+      timestamp: new Date().toISOString(),
+      page: 'support'
+    });
   };
 
   const formatTime = (date: Date) => {

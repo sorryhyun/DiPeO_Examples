@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { startMockServer, stopMockServer } from '@/utils/mockServer';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
@@ -33,13 +33,8 @@ interface AppProviderProps {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      suspense: true,
-      useErrorBoundary: true,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
-    },
-    mutations: {
-      useErrorBoundary: true,
+      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
     },
   },
 });

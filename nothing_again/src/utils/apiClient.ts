@@ -36,10 +36,10 @@ const apiRequest = async <T>(
   const url = `${BASE_URL}${endpoint}`;
   
   // Prepare headers
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string> || {}),
   };
 
   // Add auth token if available

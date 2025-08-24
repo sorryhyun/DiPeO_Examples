@@ -26,27 +26,6 @@ export const ShoppingCart: React.FC<ShoppingCartProps> = ({
   const [cartItems, setCartItems] = useLocalStorage<CartItem[]>('cart_nothing', []);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const addItem = (tier: PricingTier) => {
-    const existingItem = cartItems.find(item => item.tier === tier.name);
-    
-    if (existingItem) {
-      setCartItems(cartItems.map(item => 
-        item.tier === tier.name 
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      ));
-    } else {
-      const newItem: CartItem = {
-        id: `nothing-${tier.name}-${Date.now()}`,
-        name: `${tier.name} Nothing`,
-        price: tier.price,
-        quantity: 1,
-        tier: tier.name
-      };
-      setCartItems([...cartItems, newItem]);
-    }
-  };
-
   const removeItem = (itemId: string) => {
     setCartItems(cartItems.filter(item => item.id !== itemId));
   };

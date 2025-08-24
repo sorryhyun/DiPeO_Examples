@@ -1,13 +1,13 @@
 import { apiPost } from '@/utils/apiClient';
 import { AnalyticsEvent } from '@/types';
-import { appConfig } from '@/constants/appConfig';
+import { DEFAULT_APP_CONFIG } from '@/constants/appConfig';
 
 /**
  * Sends analytics events to the server or logs them in development mode
  */
 export const sendEvent = async (event: AnalyticsEvent): Promise<void> => {
   // In development mode with mock server, just log and return
-  if (appConfig.development_mode.enable_mock_data) {
+  if (DEFAULT_APP_CONFIG.development_mode.enable_mock_data) {
     console.log('📊 Analytics Event (Mock):', {
       event: event.event,
       properties: event.properties,
@@ -34,7 +34,7 @@ export const sendEvent = async (event: AnalyticsEvent): Promise<void> => {
  * Batch send multiple analytics events
  */
 export const sendEvents = async (events: AnalyticsEvent[]): Promise<void> => {
-  if (appConfig.development_mode.enable_mock_data) {
+  if (DEFAULT_APP_CONFIG.development_mode.enable_mock_data) {
     console.log('📊 Analytics Events Batch (Mock):', {
       count: events.length,
       events: events.map(e => ({ event: e.event, timestamp: new Date().toISOString() }))
@@ -55,7 +55,7 @@ export const sendEvents = async (events: AnalyticsEvent[]): Promise<void> => {
  * Initialize analytics service (placeholder for future session tracking)
  */
 export const initializeAnalytics = (): void => {
-  if (appConfig.development_mode.enable_mock_data) {
+  if (DEFAULT_APP_CONFIG.development_mode.enable_mock_data) {
     console.log('📊 Analytics Service initialized (Mock mode)');
   }
 };

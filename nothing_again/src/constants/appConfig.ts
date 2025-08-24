@@ -8,6 +8,8 @@ export interface AppConfig {
       readonly email: string;
       readonly name: string;
       readonly role: string;
+      readonly password: string;
+      readonly createdAt: string;
     }[];
     readonly disable_websocket_in_dev: boolean;
     readonly use_localstorage_persistence: boolean;
@@ -41,19 +43,25 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
         id: '1',
         email: 'user@nothing.com',
         name: 'Nothing User',
-        role: 'customer'
+        role: 'customer',
+        password: 'password123',
+        createdAt: '2024-01-01T00:00:00Z'
       },
       {
         id: '2',
         email: 'admin@nothing.com',
         name: 'Nothing Admin',
-        role: 'admin'
+        role: 'admin',
+        password: 'admin123',
+        createdAt: '2024-01-01T00:00:00Z'
       },
       {
         id: '3',
         email: 'test@nothing.com',
         name: 'Test Nothing',
-        role: 'tester'
+        role: 'tester',
+        password: 'test123',
+        createdAt: '2024-01-01T00:00:00Z'
       }
     ],
     disable_websocket_in_dev: true,

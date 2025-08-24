@@ -15,9 +15,16 @@ import { trackEvent } from '@/utils/analytics';
 export const HomePage = () => {
   useEffect(() => {
     // Track page view on mount
-    trackEvent('page_view', {
-      page: 'home',
+    trackEvent({
+      event: 'page_view',
+      category: 'navigation',
+      properties: {
+        page: 'home',
+        timestamp: Date.now(),
+      },
+      sessionId: 'session-' + Date.now(),
       timestamp: Date.now(),
+      page: 'home'
     });
 
     // Set page title and meta description

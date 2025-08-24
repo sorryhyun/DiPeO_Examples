@@ -17,6 +17,7 @@ export interface User {
   email: string;
   name: string;
   createdAt: string;
+  password?: string; // Optional for security - may be omitted in client responses
   subscription?: 'basic' | 'pro' | 'enterprise';
   role?: string;
 }
@@ -47,9 +48,11 @@ export interface NothingProduct {
 export interface Testimonial {
   id: string;
   author: string;
+  name: string; // Alias for author for easier access
   role: string;
   company: string;
   content: string;
+  quote: string; // Alias for content for easier access
   rating: number;
   avatar?: string;
   createdAt: string;

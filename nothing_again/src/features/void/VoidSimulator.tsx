@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { APP_CONFIG } from '@/constants/appConfig';
+import { DEFAULT_APP_CONFIG } from '@/constants/appConfig';
 
 export interface VoidSimulatorSettings {
   intensity: number;
@@ -33,8 +33,7 @@ export const VoidSimulator: React.FC<VoidSimulatorProps> = ({
 }) => {
   const [storedSettings, setStoredSettings] = useLocalStorage<VoidSimulatorSettings>(
     'void-simulator-settings',
-    { ...defaultSettings, ...initialSettings },
-    APP_CONFIG.development_mode.use_localstorage_persistence
+    { ...defaultSettings, ...initialSettings }
   );
 
   const [settings, setSettings] = useState<VoidSimulatorSettings>(storedSettings);
@@ -44,7 +43,7 @@ export const VoidSimulator: React.FC<VoidSimulatorProps> = ({
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
     
-    if (APP_CONFIG.development_mode.use_localstorage_persistence) {
+    if (DEFAULT_APP_CONFIG.development_mode.use_localstorage_persistence) {
       setStoredSettings(newSettings);
     }
     
@@ -55,7 +54,7 @@ export const VoidSimulator: React.FC<VoidSimulatorProps> = ({
     const newSettings = { ...defaultSettings };
     setSettings(newSettings);
     
-    if (APP_CONFIG.development_mode.use_localstorage_persistence) {
+    if (DEFAULT_APP_CONFIG.development_mode.use_localstorage_persistence) {
       setStoredSettings(newSettings);
     }
     

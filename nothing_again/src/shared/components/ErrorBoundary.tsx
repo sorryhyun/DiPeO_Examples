@@ -38,17 +38,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     // Track error to analytics
     trackEvent({
-      type: 'error',
-      category: 'error_boundary',
-      action: 'component_error_caught',
-      label: error.name || 'unknown_error',
-      value: 1,
-      metadata: {
+      event: 'component_error_caught',
+      category: 'error',
+      properties: {
+        label: error.name || 'unknown_error',
+        value: 1,
         errorMessage: error.message,
         errorStack: error.stack,
         componentStack: errorInfo.componentStack,
-        timestamp: new Date().toISOString(),
       },
+      timestamp: new Date().toISOString(),
     });
 
     // Log to console in development
@@ -71,11 +70,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     // Track retry action
     trackEvent({
-      type: 'interaction',
-      category: 'error_boundary',
-      action: 'retry_clicked',
-      label: 'error_recovery_attempt',
-      value: 1,
+      event: 'retry_clicked',
+      category: 'error',
+      properties: {
+        label: 'error_recovery_attempt',
+        value: 1,
+      },
+      timestamp: new Date().toISOString(),
     });
   };
 

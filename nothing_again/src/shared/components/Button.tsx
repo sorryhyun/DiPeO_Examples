@@ -25,11 +25,18 @@ export const Button: React.FC<ButtonProps> = ({
     if (disabled || loading) return;
     
     // Track button clicks for analytics
-    trackEvent('button_click', {
-      variant,
-      size,
-      disabled: false,
-      loading: false
+    trackEvent({
+      event: 'button_click',
+      category: 'interaction',
+      properties: {
+        variant,
+        size,
+        disabled: false,
+        loading: false
+      },
+      sessionId: 'session-' + Date.now(),
+      timestamp: new Date().toISOString(),
+      page: typeof window !== 'undefined' ? window.location.pathname : 'unknown'
     });
     
     onClick?.(event);

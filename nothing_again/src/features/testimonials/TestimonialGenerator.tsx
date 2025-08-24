@@ -16,9 +16,11 @@ export const TestimonialGenerator: React.FC<TestimonialGeneratorProps> = ({ clas
     const newTestimonial: Testimonial = {
       id: `generated-${Date.now()}`,
       author: 'AI Generated User',
+      name: 'AI Generated User',
       role: 'Nothing Enthusiast',
       company: 'Virtual Corp',
       content: 'This testimonial was generated to demonstrate the power of nothing.',
+      quote: 'This testimonial was generated to demonstrate the power of nothing.',
       rating: 5,
       avatar: '/api/placeholder/50/50',
       createdAt: new Date().toISOString(),
