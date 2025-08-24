@@ -123,13 +123,23 @@ const STORAGE_KEY = 'memorygame:v1:store'
 export const useGameStore = create<GameStore>()(
   subscribeWithSelector((set, get) => ({
     ...initialState,
+    // Compatibility properties for backward compatibility
+    cardDeck: initialState.deck,
+    timer: initialState.timeElapsed,
+    victory: initialState.isGameWon,
+    gameStarted: initialState.isGameActive,
+    moveCount: initialState.moves,
+    difficulty: initialState.currentDifficulty,
+    playerName: initialState.settings.playerName,
+    gridSize: 4, // Default grid size
     
     startGame: async (difficulty: GameDifficulty, theme: string) => {
       try {
         const themeData = await themesService.getTheme(theme)
         if (!themeData) return
           
-          const cardCount = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : difficulty === 'expert' ? 18 : 16
+          const cardCount = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 18 : difficulty === 'expert' ? 32 : 16
+          const gridSize = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : difficulty === 'expert' ? 8 : 4
           const cards: Card[] = []
           
           // Create pairs of cards
@@ -172,6 +182,14 @@ export const useGameStore = create<GameStore>()(
           currentDifficulty: difficulty,
           currentTheme: theme,
           timerInterval: null,
+          // Update compatibility properties
+          cardDeck: shuffledDeck,
+          timer: 0,
+          victory: false,
+          gameStarted: true,
+          moveCount: 0,
+          difficulty: difficulty,
+          gridSize: gridSize,
         })
         
         // Start timer
@@ -198,7 +216,10 @@ export const useGameStore = create<GameStore>()(
       set({
         deck: newDeck,
         flippedCards: newFlippedCards,
-        moves: state.moves + 1
+        moves: state.moves + 1,
+        // Update compatibility properties
+        cardDeck: newDeck,
+        moveCount: state.moves + 1
       })
       
       // Check for match when 2 cards are flipped
@@ -217,7 +238,9 @@ export const useGameStore = create<GameStore>()(
           set({
             deck: updatedDeck,
             matchedCards: newMatchedCards,
-            flippedCards: []
+            flippedCards: [],
+            // Update compatibility properties
+            cardDeck: updatedDeck
           })
           
           // Check if game is complete
@@ -229,11 +252,14 @@ export const useGameStore = create<GameStore>()(
           setTimeout(() => {
             const currentState = get()
             if (currentState.flippedCards.length === 2) {
+              const updatedDeck = currentState.deck.map(c => 
+                newFlippedCards.includes(c.id) ? { ...c, isFlipped: false } : c
+              )
               set({
-                deck: currentState.deck.map(c => 
-                  newFlippedCards.includes(c.id) ? { ...c, isFlipped: false } : c
-                ),
-                flippedCards: []
+                deck: updatedDeck,
+                flippedCards: [],
+                // Update compatibility properties
+                cardDeck: updatedDeck
               })
             }
           }, state.settings.flipDelay)
@@ -296,7 +322,10 @@ export const useGameStore = create<GameStore>()(
         isGameComplete: true,
         isGameWon: gameWon,
         playerStats: newStats,
-        lastGameScore: scoreEntry
+        lastGameScore: scoreEntry,
+        // Update compatibility properties
+        gameStarted: false,
+        victory: gameWon
       })
       
       // Add to best scores if completed
@@ -319,7 +348,14 @@ export const useGameStore = create<GameStore>()(
         isGameComplete: false,
         isGameWon: false,
         timerInterval: null,
-        lastGameScore: null
+        lastGameScore: null,
+        // Update compatibility properties
+        cardDeck: [],
+        timer: 0,
+        victory: false,
+        gameStarted: false,
+        moveCount: 0,
+        gridSize: 4
       })
     },
     
@@ -330,7 +366,12 @@ export const useGameStore = create<GameStore>()(
       const interval = setInterval(() => {
         const currentState = get()
         if (currentState.isGameActive && !currentState.isGameComplete) {
-          set({ timeElapsed: currentState.timeElapsed + 1 })
+          const newTime = currentState.timeElapsed + 1
+          set({ 
+            timeElapsed: newTime,
+            // Update compatibility property
+            timer: newTime
+          })
         }
       }, 1000)
       
