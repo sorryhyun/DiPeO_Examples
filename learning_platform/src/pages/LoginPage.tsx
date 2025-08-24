@@ -18,15 +18,16 @@ interface FormErrors {
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const handleInputChange = (field: keyof FormData) => (value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, [field]: e.target.value }));
     // Clear field-specific error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
@@ -59,11 +60,14 @@ export const LoginPage = () => {
     }
 
     try {
+      setIsLoading(true);
       await login(formData.email, formData.password);
       navigate('/dashboard');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed. Please try again.';
       setErrors({ general: errorMessage });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,9 +90,7 @@ export const LoginPage = () => {
               </label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
                 placeholder="Email address"
                 value={formData.email}
                 onChange={handleInputChange('email')}
@@ -102,9 +104,7 @@ export const LoginPage = () => {
               </label>
               <Input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange('password')}
@@ -129,7 +129,6 @@ export const LoginPage = () => {
               size="lg"
               className="w-full"
               disabled={isLoading}
-              loading={isLoading}
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>

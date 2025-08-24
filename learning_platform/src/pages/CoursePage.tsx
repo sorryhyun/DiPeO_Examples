@@ -83,7 +83,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseId, user, navigate 
     navigate(`/quiz/${quizId}`);
   };
 
-  const isEnrolled = user && course.enrolledStudents?.includes(user.id);
+  const isEnrolled = user && Array.isArray(course.enrolledStudents) ? course.enrolledStudents.includes(user.id) : false;
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -249,7 +249,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseId, user, navigate 
                           {assignment.description}
                         </p>
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                          <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
+                          <span>Due: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : 'No due date'}</span>
                           <span>Max Score: {assignment.maxScore}</span>
                           {assignment.submitted && (
                             <span className="text-green-600 dark:text-green-400">✓ Submitted</span>
@@ -257,7 +257,14 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseId, user, navigate 
                         </div>
                       </div>
                       {isEnrolled && (
-                        <AssignmentUploader assignment={assignment} />
+                        <AssignmentUploader 
+                          assignmentId={assignment.id}
+                          assignment={assignment} 
+                          onUploaded={(submission) => {
+                            // Handle successful submission
+                            console.log('Assignment submitted:', submission);
+                          }}
+                        />
                       )}
                     </div>
                   ))}

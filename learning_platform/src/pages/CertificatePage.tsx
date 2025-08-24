@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useApi } from '../shared/hooks/useApi';
+import { apiClient } from '../services/apiClient';
 import { CertificatePreview } from '../features/certificates/CertificatePreview';
 import { LoadingSpinner } from '../shared/components/LoadingSpinner';
 import { Button } from '../shared/components/Button';
@@ -9,10 +10,10 @@ import { Certificate } from '../types';
 export const CertificatePage = () => {
   const { certificateId } = useParams<{ certificateId: string }>();
   
-  const { data: certificate, isLoading, error } = useApi<Certificate>({
-    endpoint: `/certificates/${certificateId}`,
-    queryKey: ['certificate', certificateId]
-  });
+  const { data: certificate, isLoading, error } = useApi<Certificate>(
+    ['certificate', certificateId],
+    () => apiClient.get<Certificate>(`/certificates/${certificateId}`)
+  );
 
   const handleDownload = () => {
     window.print();
@@ -110,7 +111,7 @@ export const CertificatePage = () => {
                   Issue Date:
                 </span>
                 <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  {new Date(certificate.issuedAt).toLocaleDateString()}
+                  {new Date(certificate.issuedDate).toLocaleDateString()}
                 </span>
               </div>
               <div>

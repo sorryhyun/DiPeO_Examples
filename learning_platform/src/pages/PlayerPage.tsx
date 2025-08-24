@@ -17,9 +17,11 @@ export function PlayerPage() {
     data: lesson,
     isLoading,
     error
-  } = useApi<Lesson>(`/api/lessons/${lessonId}`, {
-    enabled: !!lessonId
-  });
+  } = useApi<Lesson>(
+    ['lesson', lessonId],
+    () => apiClient.get(`/api/lessons/${lessonId}`),
+    { enabled: !!lessonId }
+  );
 
   const saveProgress = useCallback(async (progress: number) => {
     if (!lessonId) return;
@@ -38,13 +40,15 @@ export function PlayerPage() {
     }
   }, [lessonId]);
 
-  const handleProgress = useCallback((progress: number) => {
+  const handleProgress = useCallback((progress: { currentTime: number; duration: number }) => {
     if (progressTimeoutRef.current) {
       clearTimeout(progressTimeoutRef.current);
     }
     
+    const progressPercent = progress.duration > 0 ? (progress.currentTime / progress.duration) * 100 : 0;
+    
     progressTimeoutRef.current = setTimeout(() => {
-      saveProgress(progress);
+      saveProgress(progressPercent);
     }, 2000);
   }, [saveProgress]);
 

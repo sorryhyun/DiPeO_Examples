@@ -8,11 +8,7 @@ import type {
   Grade, 
   ForumPost, 
   Certificate,
-  QuizQuestion,
-  LessonResource,
-  AssignmentSubmission,
-  AssignmentAttachment,
-  ForumReply
+  QuizQuestion
 } from '../types';
 
 // Mock users matching authentication requirements
@@ -80,6 +76,7 @@ const mockQuizQuestions: QuizQuestion[] = [
     id: 'q3',
     question: 'Explain the concept of state in React.',
     type: 'text',
+    correctAnswer: '',
     points: 20
   }
 ];
@@ -95,7 +92,10 @@ export const mockQuizzes: Quiz[] = [
     questions: mockQuizQuestions,
     timeLimit: 1800, // 30 minutes
     attempts: 3,
+    maxAttempts: 3,
     passingScore: 70,
+    totalPoints: 50, // 10 + 15 + 20 + 5 from mockQuizQuestions
+    isCompleted: false,
     createdAt: new Date('2024-01-15').toISOString(),
     updatedAt: new Date('2024-01-15').toISOString()
   },
@@ -110,6 +110,7 @@ export const mockQuizzes: Quiz[] = [
         id: 'q4',
         question: 'What is closure in JavaScript?',
         type: 'text',
+        correctAnswer: '',
         points: 25
       },
       {
@@ -123,7 +124,10 @@ export const mockQuizzes: Quiz[] = [
     ],
     timeLimit: 2400, // 40 minutes
     attempts: 2,
+    maxAttempts: 2,
     passingScore: 80,
+    totalPoints: 40, // 25 + 15 from the questions
+    isCompleted: false,
     createdAt: new Date('2024-02-01').toISOString(),
     updatedAt: new Date('2024-02-01').toISOString()
   }
@@ -141,8 +145,9 @@ export const mockLessons: Lesson[] = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     content: 'React is a JavaScript library for building user interfaces...',
     type: 'video',
-    createdAt: new Date('2024-01-10').toISOString(),
-    updatedAt: new Date('2024-01-10').toISOString()
+    resources: [],
+    isCompleted: false,
+    createdAt: new Date('2024-01-10').toISOString()
   },
   {
     id: '2',
@@ -154,8 +159,9 @@ export const mockLessons: Lesson[] = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     content: 'JSX allows you to write HTML-like syntax in JavaScript...',
     type: 'video',
-    createdAt: new Date('2024-01-12').toISOString(),
-    updatedAt: new Date('2024-01-12').toISOString()
+    resources: [],
+    isCompleted: false,
+    createdAt: new Date('2024-01-12').toISOString()
   },
   {
     id: '3',
@@ -167,8 +173,9 @@ export const mockLessons: Lesson[] = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     content: 'JavaScript is a programming language that adds interactivity...',
     type: 'video',
-    createdAt: new Date('2024-01-20').toISOString(),
-    updatedAt: new Date('2024-01-20').toISOString()
+    resources: [],
+    isCompleted: false,
+    createdAt: new Date('2024-01-20').toISOString()
   },
   {
     id: '4',
@@ -180,8 +187,9 @@ export const mockLessons: Lesson[] = [
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     content: 'Advanced JavaScript includes closures, promises, async/await...',
     type: 'video',
-    createdAt: new Date('2024-01-25').toISOString(),
-    updatedAt: new Date('2024-01-25').toISOString()
+    resources: [],
+    isCompleted: false,
+    createdAt: new Date('2024-01-25').toISOString()
   }
 ];
 
@@ -192,15 +200,17 @@ export const mockCourses: Course[] = [
     title: 'React for Beginners',
     description: 'Learn React from scratch with hands-on examples',
     instructor: mockUsers[1],
-    instructorId: '2',
     thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400',
     category: 'Web Development',
     level: 'beginner',
+    difficulty: 'beginner',
     duration: 4200, // 70 minutes total
     price: 99.99,
     rating: 4.5,
-    studentsCount: 1250,
+    enrollmentCount: 1250,
     lessonsCount: 2,
+    lessons: [],
+    tags: ['react', 'javascript', 'frontend'],
     createdAt: new Date('2024-01-05').toISOString(),
     updatedAt: new Date('2024-01-15').toISOString(),
     isPublished: true
@@ -210,15 +220,17 @@ export const mockCourses: Course[] = [
     title: 'Advanced JavaScript',
     description: 'Master advanced JavaScript concepts and patterns',
     instructor: mockUsers[1],
-    instructorId: '2',
     thumbnail: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=400',
     category: 'Programming',
     level: 'advanced',
+    difficulty: 'advanced',
     duration: 7800, // 130 minutes total
     price: 149.99,
     rating: 4.8,
-    studentsCount: 890,
+    enrollmentCount: 890,
     lessonsCount: 2,
+    lessons: [],
+    tags: ['javascript', 'advanced', 'programming'],
     createdAt: new Date('2024-01-18').toISOString(),
     updatedAt: new Date('2024-02-01').toISOString(),
     isPublished: true
@@ -228,15 +240,17 @@ export const mockCourses: Course[] = [
     title: 'Python Basics',
     description: 'Introduction to Python programming',
     instructor: mockUsers[2],
-    instructorId: '3',
     thumbnail: 'https://images.unsplash.com/photo-1526379879527-8559ecfcaec0?w=400',
     category: 'Programming',
     level: 'beginner',
+    difficulty: 'beginner',
     duration: 5400, // 90 minutes total
     price: 79.99,
     rating: 4.3,
-    studentsCount: 2100,
+    enrollmentCount: 2100,
     lessonsCount: 0,
+    lessons: [],
+    tags: ['python', 'programming', 'beginner'],
     createdAt: new Date('2024-02-01').toISOString(),
     updatedAt: new Date('2024-02-01').toISOString(),
     isPublished: false
@@ -250,10 +264,14 @@ export const mockAssignments: Assignment[] = [
     title: 'Build a React Component',
     description: 'Create a reusable React component with props and state',
     courseId: '1',
+    courseName: 'React for Beginners',
     dueDate: new Date('2024-03-01').toISOString(),
     maxPoints: 100,
     instructions: 'Build a counter component that accepts initial value as prop...',
     submissionFormat: 'code',
+    submissions: [],
+    requirements: ['Component must use useState', 'Props validation required', 'Include error handling'],
+    attachments: [],
     createdAt: new Date('2024-01-16').toISOString(),
     updatedAt: new Date('2024-01-16').toISOString()
   },
@@ -262,10 +280,14 @@ export const mockAssignments: Assignment[] = [
     title: 'JavaScript ES6 Features',
     description: 'Demonstrate understanding of modern JavaScript features',
     courseId: '2',
+    courseName: 'Advanced JavaScript',
     dueDate: new Date('2024-03-15').toISOString(),
     maxPoints: 150,
     instructions: 'Write examples using arrow functions, destructuring, and async/await...',
     submissionFormat: 'code',
+    submissions: [],
+    requirements: ['Use arrow functions', 'Implement destructuring', 'Show async/await usage'],
+    attachments: [],
     createdAt: new Date('2024-02-02').toISOString(),
     updatedAt: new Date('2024-02-02').toISOString()
   }
@@ -276,26 +298,38 @@ export const mockGrades: Grade[] = [
   {
     id: '1',
     studentId: '1',
+    studentName: 'John Student',
     courseId: '1',
     assignmentId: '1',
-    quizId: null,
+    assignmentTitle: 'Build a React Component',
+    quizId: undefined,
     score: 85,
     maxScore: 100,
+    percentage: 85,
+    grade: 85,
     feedback: 'Good work! Consider adding error handling.',
     gradedAt: new Date('2024-02-20').toISOString(),
-    gradedBy: '2'
+    submittedAt: new Date('2024-02-19').toISOString(),
+    gradedBy: '2',
+    status: 'graded'
   },
   {
     id: '2',
     studentId: '1',
+    studentName: 'John Student',
     courseId: '1',
-    assignmentId: null,
+    assignmentId: undefined,
+    assignmentTitle: 'React Basics Quiz',
     quizId: '1',
     score: 80,
     maxScore: 100,
+    percentage: 80,
+    grade: 80,
     feedback: 'Well done on the quiz!',
     gradedAt: new Date('2024-02-18').toISOString(),
-    gradedBy: '2'
+    submittedAt: new Date('2024-02-17').toISOString(),
+    gradedBy: '2',
+    status: 'graded'
   }
 ];
 
@@ -306,15 +340,27 @@ export const mockForumPosts: ForumPost[] = [
     title: 'How to handle state in React?',
     content: 'I am confused about when to use useState vs useReducer...',
     authorId: '1',
+    author: mockUsers[0],
     authorName: 'John Student',
     courseId: '1',
+    tags: ['react', 'state', 'hooks'],
+    isPinned: false,
+    isResolved: true,
+    upvotes: 5,
+    downvotes: 0,
     replies: [
       {
         id: '1-1',
+        postId: '1',
         content: 'useState is great for simple state, useReducer for complex state logic.',
         authorId: '2',
+        author: mockUsers[1],
         authorName: 'Sarah Teacher',
-        createdAt: new Date('2024-02-11').toISOString()
+        upvotes: 3,
+        downvotes: 0,
+        isAcceptedAnswer: true,
+        createdAt: new Date('2024-02-11').toISOString(),
+        updatedAt: new Date('2024-02-11').toISOString()
       }
     ],
     createdAt: new Date('2024-02-10').toISOString(),
@@ -325,8 +371,14 @@ export const mockForumPosts: ForumPost[] = [
     title: 'Best practices for JavaScript?',
     content: 'What are some coding best practices I should follow?',
     authorId: '1',
+    author: mockUsers[0],
     authorName: 'John Student',
     courseId: '2',
+    tags: ['javascript', 'best-practices'],
+    isPinned: false,
+    isResolved: false,
+    upvotes: 2,
+    downvotes: 0,
     replies: [],
     createdAt: new Date('2024-02-12').toISOString(),
     updatedAt: new Date('2024-02-12').toISOString()
@@ -338,12 +390,36 @@ export const mockCertificates: Certificate[] = [
   {
     id: '1',
     studentId: '1',
+    student: mockUsers[0],
     studentName: 'John Student',
     courseId: '1',
-    courseTitle: 'React for Beginners',
-    issuedDate: new Date('2024-02-25').toISOString(),
+    course: {
+      id: '1',
+      title: 'React for Beginners',
+      description: 'Learn React from scratch with hands-on examples',
+      instructor: mockUsers[1],
+      thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400',
+      category: 'Web Development',
+      level: 'beginner',
+      difficulty: 'beginner',
+      duration: 4200,
+      price: 99.99,
+      rating: 4.5,
+      enrollmentCount: 1250,
+      lessonsCount: 2,
+      lessons: [],
+      tags: ['react', 'javascript', 'frontend'],
+      createdAt: new Date('2024-01-05').toISOString(),
+      updatedAt: new Date('2024-01-15').toISOString(),
+      isPublished: true
+    },
+    courseName: 'React for Beginners',
     certificateUrl: '/certificates/react-beginner-john-student.pdf',
-    verificationCode: 'CERT-REACT-2024-001'
+    completionDate: new Date('2024-02-25').toISOString(),
+    credentialId: 'CERT-REACT-2024-001',
+    isVerified: true,
+    achievementLevel: 'Beginner',
+    issuedDate: new Date('2024-02-25').toISOString()
   }
 ];
 

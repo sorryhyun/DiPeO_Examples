@@ -173,15 +173,15 @@ const AssignmentContent: React.FC<AssignmentContentProps> = ({ assignmentId }) =
                   Files:
                 </span>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {submission.files.length} file(s)
+                  {submission.files?.length || 0} file(s)
                 </span>
               </div>
               <ul className="space-y-1">
-                {submission.files.map((file, index) => (
+                {submission.files?.map((file, index) => (
                   <li key={index} className="text-sm text-gray-600 dark:text-gray-400">
                     • {file.name} ({Math.round(file.size / 1024)} KB)
                   </li>
-                ))}
+                )) || []}
               </ul>
             </div>
 
@@ -192,7 +192,7 @@ const AssignmentContent: React.FC<AssignmentContentProps> = ({ assignmentId }) =
                     Grade:
                   </span>
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {submission.grade}/{assignment.maxPoints}
+                    {typeof submission.grade === 'object' ? submission.grade.score : submission.grade}/{assignment.maxPoints}
                   </span>
                 </div>
                 {submission.feedback && (
@@ -211,6 +211,7 @@ const AssignmentContent: React.FC<AssignmentContentProps> = ({ assignmentId }) =
               </p>
               <AssignmentUploader
                 assignmentId={assignmentId}
+                assignment={assignment}
                 onUploaded={handleUploadSuccess}
               />
             </div>
@@ -222,6 +223,7 @@ const AssignmentContent: React.FC<AssignmentContentProps> = ({ assignmentId }) =
             </p>
             <AssignmentUploader
               assignmentId={assignmentId}
+              assignment={assignment}
               onUploaded={handleUploadSuccess}
             />
           </div>

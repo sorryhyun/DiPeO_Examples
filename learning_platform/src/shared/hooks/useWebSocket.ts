@@ -35,7 +35,8 @@ export function useWebSocket(
 
   // Manual send function for emitting events
   const send = useCallback((eventName: string, payload: any) => {
-    mockWebsocket.emit(eventName, payload);
+    // Type cast since emit expects strict event names but send is more flexible
+    (mockWebsocket.emit as any)(eventName, payload);
   }, []);
 
   return {

@@ -114,7 +114,11 @@ class MockWebSocketService {
 const mockWebSocketService = new MockWebSocketService();
 
 export const startMockWebsocket = mockWebSocketService.startMockWebsocket.bind(mockWebSocketService);
-export const subscribe = mockWebSocketService.subscribe.bind(mockWebSocketService);
+
+export const subscribe = (eventName: string, handler: EventHandler) => {
+  return mockWebSocketService.subscribe(eventName as keyof MockWebSocketEvents, handler);
+};
+
 export const disconnect = mockWebSocketService.disconnect.bind(mockWebSocketService);
 
 // Add missing methods for compatibility
@@ -126,7 +130,10 @@ export const unsubscribe = (eventName: string, handler: EventHandler) => {
   }
 };
 
-export const emit = (eventName: string, data: any) => {
+export const emit = <T extends keyof MockWebSocketEvents>(
+  eventName: T, 
+  data: MockWebSocketEvents[T]
+) => {
   // Forward to the private emit method
   mockWebSocketService['emit'](eventName, data);
 };

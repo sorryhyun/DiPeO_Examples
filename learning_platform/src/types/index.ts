@@ -67,6 +67,7 @@ export interface Lesson {
 export interface LessonResource {
   id: string;
   title: string;
+  description?: string;
   type: 'pdf' | 'video' | 'link' | 'document';
   url: string;
   size?: number; // in bytes
@@ -86,6 +87,7 @@ export interface Quiz {
   maxAttempts: number;
   isCompleted: boolean;
   score?: number;
+  totalPoints: number;
   createdAt: string;
   updatedAt?: string;
 }
@@ -106,6 +108,16 @@ export interface QuizQuestion {
 export interface QuizAnswer {
   questionId: string;
   answer: string | string[];
+}
+
+export interface QuizSubmission {
+  id?: string;
+  quizId: string;
+  studentId?: string;
+  answers: QuizAnswer[];
+  score?: number;
+  submittedAt?: string;
+  timeSpent?: number;
 }
 
 // Assignment Types
@@ -171,6 +183,24 @@ export interface Grade {
 }
 
 // Forum Types
+export interface Thread {
+  id: string;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  replyCount: number;
+  lastReply?: {
+    author: string;
+    createdAt: string;
+  };
+}
+
+export interface CreateThreadRequest {
+  title: string;
+  content: string;
+}
+
 export interface ForumPost {
   id: string;
   courseId: string;
@@ -235,6 +265,7 @@ export interface ApiError {
   message: string;
   details?: Record<string, unknown>;
   timestamp: string;
+  status?: number;
 }
 
 export interface PaginatedResponse<T> {

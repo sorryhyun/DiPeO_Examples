@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Suspense } from 'react';
 import { QuizForm } from '../features/quiz/QuizForm';
-import { useApi } from '../shared/hooks/useApi';
+import { useApi, useMutationApi } from '../shared/hooks/useApi';
 import { LoadingSpinner } from '../shared/components/LoadingSpinner';
 import { ErrorBoundary } from '../shared/components/ErrorBoundary';
 import { Card } from '../shared/components/Card';
@@ -36,7 +36,7 @@ function QuizPageContent({ quiz, onSubmit }: QuizPageContentProps) {
           
           <QuizForm 
             quiz={quiz}
-            onSubmit={onSubmit}
+            onSubmitComplete={onSubmit}
           />
         </Card>
       </div>
@@ -52,7 +52,8 @@ interface QuizResultsProps {
 }
 
 function QuizResults({ submission, quiz, onViewGrades, onReturnToCourse }: QuizResultsProps) {
-  const scorePercentage = Math.round((submission.score / quiz.totalPoints) * 100);
+  const score = submission.score || 0;
+  const scorePercentage = Math.round((score / quiz.totalPoints) * 100);
   const passed = scorePercentage >= (quiz.passingScore || 70);
 
   return (
@@ -86,10 +87,10 @@ function QuizResults({ submission, quiz, onViewGrades, onReturnToCourse }: QuizR
               </span>
             </div>
             <p className="text-gray-600 dark:text-gray-300">
-              {submission.score} out of {quiz.totalPoints} points
+              {score} out of {quiz.totalPoints} points
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              Submitted at {new Date(submission.submittedAt).toLocaleString()}
+              {submission.submittedAt && `Submitted at ${new Date(submission.submittedAt).toLocaleString()}`}
             </p>
           </div>
 
@@ -119,14 +120,14 @@ export function QuizPage() {
   const { quizId, courseId } = useParams<{ quizId: string; courseId: string }>();
   const navigate = useNavigate();
   
-  const { data: quiz, isLoading, error } = useApi<Quiz>({
-    queryKey: ['quiz', quizId],
-    endpoint: `/api/quizzes/${quizId}`,
-    enabled: !!quizId
-  });
+  const { data: quiz, isLoading, error } = useApi<Quiz>(
+    ['quiz', quizId],
+    () => fetch(`/api/quizzes/${quizId}`).then(res => res.json()),
+    { enabled: !!quizId }
+  );
 
-  const { mutate: submitQuiz, data: submission, isPending: isSubmitting } = useApi<QuizSubmission, QuizSubmission>({
-    mutationFn: async (submissionData: QuizSubmission) => {
+  const { mutate: submitQuiz, data: submission, isPending: isSubmitting } = useMutationApi<QuizSubmission, QuizSubmission>(
+    async (submissionData: QuizSubmission) => {
       const response = await fetch(`/api/quizzes/${quizId}/submit`, {
         method: 'POST',
         headers: {
@@ -139,7 +140,7 @@ export function QuizPage() {
       }
       return response.json();
     }
-  });
+  );
 
   const handleSubmit = (submissionData: QuizSubmission) => {
     submitQuiz(submissionData);
@@ -164,7 +165,7 @@ navigate('/grades');
   if (isLoading || !quiz) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="large" />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -185,7 +186,7 @@ navigate('/grades');
     <ErrorBoundary>
       <Suspense fallback={
         <div className="flex items-center justify-center min-h-screen">
-          <LoadingSpinner size="large" />
+          <LoadingSpinner size="lg" />
         </div>
       }>
         <QuizPageContent 
@@ -197,7 +198,7 @@ navigate('/grades');
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <Card className="p-6">
               <div className="text-center">
-                <LoadingSpinner size="medium" className="mb-4" />
+                <LoadingSpinner size="md" className="mb-4" />
                 <p className="text-gray-600 dark:text-gray-300">
                   Submitting your quiz...
                 </p>

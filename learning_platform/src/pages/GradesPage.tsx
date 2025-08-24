@@ -8,7 +8,11 @@ import type { Grade } from '../types';
 
 export const GradesPage = () => {
   const { user } = useAuth();
-  const { data: grades, isLoading, error } = useApi<Grade[]>('/api/grades');
+  const { data: grades, isLoading, error } = useApi<Grade[]>(['grades'], async () => {
+    const response = await fetch('/api/grades');
+    if (!response.ok) throw new Error('Failed to fetch grades');
+    return response.json();
+  });
 
   const displayMode = user?.role === 'instructor' ? 'instructor' : 'student';
 

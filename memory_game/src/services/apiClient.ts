@@ -2,7 +2,8 @@ import { ApiResponse, ApiError } from '../types/index';
 import mockServer from './mockServer';
 
 // Configuration for enabling mock mode
-const ENABLE_MOCK = import.meta.env.MODE === 'development' || import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
+// Always use mock data since there's no backend server
+const ENABLE_MOCK = true;
 
 // Default timeout for requests
 const DEFAULT_TIMEOUT = 10000;

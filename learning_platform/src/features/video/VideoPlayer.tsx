@@ -8,9 +8,10 @@ interface VideoPlayerProps {
   onProgress?: (progress: { currentTime: number; duration: number }) => void;
   title?: string;
   poster?: string;
+  className?: string;
 }
 
-export function VideoPlayer({ src, lessonId, onProgress, title, poster }: VideoPlayerProps) {
+export function VideoPlayer({ src, lessonId, onProgress, title, poster, className }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -126,7 +127,7 @@ export function VideoPlayer({ src, lessonId, onProgress, title, poster }: VideoP
   }
 
   return (
-    <div className="relative bg-black rounded-lg overflow-hidden group">
+    <div className={`relative bg-black rounded-lg overflow-hidden group ${className || ''}`}>
       <video
         ref={videoRef}
         className="w-full h-auto"
@@ -135,7 +136,9 @@ export function VideoPlayer({ src, lessonId, onProgress, title, poster }: VideoP
         onPlay={handlePlay}
         onPause={handlePause}
         tabIndex={0}
-        aria-label="Video player"
+        aria-label={title || "Video player"}
+        title={title}
+        poster={poster}
       >
         <source src={videoSrc} type="video/mp4" />
         Your browser does not support the video tag.

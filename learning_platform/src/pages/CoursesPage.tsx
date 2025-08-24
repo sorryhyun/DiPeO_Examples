@@ -10,7 +10,11 @@ export const CoursesPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   
-  const { data: courses, isLoading, error } = useApi<Course[]>(['courses'], '/api/courses');
+  const { data: courses, isLoading, error } = useApi<Course[]>(['courses'], async () => {
+    const response = await fetch('/api/courses');
+    if (!response.ok) throw new Error('Failed to fetch courses');
+    return response.json();
+  });
 
   const filteredCourses = useMemo(() => {
     if (!courses) return [];
@@ -23,7 +27,7 @@ export const CoursesPage: React.FC = () => {
     return courses.filter(course => 
       course.title.toLowerCase().includes(lowercaseSearch) ||
       course.description.toLowerCase().includes(lowercaseSearch) ||
-      course.instructor.toLowerCase().includes(lowercaseSearch)
+      (course.instructor?.name || course.instructor?.firstName + ' ' + course.instructor?.lastName || '').toLowerCase().includes(lowercaseSearch)
     );
   }, [courses, searchTerm]);
 

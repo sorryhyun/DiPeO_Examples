@@ -1,5 +1,4 @@
-import { endpoints } from './endpoints';
-import { ApiError, ApiResponse } from '../types';
+import { ApiError } from '../types';
 
 /**
  * Creates an API client with typed methods for HTTP operations
@@ -38,9 +37,11 @@ function createApiClient(getToken?: () => string | undefined) {
         }
 
         const error: ApiError = {
+          code: response.status.toString(),
           message: errorMessage,
-          status: response.status,
-          data: errorData,
+          details: errorData,
+          timestamp: new Date().toISOString(),
+          status: response.status
         };
         throw error;
       }
@@ -60,9 +61,11 @@ function createApiClient(getToken?: () => string | undefined) {
 
       // Network or other errors
       const apiError: ApiError = {
+        code: 'NETWORK_ERROR',
         message: error instanceof Error ? error.message : 'Network error',
-        status: 0,
-        data: null,
+        details: undefined,
+        timestamp: new Date().toISOString(),
+        status: 0
       };
       throw apiError;
     }

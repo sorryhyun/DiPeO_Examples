@@ -11,8 +11,8 @@ export function useLocalStorage<T>(
   // Initialize state with value from localStorage or initial value
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
-      const item = storage.getItem(key);
-      return item !== null ? item : initialValue;
+      const item = storage.getItem<T>(key);
+      return item !== undefined ? item : initialValue;
     } catch (error) {
       console.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;

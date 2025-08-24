@@ -17,7 +17,8 @@ const createResponse = <T>(data: T, status = 200): Response => {
   const response: ApiResponse<T> = {
     data,
     success: status >= 200 && status < 300,
-    message: status >= 400 ? 'Error' : 'Success'
+    message: status >= 400 ? 'Error' : 'Success',
+    timestamp: new Date().toISOString()
   };
 
   return new Response(JSON.stringify(response), {
@@ -32,7 +33,8 @@ const createErrorResponse = (message: string, status = 500): Response => {
   const response: ApiResponse<null> = {
     data: null,
     success: false,
-    message
+    message,
+    timestamp: new Date().toISOString()
   };
 
   return new Response(JSON.stringify(response), {
@@ -83,12 +85,13 @@ const mockFetch = async (
       const newUser: User = {
         id: 'user-' + Date.now(),
         email: 'new@example.com',
+        firstName: 'New',
+        lastName: 'User',
         name: 'New User',
+        password: 'demo123',
         role: 'student',
-        avatar: null,
+        avatar: undefined,
         enrolledCourses: [],
-        completedLessons: [],
-        certificates: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -128,15 +131,17 @@ const mockFetch = async (
         title: body.title || 'New Course',
         description: body.description || 'Course description',
         instructor: mockData.getUsers().find(u => u.role === 'instructor')!,
-        thumbnail: null,
-        duration: '8 weeks',
+        thumbnail: undefined,
+        duration: 480,
         difficulty: 'beginner',
+        level: 'beginner',
         category: 'general',
         tags: [],
         lessons: [],
-        enrolled: 0,
+        enrollmentCount: 0,
         rating: 0,
-        reviews: [],
+        price: 0,
+        isPublished: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -249,7 +254,6 @@ const mockFetch = async (
 
     // Progress tracking
     if (path === '/api/progress' && method === 'GET') {
-      const userId = searchParams.get('userId');
       return createResponse({
         coursesCompleted: 2,
         lessonsCompleted: 15,

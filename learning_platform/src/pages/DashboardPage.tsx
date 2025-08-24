@@ -3,7 +3,7 @@ import { Card } from '../shared/components/Card';
 import { LoadingSpinner } from '../shared/components/LoadingSpinner';
 import { useApi } from '../shared/hooks/useApi';
 import { useWebSocket } from '../shared/hooks/useWebSocket';
-import { formatPercentage, formatDate } from '../utils/formatters';
+import { formatDate } from '../utils/formatters';
 
 interface DashboardData {
   enrolledCourses: number;
@@ -34,9 +34,10 @@ interface DeadlineItem {
 }
 
 export function DashboardPage() {
-  const { data: dashboardData, isLoading, error } = useApi<DashboardData>({
-    queryKey: ['dashboard'],
-    endpoint: '/dashboard'
+  const { data: dashboardData, isLoading, error } = useApi<DashboardData>(['dashboard'], async () => {
+    const response = await fetch('/api/dashboard');
+    if (!response.ok) throw new Error('Failed to fetch dashboard data');
+    return response.json();
   });
 
   // Subscribe to real-time activity updates
@@ -99,7 +100,7 @@ export function DashboardPage() {
                 Overall Progress
               </h3>
               <p className="text-3xl font-bold text-blue-600 mt-2">
-                {formatPercentage(dashboardData?.totalProgress ?? 0)}
+                {dashboardData?.totalProgress ? `${dashboardData.totalProgress}%` : '0%'}
               </p>
             </Card>
 
@@ -109,7 +110,7 @@ export function DashboardPage() {
               </h3>
               <p className="text-3xl font-bold text-purple-600 mt-2">
                 {dashboardData?.enrolledCourses 
-                  ? formatPercentage((dashboardData.completedCourses / dashboardData.enrolledCourses) * 100)
+                  ? `${Math.round((dashboardData.completedCourses / dashboardData.enrolledCourses) * 100)}%`
                   : '0%'
                 }
               </p>
@@ -144,7 +145,7 @@ export function DashboardPage() {
                               <span className="ml-2">Score: {activity.metadata.score}%</span>
                             )}
                             {activity.metadata.progress && (
-                              <span className="ml-2">Progress: {formatPercentage(activity.metadata.progress)}</span>
+                              <span className="ml-2">Progress: {activity.metadata.progress}%</span>
                             )}
                           </div>
                         )}

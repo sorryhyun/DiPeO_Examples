@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '../shared/components/Card';
 import { Button } from '../shared/components/Button';
 import { Input } from '../shared/components/Input';
 import { LoadingSpinner } from '../shared/components/LoadingSpinner';
 import { ForumThread } from '../features/forum/ForumThread';
-import { useApi } from '../shared/hooks/useApi';
+import { useApi, useMutationApi } from '../shared/hooks/useApi';
 import { useWebSocket } from '../shared/hooks/useWebSocket';
 import { Thread, CreateThreadRequest } from '../types';
 
@@ -19,24 +19,30 @@ export const ForumPage: React.FC = () => {
     isLoading,
     error,
     refetch: refetchThreads
-  } = useApi<Thread[]>({
-    endpoint: '/api/forums',
-    method: 'GET'
+  } = useApi<Thread[]>(['forums'], async () => {
+    const response = await fetch('/api/forums');
+    if (!response.ok) throw new Error('Failed to fetch threads');
+    return response.json();
   });
 
-  const { mutateAsync: createThread, isPending: isCreating } = useApi<Thread, CreateThreadRequest>({
-    endpoint: '/api/forums',
-    method: 'POST'
-  });
+  const { mutateAsync: createThread, isPending: isCreating } = useMutationApi<Thread, CreateThreadRequest>(
+    async (data) => {
+      const response = await fetch('/api/forums', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error('Failed to create thread');
+      return response.json();
+    }
+  );
 
   // Listen for real-time thread updates
-  const { lastMessage } = useWebSocket('/ws/forums');
-
-  useEffect(() => {
-    if (lastMessage?.type === 'thread_created' || lastMessage?.type === 'thread_updated') {
+  useWebSocket('/ws/forums', (message) => {
+    if (message?.type === 'thread_created' || message?.type === 'thread_updated') {
       refetchThreads();
     }
-  }, [lastMessage, refetchThreads]);
+  });
 
   const handleThreadClick = (threadId: string) => {
     setSelectedThreadId(threadId);
