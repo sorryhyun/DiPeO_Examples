@@ -1,1 +1,0 @@
-Looking at the generated output, it already contains valid TypeScript code for the transactions service. I need to check if the imports align with the actual contract types from the core contracts and fix any type mismatches.

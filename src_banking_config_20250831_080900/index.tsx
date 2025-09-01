@@ -1,3 +1,0 @@
-Looking at the generated output for `src/index.tsx`, I can see there's an issue with the mock server configuration reference. The code is trying to access `appConfig.developmentMode.enabled` and `appConfig.developmentMode.mockServer.enabled`, but according to the config structure I can see earlier, the development mode properties are structured differently.
-
-Let me check the actual config structure and fix this:
