@@ -8,6 +8,7 @@
 
 import { ApiResult, AuthTokens, User } from '@/core/contracts';
 import { apiClient } from '@/services/api';
+import { shouldUseMockData, mockUser } from '@/app/config';
 
 // Authentication endpoints
 const AUTH_ENDPOINTS = {
@@ -21,6 +22,27 @@ const AUTH_ENDPOINTS = {
  * Login with email and password
  */
 export async function login(email: string, password: string): Promise<ApiResult<{ tokens: AuthTokens; user: User }>> {
+  // Mock mode: accept any credentials
+  if (shouldUseMockData && mockUser) {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Accept any email/password combination in mock mode
+    // You can use any credentials you want, e.g.:
+    // Email: jane.doe@example.com (or any email)
+    // Password: password123 (or any password >= 6 chars)
+    return {
+      data: {
+        tokens: {
+          accessToken: 'mock-access-token',
+          refreshToken: 'mock-refresh-token',
+          expiresAt: new Date(Date.now() + 3600000).toISOString() // 1 hour from now
+        },
+        user: mockUser
+      }
+    };
+  }
+
   try {
     const response = await apiClient.post<{ tokens: AuthTokens; user: User }>(
       AUTH_ENDPOINTS.LOGIN,
@@ -92,6 +114,12 @@ export async function refreshToken(token: string): Promise<ApiResult<{ tokens: A
  * Get current authenticated user
  */
 export async function getCurrentUser(): Promise<ApiResult<User>> {
+  // Mock mode: return mock user
+  if (shouldUseMockData && mockUser) {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    return { data: mockUser };
+  }
+
   try {
     const response = await apiClient.get<User>(AUTH_ENDPOINTS.ME);
     
