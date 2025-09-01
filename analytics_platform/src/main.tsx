@@ -15,6 +15,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import App from '@/app/App';
 import { createQueryClient } from '@/core/queryClient';
 import { isDevelopment } from '@/app/config';
+import '@/styles/tailwind.css';
 import '@/styles/global.css';
 
 // Create the React Query client instance

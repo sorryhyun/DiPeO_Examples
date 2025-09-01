@@ -1,7 +1,7 @@
 // src/app/config.ts
 /* src/app/config.ts
    Materializes runtime application configuration into a typed AppConfig object.
-   - Reads from window.__APP_CONFIG__ (recommended), falling back to process.env for SSR/dev.
+   - Reads from window.__APP_CONFIG__ (recommended), falling back to import.meta.env for dev.
    - Computes convenience flags and feature helpers.
    - Provides mock user data when development_mode.enable_mock_data is true.
 */
@@ -17,17 +17,17 @@ declare global {
 
 // Default base configuration used as a safe fallback
 const DEFAULT_CONFIG: AppConfig = {
-  env: (process.env.NODE_ENV as 'development' | 'staging' | 'production') || 'development',
-  appName: process.env.REACT_APP_NAME || 'HealthApp',
-  apiBaseUrl: process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000/api',
-  wsBaseUrl: process.env.REACT_APP_WS_BASE_URL || undefined,
-  features: (process.env.REACT_APP_FEATURES || '').split(',').filter(Boolean),
+  env: (import.meta.env.MODE as 'development' | 'staging' | 'production') || 'development',
+  appName: import.meta.env.VITE_APP_NAME || 'HealthApp',
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  wsBaseUrl: import.meta.env.VITE_WS_BASE_URL || undefined,
+  features: (import.meta.env.VITE_FEATURES || '').split(',').filter(Boolean),
   development_mode: {
-    enable_mock_data: (process.env.REACT_APP_ENABLE_MOCK_DATA || 'true') === 'true'
+    enable_mock_data: (import.meta.env.VITE_ENABLE_MOCK_DATA || 'true') === 'true'
   },
   defaults: {
-    pageSize: Number(process.env.REACT_APP_PAGE_SIZE) || 20,
-    dateFormat: process.env.REACT_APP_DATE_FORMAT || 'yyyy-MM-dd HH:mm'
+    pageSize: Number(import.meta.env.VITE_PAGE_SIZE) || 20,
+    dateFormat: import.meta.env.VITE_DATE_FORMAT || 'yyyy-MM-dd HH:mm'
   }
 };
 

@@ -506,7 +506,7 @@ input::placeholder, textarea::placeholder {
 /* Print styles */
 @media print {
   * {
-    color-adjust: exact;
+    print-color-adjust: exact;
   }
   
   .no-print {
