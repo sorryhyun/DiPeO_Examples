@@ -1,0 +1,1 @@
+Looking at the Account interface from contracts.ts, I need to update the generated code to match the correct interface structure. The current code uses properties that don't exist in the Account interface.

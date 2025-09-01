@@ -1,0 +1,1 @@
+Looking at the dependencies, I need to first implement the i18n setup and locale files, then the provider. Let me start with the i18n configuration:

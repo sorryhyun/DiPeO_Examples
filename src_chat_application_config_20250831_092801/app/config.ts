@@ -1,0 +1,1 @@
+Looking at the API Client specification, I need to create a fetch wrapper that handles authentication, error handling, and mock server fallback. Let me examine the requirements and implement this service.

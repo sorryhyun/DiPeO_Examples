@@ -1,0 +1,1 @@
+I need to read the existing code first to understand the current implementation, then generate the accounts service code according to the specifications.
