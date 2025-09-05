@@ -187,7 +187,7 @@ export const Modal: React.FC<ModalProps> = ({
               initial="initial"
               animate="animate"
               exit="exit"
->
+            >
               {/* Header */}
               {(title || showCloseButton) && (
                 <div className="flex items-center justify-between p-6 pb-4">
@@ -207,4 +207,76 @@ export const Modal: React.FC<ModalProps> = ({
                     <button
                       type="button"
                       onClick={handleCloseClick}
-                      className={cn(\n                        'ml-auto p-2 rounded-lg',\n                        'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300',\n                        'hover:bg-gray-100 dark:hover:bg-gray-800',\n                        'focus:outline-none focus:ring-2 focus:ring-blue-500',\n                        'transition-colors duration-200'\n                      )}\n                      aria-label=\"Close modal\"\n                    >\n                      <svg\n                        className=\"w-5 h-5\"\n                        fill=\"none\"\n                        stroke=\"currentColor\"\n                        viewBox=\"0 0 24 24\"\n                        aria-hidden=\"true\"\n                      >\n                        <path\n                          strokeLinecap=\"round\"\n                          strokeLinejoin=\"round\"\n                          strokeWidth={2}\n                          d=\"M6 18L18 6M6 6l12 12\"\n                        />\n                      </svg>\n                    </button>\n                  )}\n                </div>\n              )}\n\n              {/* Content */}\n              <div\n                className={cn(\n                  'px-6',\n                  (title || showCloseButton) ? 'pb-6' : 'py-6'\n                )}\n                id={descriptionId}\n              >\n                {children}\n              </div>\n            </motion.div>\n          </FocusTrap>\n        </div>\n      )}\n    </AnimatePresence>\n  );\n\n  // Only render if we have a DOM\n  if (typeof document === 'undefined') {\n    return null;\n  }\n\n  // Get or create modal root\n  let modalRoot = document.getElementById('modal-root');\n  if (!modalRoot) {\n    modalRoot = document.createElement('div');\n    modalRoot.id = 'modal-root';\n    modalRoot.setAttribute('data-portal', 'true');\n    document.body.appendChild(modalRoot);\n  }\n\n  return createPortal(modalContent, modalRoot);\n};\n\n// Export default\nexport default Modal;\n\n/*\nSelf-check comments:\n- [x] Uses `@/` imports only\n- [x] Uses providers/hooks (no direct DOM/localStorage side effects)\n- [x] Reads config from `@/app/config` (not needed for Modal component)\n- [x] Exports default named component\n- [x] Adds basic ARIA and keyboard handlers (ESC key, focus management, ARIA attributes)\n*/\n```
+                      className={cn(
+                        'ml-auto p-2 rounded-lg',
+                        'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300',
+                        'hover:bg-gray-100 dark:hover:bg-gray-800',
+                        'focus:outline-none focus:ring-2 focus:ring-blue-500',
+                        'transition-colors duration-200'
+                      )}
+                      aria-label="Close modal"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Content */}
+              <div
+                className={cn(
+                  'px-6',
+                  (title || showCloseButton) ? 'pb-6' : 'py-6'
+                )}
+                id={descriptionId}
+              >
+                {children}
+              </div>
+            </motion.div>
+          </FocusTrap>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+
+  // Only render if we have a DOM
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  // Get or create modal root
+  let modalRoot = document.getElementById('modal-root');
+  if (!modalRoot) {
+    modalRoot = document.createElement('div');
+    modalRoot.id = 'modal-root';
+    modalRoot.setAttribute('data-portal', 'true');
+    document.body.appendChild(modalRoot);
+  }
+
+  return createPortal(modalContent, modalRoot);
+};
+
+// Export default
+export default Modal;
+
+/*
+Self-check comments:
+- [x] Uses `@/` imports only
+- [x] Uses providers/hooks (no direct DOM/localStorage side effects)
+- [x] Reads config from `@/app/config` (not needed for Modal component)
+- [x] Exports default named component
+- [x] Adds basic ARIA and keyboard handlers (ESC key, focus management, ARIA attributes)
+*/

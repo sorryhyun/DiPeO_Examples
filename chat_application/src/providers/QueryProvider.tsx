@@ -29,11 +29,11 @@ const createQueryClient = () => {
         // Retry failed requests
         retry: (failureCount, error: any) => {
           // Don't retry on 4xx errors (client errors)
-          if (error?.status >= 400 && error?.status < 500) {
+          if (error?.status >= 400 && error?.status <= 499) {
             return false;
           }
           // Retry up to 3 times for server errors
-          return failureCount < 3;
+          return failureCount <= 2;
         },
         
         // Retry delay with exponential backoff
@@ -188,12 +188,12 @@ export interface QueryClientExtension {
   // Utility methods for common operations
   invalidateQueries: (queryKey: unknown[]) => Promise<void>;
   removeQueries: (queryKey: unknown[]) => void;
-  setQueryData: <T>(queryKey: unknown[], data: T) => void;
-  getQueryData: <T>(queryKey: unknown[]) => T | undefined;
+  setQueryData: <T,>(queryKey: unknown[], data: T) => void;
+  getQueryData: <T,>(queryKey: unknown[]) => T | undefined;
   
   // Batch operations
   invalidateMultiple: (queryKeys: unknown[][]) => Promise<void>;
-  prefetchQuery: <T>(
+  prefetchQuery: <T,>(
     queryKey: unknown[], 
     queryFn: () => Promise<T>, 
     options?: { staleTime?: number }
@@ -208,4 +208,263 @@ export interface QueryClientExtension {
   resetErrorBoundaries: () => void;
 }
 
-/**\n * Extended hook that provides the QueryClient with additional utility methods\n * for common operations like cache management and batch operations.\n */\nexport const useQueryClientExt = (): QueryClientExtension => {\n  const client = useQueryClient();\n\n  return {\n    client,\n    \n    // Invalidate specific queries\n    invalidateQueries: async (queryKey: unknown[]) => {\n      await client.invalidateQueries({ queryKey });\n    },\n    \n    // Remove queries from cache\n    removeQueries: (queryKey: unknown[]) => {\n      client.removeQueries({ queryKey });\n    },\n    \n    // Set query data directly\n    setQueryData: <T>(queryKey: unknown[], data: T) => {\n      client.setQueryData(queryKey, data);\n    },\n    \n    // Get query data from cache\n    getQueryData: <T>(queryKey: unknown[]): T | undefined => {\n      return client.getQueryData<T>(queryKey);\n    },\n    \n    // Invalidate multiple query patterns\n    invalidateMultiple: async (queryKeys: unknown[][]) => {\n      await Promise.all(\n        queryKeys.map(queryKey => \n          client.invalidateQueries({ queryKey })\n        )\n      );\n    },\n    \n    // Prefetch a query\n    prefetchQuery: async <T>(\n      queryKey: unknown[], \n      queryFn: () => Promise<T>, \n      options?: { staleTime?: number }\n    ) => {\n      await client.prefetchQuery({\n        queryKey,\n        queryFn,\n        staleTime: options?.staleTime || 5 * 60 * 1000, // 5 minutes default\n      });\n    },\n    \n    // Clear all cached data\n    clearCache: () => {\n      client.clear();\n    },\n    \n    // Get approximate cache size (number of queries)\n    getCacheSize: () => {\n      return client.getQueryCache().getAll().length;\n    },\n    \n    // Refetch queries that have errors\n    refetchOnError: async (queryKey: unknown[]) => {\n      await client.refetchQueries({\n        queryKey,\n        type: 'all',\n      });\n    },\n    \n    // Reset error boundaries for failed queries\n    resetErrorBoundaries: () => {\n      client.resetQueries({\n        type: 'all',\n      });\n    },\n  };\n};\n\n// =============================================================================\n// Query Key Factories\n// =============================================================================\n\n/**\n * Query key factory helpers for consistent key generation\n */\nexport const queryKeys = {\n  // User-related queries\n  users: {\n    all: ['users'] as const,\n    list: (filters?: Record<string, any>) => ['users', 'list', filters] as const,\n    detail: (id: string) => ['users', 'detail', id] as const,\n    profile: (id: string) => ['users', 'profile', id] as const,\n  },\n  \n  // Patient-related queries\n  patients: {\n    all: ['patients'] as const,\n    list: (filters?: Record<string, any>) => ['patients', 'list', filters] as const,\n    detail: (id: string) => ['patients', 'detail', id] as const,\n    records: (patientId: string) => ['patients', patientId, 'records'] as const,\n  },\n  \n  // Appointment-related queries\n  appointments: {\n    all: ['appointments'] as const,\n    list: (filters?: Record<string, any>) => ['appointments', 'list', filters] as const,\n    detail: (id: string) => ['appointments', 'detail', id] as const,\n    byPatient: (patientId: string) => ['appointments', 'patient', patientId] as const,\n    byDoctor: (doctorId: string) => ['appointments', 'doctor', doctorId] as const,\n  },\n  \n  // Medical records\n  medicalRecords: {\n    all: ['medical-records'] as const,\n    list: (patientId: string) => ['medical-records', 'patient', patientId] as const,\n    detail: (id: string) => ['medical-records', 'detail', id] as const,\n  },\n  \n  // Prescriptions\n  prescriptions: {\n    all: ['prescriptions'] as const,\n    list: (patientId: string) => ['prescriptions', 'patient', patientId] as const,\n    detail: (id: string) => ['prescriptions', 'detail', id] as const,\n  },\n  \n  // Lab results\n  labResults: {\n    all: ['lab-results'] as const,\n    list: (patientId: string) => ['lab-results', 'patient', patientId] as const,\n    detail: (id: string) => ['lab-results', 'detail', id] as const,\n  },\n};\n\n// =============================================================================\n// Mutation Key Factories\n// =============================================================================\n\n/**\n * Mutation key factory helpers for consistent key generation\n */\nexport const mutationKeys = {\n  // User mutations\n  users: {\n    create: ['users', 'create'] as const,\n    update: (id: string) => ['users', 'update', id] as const,\n    delete: (id: string) => ['users', 'delete', id] as const,\n  },\n  \n  // Patient mutations\n  patients: {\n    create: ['patients', 'create'] as const,\n    update: (id: string) => ['patients', 'update', id] as const,\n    delete: (id: string) => ['patients', 'delete', id] as const,\n  },\n  \n  // Appointment mutations\n  appointments: {\n    create: ['appointments', 'create'] as const,\n    update: (id: string) => ['appointments', 'update', id] as const,\n    delete: (id: string) => ['appointments', 'delete', id] as const,\n    cancel: (id: string) => ['appointments', 'cancel', id] as const,\n    complete: (id: string) => ['appointments', 'complete', id] as const,\n  },\n  \n  // Authentication mutations\n  auth: {\n    login: ['auth', 'login'] as const,\n    logout: ['auth', 'logout'] as const,\n    register: ['auth', 'register'] as const,\n    refreshToken: ['auth', 'refresh'] as const,\n    changePassword: ['auth', 'change-password'] as const,\n  },\n};\n\n// =============================================================================\n// Error Recovery Utilities\n// =============================================================================\n\n/**\n * Utility functions for handling query errors and recovery\n */\nexport const queryErrorUtils = {\n  /**\n   * Check if an error is a network error\n   */\n  isNetworkError: (error: any): boolean => {\n    return error?.code === 'NETWORK_ERROR' || \n           error?.name === 'NetworkError' ||\n           !navigator.onLine;\n  },\n  \n  /**\n   * Check if an error is a server error (5xx)\n   */\n  isServerError: (error: any): boolean => {\n    return error?.status >= 500 && error?.status < 600;\n  },\n  \n  /**\n   * Check if an error is a client error (4xx)\n   */\n  isClientError: (error: any): boolean => {\n    return error?.status >= 400 && error?.status < 500;\n  },\n  \n  /**\n   * Check if an error is retryable\n   */\n  isRetryable: (error: any): boolean => {\n    return queryErrorUtils.isNetworkError(error) || \n           queryErrorUtils.isServerError(error);\n  },\n  \n  /**\n   * Get user-friendly error message\n   */\n  getErrorMessage: (error: any): string => {\n    if (queryErrorUtils.isNetworkError(error)) {\n      return 'Network connection error. Please check your internet connection.';\n    }\n    \n    if (error?.status === 401) {\n      return 'Authentication required. Please log in.';\n    }\n    \n    if (error?.status === 403) {\n      return 'You do not have permission to perform this action.';\n    }\n    \n    if (error?.status === 404) {\n      return 'The requested resource was not found.';\n    }\n    \n    if (queryErrorUtils.isServerError(error)) {\n      return 'Server error. Please try again later.';\n    }\n    \n    return error?.message || 'An unexpected error occurred.';\n  },\n};\n\n// Export the singleton client for use in services\nexport { getQueryClient };\n\n/*\nSelf-check comments:\n- [x] Uses `@/` imports only\n- [x] Uses providers/hooks (creates React Query provider with hooks)\n- [x] Reads config from `@/app/config` \n- [x] Exports default named component (QueryProvider)\n- [x] Adds basic ARIA and keyboard handlers (not applicable for query provider)\n- [x] Provides QueryClient with sensible defaults and error handling\n- [x] Integrates with event bus for cross-cutting concerns\n- [x] Includes React Query DevTools in development mode\n- [x] Provides extended hook with utility methods\n- [x] Includes query and mutation key factories for consistency\n- [x] Includes error recovery utilities\n- [x] Uses import.meta.env through config for environment variables\n*/\n```
+/**
+ * Extended hook that provides the QueryClient with additional utility methods
+ * for common operations like cache management and batch operations.
+ */
+export const useQueryClientExt = (): QueryClientExtension => {
+  const client = useQueryClient();
+
+  return {
+    client,
+    
+    // Invalidate specific queries
+    invalidateQueries: async (queryKey: unknown[]) => {
+      await client.invalidateQueries({ queryKey });
+    },
+    
+    // Remove queries from cache
+    removeQueries: (queryKey: unknown[]) => {
+      client.removeQueries({ queryKey });
+    },
+    
+    // Set query data directly
+    setQueryData: <T,>(queryKey: unknown[], data: T) => {
+      client.setQueryData(queryKey, data);
+    },
+    
+    // Get query data from cache
+    getQueryData: <T,>(queryKey: unknown[]): T | undefined => {
+      return client.getQueryData<T>(queryKey);
+    },
+    
+    // Invalidate multiple query patterns
+    invalidateMultiple: async (queryKeys: unknown[][]) => {
+      await Promise.all(
+        queryKeys.map(queryKey => 
+          client.invalidateQueries({ queryKey })
+        )
+      );
+    },
+    
+    // Prefetch a query
+    prefetchQuery: async <T,>(
+      queryKey: unknown[], 
+      queryFn: () => Promise<T>, 
+      options?: { staleTime?: number }
+    ) => {
+      await client.prefetchQuery({
+        queryKey,
+        queryFn,
+        staleTime: options?.staleTime || 5 * 60 * 1000, // 5 minutes default
+      });
+    },
+    
+    // Clear all cached data
+    clearCache: () => {
+      client.clear();
+    },
+    
+    // Get approximate cache size (number of queries)
+    getCacheSize: () => {
+      return client.getQueryCache().getAll().length;
+    },
+    
+    // Refetch queries that have errors
+    refetchOnError: async (queryKey: unknown[]) => {
+      await client.refetchQueries({
+        queryKey,
+        type: 'all',
+      });
+    },
+    
+    // Reset error boundaries for failed queries
+    resetErrorBoundaries: () => {
+      client.resetQueries({
+        type: 'all',
+      });
+    },
+  };
+};
+
+// =============================================================================
+// Query Key Factories
+// =============================================================================
+
+/**
+ * Query key factory helpers for consistent key generation
+ */
+export const queryKeys = {
+  // User-related queries
+  users: {
+    all: ['users'] as const,
+    list: (filters?: Record<string, any>) => ['users', 'list', filters] as const,
+    detail: (id: string) => ['users', 'detail', id] as const,
+    profile: (id: string) => ['users', 'profile', id] as const,
+  },
+  
+  // Patient-related queries
+  patients: {
+    all: ['patients'] as const,
+    list: (filters?: Record<string, any>) => ['patients', 'list', filters] as const,
+    detail: (id: string) => ['patients', 'detail', id] as const,
+    records: (patientId: string) => ['patients', patientId, 'records'] as const,
+  },
+  
+  // Appointment-related queries
+  appointments: {
+    all: ['appointments'] as const,
+    list: (filters?: Record<string, any>) => ['appointments', 'list', filters] as const,
+    detail: (id: string) => ['appointments', 'detail', id] as const,
+    byPatient: (patientId: string) => ['appointments', 'patient', patientId] as const,
+    byDoctor: (doctorId: string) => ['appointments', 'doctor', doctorId] as const,
+  },
+  
+  // Medical records
+  medicalRecords: {
+    all: ['medical-records'] as const,
+    list: (patientId: string) => ['medical-records', 'patient', patientId] as const,
+    detail: (id: string) => ['medical-records', 'detail', id] as const,
+  },
+  
+  // Prescriptions
+  prescriptions: {
+    all: ['prescriptions'] as const,
+    list: (patientId: string) => ['prescriptions', 'patient', patientId] as const,
+    detail: (id: string) => ['prescriptions', 'detail', id] as const,
+  },
+  
+  // Lab results
+  labResults: {
+    all: ['lab-results'] as const,
+    list: (patientId: string) => ['lab-results', 'patient', patientId] as const,
+    detail: (id: string) => ['lab-results', 'detail', id] as const,
+  },
+};
+
+// =============================================================================
+// Mutation Key Factories
+// =============================================================================
+
+/**
+ * Mutation key factory helpers for consistent key generation
+ */
+export const mutationKeys = {
+  // User mutations
+  users: {
+    create: ['users', 'create'] as const,
+    update: (id: string) => ['users', 'update', id] as const,
+    delete: (id: string) => ['users', 'delete', id] as const,
+  },
+  
+  // Patient mutations
+  patients: {
+    create: ['patients', 'create'] as const,
+    update: (id: string) => ['patients', 'update', id] as const,
+    delete: (id: string) => ['patients', 'delete', id] as const,
+  },
+  
+  // Appointment mutations
+  appointments: {
+    create: ['appointments', 'create'] as const,
+    update: (id: string) => ['appointments', 'update', id] as const,
+    delete: (id: string) => ['appointments', 'delete', id] as const,
+    cancel: (id: string) => ['appointments', 'cancel', id] as const,
+    complete: (id: string) => ['appointments', 'complete', id] as const,
+  },
+  
+  // Authentication mutations
+  auth: {
+    login: ['auth', 'login'] as const,
+    logout: ['auth', 'logout'] as const,
+    register: ['auth', 'register'] as const,
+    refreshToken: ['auth', 'refresh'] as const,
+    changePassword: ['auth', 'change-password'] as const,
+  },
+};
+
+// =============================================================================
+// Error Recovery Utilities
+// =============================================================================
+
+/**
+ * Utility functions for handling query errors and recovery
+ */
+export const queryErrorUtils = {
+  /**
+   * Check if an error is a network error
+   */
+  isNetworkError: (error: any): boolean => {
+    return error?.code === 'NETWORK_ERROR' || 
+           error?.name === 'NetworkError' ||
+           !navigator.onLine;
+  },
+  
+  /**
+   * Check if an error is a server error (5xx)
+   */
+  isServerError: (error: any): boolean => {
+    return error?.status >= 500 && error?.status <= 599;
+  },
+  
+  /**
+   * Check if an error is a client error (4xx)
+   */
+  isClientError: (error: any): boolean => {
+    return error?.status >= 400 && error?.status <= 499;
+  },
+  
+  /**
+   * Check if an error is retryable
+   */
+  isRetryable: (error: any): boolean => {
+    return queryErrorUtils.isNetworkError(error) || 
+           queryErrorUtils.isServerError(error);
+  },
+  
+  /**
+   * Get user-friendly error message
+   */
+  getErrorMessage: (error: any): string => {
+    if (queryErrorUtils.isNetworkError(error)) {
+      return 'Network connection error. Please check your internet connection.';
+    }
+    
+    if (error?.status === 401) {
+      return 'Authentication required. Please log in.';
+    }
+    
+    if (error?.status === 403) {
+      return 'You do not have permission to perform this action.';
+    }
+    
+    if (error?.status === 404) {
+      return 'The requested resource was not found.';
+    }
+    
+    if (queryErrorUtils.isServerError(error)) {
+      return 'Server error. Please try again later.';
+    }
+    
+    return error?.message || 'An unexpected error occurred.';
+  },
+};
+
+// Export the singleton client for use in services
+export { getQueryClient };
+
+/*
+Self-check comments:
+- [x] Uses `@/` imports only
+- [x] Uses providers/hooks (creates React Query provider with hooks)
+- [x] Reads config from `@/app/config` 
+- [x] Exports default named component (QueryProvider)
+- [x] Adds basic ARIA and keyboard handlers (not applicable for query provider)
+- [x] Provides QueryClient with sensible defaults and error handling
+- [x] Integrates with event bus for cross-cutting concerns
+- [x] Includes React Query DevTools in development mode
+- [x] Provides extended hook with utility methods
+- [x] Includes query and mutation key factories for consistency
+- [x] Includes error recovery utilities
+- [x] Uses import.meta.env through config for environment variables
+*/

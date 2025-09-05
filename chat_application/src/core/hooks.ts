@@ -165,7 +165,8 @@ export class HookRegistry {
     handlers.set(token, handler);
 
     if (this.debug) {
-      console.debug(`HookRegistry: Registered handler for '${point}' (token: ${token}, ${handlers.size} total)`);\n    }
+      console.debug(`HookRegistry: Registered handler for '${point}' (token: ${token}, ${handlers.size} total)`);
+    }
 
     return token;
   }
@@ -277,7 +278,8 @@ export class HookRegistry {
       for (const [token, handler] of handlerEntries) {
         if (context.stopPropagation) {
           if (this.debug) {
-            console.debug(`HookRegistry: Stopping propagation for '${point}' (remaining handlers skipped)`);\n          }
+            console.debug(`HookRegistry: Stopping propagation for '${point}' (remaining handlers skipped)`);
+          }
           break;
         }
 
@@ -286,7 +288,8 @@ export class HookRegistry {
     }
 
     if (this.debug) {
-      console.debug(`HookRegistry: Completed execution for '${point}'`);\n    }
+      console.debug(`HookRegistry: Completed execution for '${point}'`);
+    }
   }
 
   /**

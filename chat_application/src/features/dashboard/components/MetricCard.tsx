@@ -278,4 +278,145 @@ const MetricCard = memo<MetricCardProps>(({
               >
                 {icon}
               </div>
-            )}\n            <div className="min-w-0 flex-1">\n              <h3\n                className="font-medium text-gray-900 truncate"\n                style={{\n                  fontSize: styles.size.labelSize,\n                  lineHeight: theme.typography.lineHeight.tight,\n                }}\n              >\n                {label}\n              </h3>\n              {subtitle && (\n                <p\n                  className="text-gray-500 truncate"\n                  style={{\n                    fontSize: theme.typography.fontSize.xs,\n                    lineHeight: theme.typography.lineHeight.snug,\n                  }}\n                >\n                  {subtitle}\n                </p>\n              )}\n            </div>\n          </div>\n        </div>\n        \n        {/* Main value */}\n        <div className="flex items-end justify-between">\n          <div className="min-w-0 flex-1">\n            <p\n              className="font-bold text-gray-900 truncate"\n              style={{\n                fontSize: styles.size.valueSize,\n                lineHeight: theme.typography.lineHeight.none,\n                color: styles.variant.accent,\n              }}\n            >\n              {value}\n            </p>\n          </div>\n          \n          {/* Delta indicator */}\n          {deltaDisplay && (\n            <div \n              className="flex items-center space-x-1 text-sm font-medium flex-shrink-0 ml-2"\n              style={{ color: deltaDisplay.color }}\n            >\n              <span \n                className="text-xs"\n                aria-hidden="true"\n              >\n                {deltaDisplay.icon}\n              </span>\n              <span>{Math.abs(delta!.value)}{delta!.percentage ? '%' : ''}</span>\n              {delta!.period && (\n                <span className="text-xs text-gray-500 ml-1">\n                  {delta!.period}\n                </span>\n              )}\n            </div>\n          )}\n        </div>\n        \n        {/* Sparkline chart */}\n        {sparklineData && sparklineData.length > 0 && (\n          <div \n            className="mt-4"\n            style={{ height: styles.size.chartHeight }}\n          >\n            <Chart\n              type="line"\n              data={sparklineData}\n              options={{\n                responsive: true,\n                maintainAspectRatio: false,\n                plugins: {\n                  legend: {\n                    display: false,\n                  },\n                  tooltip: {\n                    enabled: false,\n                  },\n                },\n                scales: {\n                  x: {\n                    display: false,\n                  },\n                  y: {\n                    display: false,\n                  },\n                },\n                elements: {\n                  line: {\n                    borderWidth: 2,\n                    borderColor: styles.variant.accent,\n                    backgroundColor: 'transparent',\n                    tension: 0.4,\n                  },\n                  point: {\n                    radius: 0,\n                    hitRadius: 0,\n                  },\n                },\n                interaction: {\n                  intersect: false,\n                  mode: 'index',\n                },\n              }}\n              height={parseInt(styles.size.chartHeight)}\n              aria-label={`Trend chart for ${label}`}\n            />\n          </div>\n        )}\n      </div>\n      \n      {/* Focus indicator for keyboard navigation */}\n      {onClick && (\n        <div\n          className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-200 pointer-events-none focus-within:opacity-100"\n          style={{\n            boxShadow: `0 0 0 2px ${styles.variant.accent}`,\n          }}\n          aria-hidden="true"\n        />\n      )}\n    </Card>\n  );\n});\n\nMetricCard.displayName = 'MetricCard';\n\nexport { MetricCard };\nexport default MetricCard;\n\n/*\nSelf-check comments:\n- [x] Uses `@/` imports only\n- [x] Uses providers/hooks (no direct DOM/localStorage side effects)\n- [x] Reads config from `@/app/config` (uses theme system)\n- [x] Exports default named component\n- [x] Adds basic ARIA and keyboard handlers (accessible labels, keyboard navigation for interactive cards)\n*/\n```
+            )}
+            <div className="min-w-0 flex-1">
+              <h3
+                className="font-medium text-gray-900 truncate"
+                style={{
+                  fontSize: styles.size.labelSize,
+                  lineHeight: theme.typography.lineHeight.tight,
+                }}
+              >
+                {label}
+              </h3>
+              {subtitle && (
+                <p
+                  className="text-gray-500 truncate"
+                  style={{
+                    fontSize: theme.typography.fontSize.xs,
+                    lineHeight: theme.typography.lineHeight.snug,
+                  }}
+                >
+                  {subtitle}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        {/* Main value */}
+        <div className="flex items-end justify-between">
+          <div className="min-w-0 flex-1">
+            <p
+              className="font-bold text-gray-900 truncate"
+              style={{
+                fontSize: styles.size.valueSize,
+                lineHeight: theme.typography.lineHeight.none,
+                color: styles.variant.accent,
+              }}
+            >
+              {value}
+            </p>
+          </div>
+          
+          {/* Delta indicator */}
+          {deltaDisplay && (
+            <div 
+              className="flex items-center space-x-1 text-sm font-medium flex-shrink-0 ml-2"
+              style={{ color: deltaDisplay.color }}
+            >
+              <span 
+                className="text-xs"
+                aria-hidden="true"
+              >
+                {deltaDisplay.icon}
+              </span>
+              <span>{Math.abs(delta!.value)}{delta!.percentage ? '%' : ''}</span>
+              {delta!.period && (
+                <span className="text-xs text-gray-500 ml-1">
+                  {delta!.period}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {/* Sparkline chart */}
+        {sparklineData && sparklineData.length > 0 && (
+          <div 
+            className="mt-4"
+            style={{ height: styles.size.chartHeight }}
+          >
+            <Chart
+              type="line"
+              data={sparklineData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false,
+                  },
+                  tooltip: {
+                    enabled: false,
+                  },
+                },
+                scales: {
+                  x: {
+                    display: false,
+                  },
+                  y: {
+                    display: false,
+                  },
+                },
+                elements: {
+                  line: {
+                    borderWidth: 2,
+                    borderColor: styles.variant.accent,
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                  },
+                  point: {
+                    radius: 0,
+                    hitRadius: 0,
+                  },
+                },
+                interaction: {
+                  intersect: false,
+                  mode: 'index',
+                },
+              }}
+              height={parseInt(styles.size.chartHeight)}
+              aria-label={`Trend chart for ${label}`}
+            />
+          </div>
+        )}
+      </div>
+      
+      {/* Focus indicator for keyboard navigation */}
+      {onClick && (
+        <div
+          className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-200 pointer-events-none focus-within:opacity-100"
+          style={{
+            boxShadow: `0 0 0 2px ${styles.variant.accent}`,
+          }}
+          aria-hidden="true"
+        />
+      )}
+    </Card>
+  );
+});
+
+MetricCard.displayName = 'MetricCard';
+
+export { MetricCard };
+export default MetricCard;
+
+/*
+Self-check comments:
+- [x] Uses `@/` imports only
+- [x] Uses providers/hooks (no direct DOM/localStorage side effects)
+- [x] Reads config from `@/app/config` (uses theme system)
+- [x] Exports default named component
+- [x] Adds basic ARIA and keyboard handlers (accessible labels, keyboard navigation for interactive cards)
+*/
