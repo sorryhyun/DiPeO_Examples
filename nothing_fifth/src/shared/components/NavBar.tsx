@@ -55,6 +55,11 @@ const navigationItems: NavItem[] = [
     requiresAuth: true,
   },
   {
+    label: 'Components',
+    path: '/components',
+    requiresAuth: true,
+  },
+  {
     label: 'Patients',
     path: '/patients',
     requiresAuth: true,

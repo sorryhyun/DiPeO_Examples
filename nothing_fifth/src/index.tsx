@@ -19,9 +19,7 @@ function mountApp() {
   console.log('Mounting app...');
   
   root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+    <App />
   );
 
   // Initialize global event listeners for development

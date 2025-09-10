@@ -21,6 +21,7 @@ const HomePage = lazy(() => import('@/pages/HomePage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+const ComponentsShowcase = lazy(() => import('@/pages/ComponentsShowcase'));
 
 // ============================================================================
 // Layout Wrappers
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
         {
           path: 'dashboard',
           element: <DashboardPage />
+        },
+        {
+          path: 'components',
+          element: <ComponentsShowcase />
         }
       ]
     },

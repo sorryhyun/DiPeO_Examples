@@ -176,7 +176,8 @@ function inferTrend(delta?: MetricCardProps['delta']): MetricTrend {
 /**
  * Format the metric value for display
  */
-function formatValue(value: string | number): string {
+function formatValue(value: string | number | undefined | null): string {
+  if (value === undefined || value === null) return '0';
   if (typeof value === 'string') return value;
   
   // Format large numbers with abbreviations

@@ -112,7 +112,7 @@ export function useFetch<TData = unknown>(
     } finally {
       setIsLoading(false);
     }
-  }, [endpoint, options.enabled, queryKey]);
+  }, [endpoint, options.enabled, JSON.stringify(queryKey)]);
 
   useEffect(() => {
     fetchData();
@@ -221,7 +221,7 @@ export function useMutation<TData = unknown, TVariables = void>(
     } finally {
       setIsLoading(false);
     }
-  }, [endpoint, method, mutationKey, options]);
+  }, [endpoint, method, JSON.stringify(mutationKey), options]);
 
   const mutateAsync = useCallback(async (variables: TVariables): Promise<TData> => {
     return new Promise((resolve, reject) => {

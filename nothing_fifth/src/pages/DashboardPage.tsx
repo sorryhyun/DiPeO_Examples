@@ -6,7 +6,6 @@ import { EASINGS } from '@/theme/animations';
 import { User, Patient, Appointment, ApiResult, LoadingState } from '@/core/contracts';
 import { isDevelopment, shouldUseMockData } from '@/app/config';
 import { eventBus } from '@/core/events';
-import { AppLayout } from '@/shared/layouts/AppLayout';
 import { DashboardPanel } from '@/features/dashboard/DashboardPanel';
 import { useFetch } from '@/hooks/useFetch';
 import { dataService, DashboardMetrics } from '@/services/dataService';
@@ -226,9 +225,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // Show loading state during page initialization
   if (isPageLoading || userLoading) {
     return (
-      <AppLayout>
-        <div 
-          className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}
+      <div 
+        className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}
           role="main"
           aria-label="Loading dashboard"
         >
@@ -258,8 +256,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           </div>
           <span className="sr-only">Loading dashboard content...</span>
-        </div>
-      </AppLayout>
+      </div>
     );
   }
 
@@ -268,8 +265,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const errorMessage = pageError || userErrorDetail?.message || 'Failed to load dashboard';
     
     return (
-      <AppLayout>
-        <div 
+      <div 
           className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center ${className}`}
           role="main"
           aria-label="Dashboard error"
@@ -291,14 +287,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               </button>
             </div>
           </div>
-        </div>
-      </AppLayout>
+      </div>
     );
   }
 
   return (
-    <AppLayout>
-      <motion.div
+    <motion.div
         className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}
         variants={pageVariants}
         initial="initial"
@@ -429,8 +423,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           </motion.div>
         </div>
-      </motion.div>
-    </AppLayout>
+    </motion.div>
   );
 };
 
