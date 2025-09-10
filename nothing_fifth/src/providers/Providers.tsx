@@ -31,7 +31,7 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   React.useEffect(() => {
     // Initialize providers hook
-    hooks.invoke('providers:init', { config });
+    hooks.invoke('app:init', { config });
 
     // Emit provider initialization event
     eventBus.emit('data:updated', { 
@@ -62,12 +62,12 @@ export function Providers({ children }: ProvidersProps) {
 
       return () => {
         window.removeEventListener('error', handleProviderError);
-        hooks.invoke('providers:cleanup', { config });
+        hooks.invoke('app:cleanup', { config });
       };
     }
 
     return () => {
-      hooks.invoke('providers:cleanup', { config });
+      hooks.invoke('app:cleanup', { config });
     };
   }, []);
 

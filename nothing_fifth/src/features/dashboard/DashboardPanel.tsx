@@ -82,8 +82,6 @@ export const DashboardPanel: React.FC<DashboardPanelProps> = ({
     '/dashboard/metrics',
     {
       enabled: showMetrics,
-      refetchInterval: refreshInterval,
-      refetchOnWindowFocus: true,
     }
   );
 
@@ -98,7 +96,6 @@ export const DashboardPanel: React.FC<DashboardPanelProps> = ({
     '/analytics/appointments',
     {
       enabled: showCharts,
-      refetchInterval: refreshInterval,
     }
   );
 

@@ -106,7 +106,7 @@ export function ModalProvider({ children }: ModalProviderProps) {
           onClose={() => closeModal(modal.id)}
           title={modal.title}
           size={modal.size}
-          style={{ zIndex: 1000 + index }}
+          zIndex={1000 + index}
         >
           {modal.content}
         </Modal>

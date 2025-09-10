@@ -13,7 +13,7 @@ export type CardVariant = 'elevated' | 'outlined' | 'filled' | 'glass';
 export type CardSize = 'sm' | 'md' | 'lg' | 'xl';
 export type CardPadding = 'none' | 'sm' | 'md' | 'lg' | 'xl';
 
-export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'onAnimationStart' | 'onDragStart' | 'onDrag' | 'onDragEnd'> {
   /** Card content */
   children: ReactNode;
   

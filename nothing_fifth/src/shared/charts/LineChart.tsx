@@ -247,7 +247,7 @@ function createChartOptions(
             size: isSmallScreen ? 10 : 12,
           },
           color: '#6B7280',
-          callback: function(value) {
+          callback: function(value: string | number) {
             if (typeof value === 'number') {
               return value.toLocaleString();
             }
@@ -292,7 +292,7 @@ export const LineChart: React.FC<LineChartProps> = (props) => {
     
     // Add click handler if provided
     if (onPointClick) {
-      options.onClick = (event, elements) => {
+      options.onClick = (event: any, elements: any[]) => {
         if (elements.length > 0) {
           const element = elements[0];
           const datasetIndex = element.datasetIndex;

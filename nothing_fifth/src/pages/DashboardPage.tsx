@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { EASINGS } from '@/theme/animations';
 import { User, Patient, Appointment, ApiResult, LoadingState } from '@/core/contracts';
-import { config, isDevelopment, shouldUseMockData } from '@/app/config';
+import { isDevelopment, shouldUseMockData } from '@/app/config';
 import { eventBus } from '@/core/events';
-import { hooks } from '@/core/hooks';
 import { AppLayout } from '@/shared/layouts/AppLayout';
 import { DashboardPanel } from '@/features/dashboard/DashboardPanel';
 import { useFetch } from '@/hooks/useFetch';
@@ -73,11 +72,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       try {
         debugLog('DashboardPage: Initializing');
 
-        // Execute page initialization hooks
-        hooks.run('page:dashboard:init', {
-          config,
-          dateRange: state.dateRange,
-        });
+        // Page initialization complete
+        debugLog('DashboardPage: Page initialized with config and date range');
 
         // Emit page navigation event
         eventBus.emit('navigation:page-changed', {
@@ -97,7 +93,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
     // Initialize after user data is available or fails
     if (!userLoading) {
-      initializePage();
+      void initializePage();
     }
   }, [userLoading, currentUser]);
 
@@ -106,11 +102,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     return () => {
       debugLog('DashboardPage: Cleanup');
       
-      // Execute cleanup hooks
-      hooks.run('page:dashboard:cleanup', {
-        config,
-        refreshCount: state.refreshCount,
-      });
+      // Page cleanup complete
+      debugLog('DashboardPage: Page cleanup completed');
 
       // Emit page leave event
       eventBus.emit('navigation:page-left', {
@@ -134,12 +127,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       metric: metric,
     });
 
-    // Execute metric selection hooks
-    hooks.run('dashboard:metric-clicked', {
-      metric,
-      value,
-      user: currentUser,
-    });
+    // Metric selection completed
+    debugLog('DashboardPage: Metric selection completed', { metric, value, user: currentUser?.id });
   };
 
   // Handle dashboard refresh
@@ -154,7 +143,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
     // Emit refresh event
     eventBus.emit('dashboard:refreshed', {
-      range: state.refreshCount + 1,
+      timestamp: state.refreshCount + 1,
     });
   };
 

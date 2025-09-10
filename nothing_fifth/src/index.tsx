@@ -1,11 +1,10 @@
-// filepath: src/main.tsx
+// filepath: src/index.tsx
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
-import { Providers } from './providers/Providers';
-import { config } from './app/config';
-import { eventBus } from './core/events';
-import './styles/global.css';
+import App from '@/app/App';
+import { config } from '@/app/config';
+import { eventBus } from '@/core/events';
+import '@/styles/global.css';
 
 // Mount the application to the DOM
 function mountApp() {
@@ -17,11 +16,11 @@ function mountApp() {
 
   const root = createRoot(rootElement);
   
+  console.log('Mounting app...');
+  
   root.render(
     <React.StrictMode>
-      <Providers>
-        <App />
-      </Providers>
+      <App />
     </React.StrictMode>
   );
 

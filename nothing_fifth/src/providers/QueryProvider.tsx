@@ -25,7 +25,7 @@ function createQueryClient(): QueryClient {
         gcTime: 10 * 60 * 1000,
         
         // Retry configuration
-        retry: (failureCount, error: any) => {
+        retry: (failureCount: number, error: any) => {
           // Don't retry on 4xx errors (client errors)
           if (error?.status >= 400 && error?.status < 500) {
             return false;
@@ -36,7 +36,7 @@ function createQueryClient(): QueryClient {
         },
         
         // Retry delay with exponential backoff
-        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+        retryDelay: (attemptIndex: number) => Math.min(1000 * 2 ** attemptIndex, 30000),
         
         // Refetch on window focus only in development
         refetchOnWindowFocus: isDevelopment,
@@ -61,7 +61,7 @@ function createQueryClient(): QueryClient {
     
     // Global query error handling
     queryCache: new QueryCache({
-      onError: (error, query) => {
+      onError: (error: Error, query: any) => {
         const errorMessage = error instanceof Error ? error.message : String(error);
         
         errorLog(`Query failed: ${query.queryKey.join(' -> ')}`, error instanceof Error ? error : new Error(errorMessage));
@@ -81,7 +81,7 @@ function createQueryClient(): QueryClient {
         });
       },
       
-      onSuccess: (data, query) => {
+      onSuccess: (data: any, query: any) => {
         if (isDevelopment) {
           debugLog(`Query succeeded: ${query.queryKey.join(' -> ')}`, data);
         }
@@ -90,7 +90,7 @@ function createQueryClient(): QueryClient {
     
     // Global mutation error handling
     mutationCache: new MutationCache({
-      onError: (error, variables, context, mutation) => {
+      onError: (error: Error, variables: any, context: any, mutation: any) => {
         const errorMessage = error instanceof Error ? error.message : String(error);
         
         errorLog(`Mutation failed: ${mutation.options.mutationKey?.join(' -> ') || 'unknown'}`, error instanceof Error ? error : new Error(errorMessage));
@@ -110,7 +110,7 @@ function createQueryClient(): QueryClient {
         });
       },
       
-      onSuccess: (data, variables, context, mutation) => {
+      onSuccess: (data: any, variables: any, context: any, mutation: any) => {
         if (isDevelopment) {
           debugLog(`Mutation succeeded: ${mutation.options.mutationKey?.join(' -> ') || 'unknown'}`, data);
         }
@@ -171,14 +171,7 @@ export function QueryProvider({ children }: QueryProviderProps): JSX.Element {
       {isDevelopment && (
         <ReactQueryDevtools
           initialIsOpen={false}
-          position="bottom-right"
-          toggleButtonProps={{
-            'aria-label': 'Toggle React Query DevTools',
-            style: {
-              transform: 'scale(0.8)',
-              transformOrigin: 'bottom right',
-            },
-          }}
+          position="bottom"
         />
       )}
     </QueryClientProvider>
@@ -190,18 +183,10 @@ export function QueryProvider({ children }: QueryProviderProps): JSX.Element {
 // ============================================================================
 
 /**
- * Hook to access the QueryClient instance
- * Useful for manual cache invalidation or manipulation
+ * Re-export the useQueryClient hook from @tanstack/react-query
+ * This provides access to the QueryClient instance for manual cache invalidation or manipulation
  */
-export function useQueryClient() {
-  const client = React.useContext(QueryClientProvider as any)?._context?._currentValue;
-  
-  if (!client) {
-    throw new Error('useQueryClient must be used within a QueryProvider');
-  }
-  
-  return client as QueryClient;
-}
+export { useQueryClient } from '@tanstack/react-query';
 
 // ============================================================================
 // HELPER UTILITIES

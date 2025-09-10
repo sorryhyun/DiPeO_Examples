@@ -77,6 +77,7 @@ const gradientPresets = {
   aurora: 'linear-gradient(135deg, #d299c2 0%, #fef9d7 50%, #89f7fe 100%)',
   sunset: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)',
   ocean: 'linear-gradient(135deg, #667db6 0%, #0082c8 25%, #0082c8 75%, #667db6 100%)',
+  custom: '',
 } as const;
 
 const blurIntensities = {
@@ -190,7 +191,7 @@ export const GradientBackground: React.FC<GradientBackgroundProps> = ({
   });
   
   // Get final gradient value
-  const finalGradient = gradient || gradientPresets[variant];
+  const finalGradient = gradient || (variant === 'custom' ? gradient : gradientPresets[variant]);
   
   // Build CSS classes
   const containerClasses = [

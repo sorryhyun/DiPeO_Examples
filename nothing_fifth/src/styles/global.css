@@ -1,5 +1,10 @@
 /* filepath: src/styles/global.css */
 
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ============================================================================ */
 /* CSS Custom Properties (CSS Variables) */
 /* ============================================================================ */
@@ -673,7 +678,7 @@ a:focus-visible {
 /* High Contrast Mode Support */
 /* ============================================================================ */
 
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   :root {
     --color-border: #000000;
     --color-text-secondary: #000000;

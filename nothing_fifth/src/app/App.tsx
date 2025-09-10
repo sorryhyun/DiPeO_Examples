@@ -137,19 +137,7 @@ const App: React.FC = () => {
 
   return (
     <AppErrorBoundary>
-      <ToastProvider>
-        <Suspense fallback={<AppSuspenseFallback />}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key="app-container"
-              {...pageTransitions.fade}
-              className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100"
-            >
-              <AppRouter />
-            </motion.div>
-          </AnimatePresence>
-        </Suspense>
-      </ToastProvider>
+      <AppRouter />
     </AppErrorBoundary>
   );
 };

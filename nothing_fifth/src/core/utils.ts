@@ -40,15 +40,15 @@ export function formatDate(
  * Utility to join class names and support conditional class maps
  */
 export function classNames(
-  ...items: Array<string | false | null | undefined | Record<string, boolean>>
+  ...items: Array<string | number | false | null | undefined | Record<string, boolean>>
 ): string {
   const classes: string[] = [];
 
   for (const item of items) {
     if (!item) continue;
 
-    if (typeof item === 'string') {
-      classes.push(item);
+    if (typeof item === 'string' || typeof item === 'number') {
+      classes.push(String(item));
     } else if (typeof item === 'object') {
       for (const [className, condition] of Object.entries(item)) {
         if (condition) {
@@ -133,6 +133,39 @@ export function formatCurrency(value: number, currency = 'USD'): string {
  */
 export function formatPercentage(value: number, decimals = 1): string {
   return `${(value * 100).toFixed(decimals)}%`;
+}
+
+/**
+ * Safe async wrapper that returns a result object with error handling
+ */
+export interface AsyncResult<T> {
+  data: T | null;
+  error: Error | null;
+  success: boolean;
+}
+
+/**
+ * Wraps an async function to always return a safe result object
+ */
+export function safeAsync<TArgs extends any[], TReturn>(
+  fn: (...args: TArgs) => Promise<TReturn>
+): (...args: TArgs) => Promise<AsyncResult<TReturn>> {
+  return async (...args: TArgs): Promise<AsyncResult<TReturn>> => {
+    try {
+      const data = await fn(...args);
+      return {
+        data,
+        error: null,
+        success: true,
+      };
+    } catch (error) {
+      return {
+        data: null,
+        error: error instanceof Error ? error : new Error(String(error)),
+        success: false,
+      };
+    }
+  };
 }
 
 // Self-Check Comments:

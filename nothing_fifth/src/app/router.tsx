@@ -8,10 +8,10 @@ import {
   Outlet 
 } from 'react-router-dom';
 import { config, isFeatureEnabled } from '@/app/config';
-import { useAuth } from '@/hooks/useAuth';
 import { Spinner } from '@/shared/components/Spinner';
 import { AppLayout } from '@/shared/layouts/AppLayout';
-import { AuthLayout } from '@/shared/layouts/AuthLayout';
+import { ProtectedPage } from '@/shared/components/ProtectedPage';
+import { Providers } from '@/providers/Providers';
 
 // ============================================================================
 // Lazy-loaded Pages
@@ -23,156 +23,110 @@ const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // ============================================================================
-// Route Guards
-// ============================================================================
-
-interface ProtectedRouteProps {
-  children?: React.ReactNode;
-}
-
-function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children || <Outlet />}</>;
-}
-
-function PublicRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <>{children || <Outlet />}</>;
-}
-
-// ============================================================================
 // Layout Wrappers
 // ============================================================================
 
-function AppLayoutWrapper() {
+function ProtectedLayout() {
   return (
-    <AppLayout>
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <Spinner size="lg" />
-        </div>
-      }>
-        <Outlet />
-      </Suspense>
-    </AppLayout>
+    <Providers>
+      <ProtectedPage requireAuth={true}>
+        <AppLayout>
+          <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <Spinner size="lg" />
+            </div>
+          }>
+            <Outlet />
+          </Suspense>
+        </AppLayout>
+      </ProtectedPage>
+    </Providers>
   );
 }
 
-function AuthLayoutWrapper() {
+function PublicLayout() {
   return (
-    <AuthLayout>
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <Spinner size="lg" />
-        </div>
-      }>
-        <Outlet />
-      </Suspense>
-    </AuthLayout>
+    <Providers>
+      <ProtectedPage requireAuth={false}>
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <Spinner size="lg" />
+          </div>
+        }>
+          <Outlet />
+        </Suspense>
+      </ProtectedPage>
+    </Providers>
   );
 }
 
-// ============================================================================
-// Router Configuration
-// ============================================================================
-
-const router = createBrowserRouter([
-  // Public routes (auth layout)
-  {
-    path: '/auth',
-    element: <AuthLayoutWrapper />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/auth/login" replace />
-      },
-      {
-        path: 'login',
-        element: (
-          <PublicRoute>
-            <LoginPage />
-          </PublicRoute>
-        )
-      }
-    ]
-  },
-  
-  // Legacy login route redirect
-  {
-    path: '/login',
-    element: <Navigate to="/auth/login" replace />
-  },
-
-  // Protected routes (app layout)
-  {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <AppLayoutWrapper />
-      </ProtectedRoute>
-    ),
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/dashboard" replace />
-      },
-      {
-        path: 'home',
-        element: <HomePage />
-      },
-      {
-        path: 'dashboard',
-        element: <DashboardPage />
-      }
-    ]
-  },
-
-  // 404 Not Found
-  {
-    path: '*',
-    element: (
-      <Suspense fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <Spinner size="lg" />
-        </div>
-      }>
-        <NotFoundPage />
-      </Suspense>
-    )
-  }
-], {
-  basename: config.isDevelopment ? '/' : undefined
-});
+// Note: Auth checks will be handled in AppLayout and pages directly
+// since useAuth needs to be called inside the AuthProvider context
 
 // ============================================================================
 // Main Router Component
 // ============================================================================
+
+// Create router outside component to avoid recreation
+const router = createBrowserRouter([
+    // Public routes with auth layout
+    {
+      path: '/auth',
+      element: <PublicLayout />,
+      children: [
+        {
+          path: '',
+          element: <Navigate to="/auth/login" replace />
+        },
+        {
+          path: 'login',
+          element: <LoginPage />
+        }
+      ]
+    },
+    
+    // Legacy login route redirect  
+    {
+      path: '/login',
+      element: <Navigate to="/auth/login" replace />
+    },
+
+    // Protected routes with app layout
+    {
+      path: '/',
+      element: <ProtectedLayout />,
+      children: [
+        {
+          path: '',
+          element: <Navigate to="/dashboard" replace />
+        },
+        {
+          path: 'home',
+          element: <HomePage />
+        },
+        {
+          path: 'dashboard',
+          element: <DashboardPage />
+        }
+      ]
+    },
+
+    // 404 Not Found
+    {
+      path: '*',
+      element: (
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <Spinner size="lg" />
+          </div>
+        }>
+          <NotFoundPage />
+        </Suspense>
+      )
+    }
+  ], {
+    basename: config.isDevelopment ? '/' : undefined
+  });
 
 export function AppRouter() {
   return <RouterProvider router={router} />;

@@ -13,7 +13,7 @@ import { classNames } from '@/core/utils';
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'subtle' | 'danger';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'size' | 'onAnimationStart' | 'onDragStart' | 'onDrag' | 'onDragEnd'> {
   /** Button content */
   children: ReactNode;
   
