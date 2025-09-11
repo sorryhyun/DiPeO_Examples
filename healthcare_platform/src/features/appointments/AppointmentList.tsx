@@ -1,1 +1,0 @@
-Looking at the requirements, I need to generate the AppointmentList component that displays appointments with status and cancellation functionality. Let me read the existing files to understand the type definitions and hook implementations.
